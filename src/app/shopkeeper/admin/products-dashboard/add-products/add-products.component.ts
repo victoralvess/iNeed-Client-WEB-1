@@ -6,13 +6,13 @@ import { SelectItem } from 'primeng/primeng';
 import { Message } from 'primeng/primeng';
 import * as firebase from 'firebase';
 
-@Component({
+@Component({ 
   selector: 'app-add-products',
   templateUrl: './add-products.component.html',
   styleUrls: ['./add-products.component.css']
 })
 export class AddProductsComponent implements OnInit {
- categories: SelectItem[];
+ categories: SelectItem[] = [{ label : '123', value : '123' }];
   stores = [];
   selectAtLeastOneStore : boolean = true; 
   whitespaceError : boolean = false;
@@ -20,7 +20,9 @@ export class AddProductsComponent implements OnInit {
   storesGroup : FormGroup;
 	user : firebase.User;
   selectedCategories: any[];
- 
+  files = [];
+  growlMessages : Message[] = [];
+
   constructor(private fb: FormBuilder, private productsService : ProductsService) { 
   	this.productsForm = new FormGroup({
   		name : new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])),
@@ -41,10 +43,10 @@ export class AddProductsComponent implements OnInit {
           this.whitespaceError = true;
         } else {
           this.whitespaceError = false;
-        }
+        } 
         return value;
     });
-
+ 
     productsService.getUser().subscribe((user) => {
     	console.log('worksat', user.worksAt);
 	   	user.worksAt.forEach(store => {
@@ -62,10 +64,9 @@ export class AddProductsComponent implements OnInit {
   }
 
   ngOnInit() {}  
-growlMessages : Message[] = [];
+
   addNewProduct(data) {
     
-    console.log(data);
     if(data.name.trim().length < 3 || data.description.trim().length < 20) {
     	this.whitespaceError = true;
     	return;
@@ -84,6 +85,16 @@ growlMessages : Message[] = [];
     	return;
     }
 
+    if(this.files.length == 0) {
+      this.growlMessages = [{severity: 'error', summary: 'Erro', detail: 'Adicione alguma imagem (.png, .jpg, .jpeg) antes de continuar!'}];  
+      setTimeout(() => {
+        this.growlMessages = [];
+      }, 5000)
+      return;
+    }
+
+    data.images = this.files;
+    console.log(this.files);
     data.stores = this.stores
               		.filter(store => store.checked)
               		.map(store => store.id);
@@ -97,35 +108,20 @@ growlMessages : Message[] = [];
       }, 5000)
     });
   }
-files = [];
+  
   imageFinishedUploading(file) {
-  console.log(JSON.stringify(file));
-
-  let byteString = atob(file.src.split(',')[1]);
-  let mimeString = file.src.split(',')[0].split(':')[1].split(';')[0]
-
-  let arrayBuffer = new ArrayBuffer(byteString.length);
-  let uInt8Array = new Uint8Array(arrayBuffer);
-  for (let i = 0; i < byteString.length; i++) {
-      uInt8Array[i] = byteString.charCodeAt(i);
-  }
-
-  let blob = new Blob([arrayBuffer]);
-  this.files.push(file.src);
-  console.log(this.files);
-  //firebase.storage().ref('teste.png').put(blob).then(function(snapshot) {
-    //console.log('Uploaded a blob or file!');
-  //});
+    console.log(file, file.file.type);
+    if(file.file.type != 'image/jpeg' && file.file.type != 'image/png') {
+      return;
+    }
+    this.files.push(file);  
   }
 
   imageRemoved(file) {
-    // do some stuff with the removed file.
     this.files.splice(this.files.indexOf(file.src), 1);
-    console.log(this.files);
   }
 
   uploadStateChange(state: boolean) {
     console.log(JSON.stringify(state));
-  }
- 
+  } 
 }

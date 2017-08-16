@@ -3,6 +3,8 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AuthService } from '../../../../shared/services/services-auth/auth.service';
 
+import { UUID } from 'angular2-uuid';
+
 import * as firebase from 'firebase/app';
 import 'rxjs/add/operator/map';
 
@@ -43,8 +45,8 @@ export class ProductsService {
 
       let key = firebase.database().ref(`/products`).push(newProduct).key;   
       firebase.database().ref(`/products-stores/${store}/${key}`).set(newProduct);
-      this.setCategories(product, store, key);      
-         
+      this.setCategories(product, store, key);     
+      this.uploadImages(product.images, store);
     });  	
   }
 
@@ -77,6 +79,27 @@ export class ProductsService {
 
   getCategoriesFrom(product) {
     return Object.keys(product.categories);
+  }
+
+  uploadImages(files : any[], store : any) {
+    files.forEach((file) => {
+      let byteString = atob(file.src.split(',')[1]);
+      let mimeString = file.src.split(',')[0].split(':')[1].split(';')[0]
+
+      let arrayBuffer = new ArrayBuffer(byteString.length);
+      let uInt8Array = new Uint8Array(arrayBuffer);
+      for (let i = 0; i < byteString.length; i++) {
+          uInt8Array[i] = byteString.charCodeAt(i);
+      }
+
+      let blob = new Blob([arrayBuffer]);
+      /*UPLOAD ADDITIONAL INFO*/
+      let uuid = UUID.UUID();
+      let ext = mimeString.split('/')[1];      
+      let metadata = { contentType: mimeString };
+      console.log(uuid);
+      firebase.storage().ref(`${store}/${uuid}.${ext}`).put(blob, metadata);   
+    });      
   }
 
 }

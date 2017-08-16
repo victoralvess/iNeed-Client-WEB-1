@@ -13,7 +13,7 @@ import { HomeComponent } from './home/home.component';
 import { AuthService } from './shared/services/services-auth/auth.service';
 import { VerifyAuth } from './shared/services/verify-auth/verify-auth';
 
-@NgModule({
+@NgModule({ 
   declarations: [
     AppComponent,
     HomeComponent

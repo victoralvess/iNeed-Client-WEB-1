@@ -25,11 +25,11 @@
     <aside *ngIf="!selectAtLeastOneStore" class="alert alert-danger">Onde será vendido? Escolha, ao menos, uma loja.</aside> 	 
   </div>
   <aside *ngIf="whitespaceError" class="alert alert-danger">Boa tentativa, mas hoje não. Preencha os campos com caracteres válidos</aside>
-  <p-multiSelect [options]="categories" formControlName ="selectedCategories"></p-multiSelect>
+  <p-multiSelect [options]="categories" formControlName ="selectedCategories" defaultLabel="Escolha"></p-multiSelect>
   <image-upload [max]="2" [extensions]="['jpeg','png']"
   (onFileUploadFinish)="imageFinishedUploading($event)"
-  (onRemove)="imageRemoved($event)"
+  (onRemove)="imageRemoved($event)" 
   (isPending)="uploadStateChange($event)"></image-upload>
 	<button class="btn" type="submit" [disabled]="!productsForm.valid">Adicionar</button>	  
 </form>
-<p-growl [value]="growlMessages"></p-growl>
+<p-growl [value]="growlMessages"></p-growl>  
