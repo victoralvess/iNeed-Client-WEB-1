@@ -19,5 +19,8 @@
 </div>
 <aside *ngIf="whitespaceError" class="alert alert-danger">Boa tentativa, mas hoje não. Preencha os campos com caracteres válidos</aside>
 <p-multiSelect [options]="categories" formControlName ="selectedCategories"></p-multiSelect>
+<div *ngFor="let image of images | async">
+  <img width="150" height="150" [src]="image.downloadURL" (click)="removeImage(image.$key, image.uuid, image.imageExt)">
+</div>
 <button class="btn" type="submit" [disabled]="!productsForm.valid">Atualizar</button>	  
 </form>	 

@@ -8,6 +8,7 @@ import { UUID } from 'angular2-uuid';
 import * as firebase from 'firebase/app';
 import 'rxjs/add/operator/map';
 
+import { AddProductsComponent } from '../add-products/add-products.component'
 @Injectable()
 export class ProductsService {
 
@@ -25,9 +26,9 @@ export class ProductsService {
     return this.db.list(`/categories`); 
   }
 
-  getProductsFrom(thisStore, query?) {
+  getProductsFrom(thisStore, params?) {
 		return this.db.list(`/products-stores/${thisStore}`, {
-      query : query || {
+      query : params || {
         orderByChild: 'name'
       }
 		}); 
@@ -43,10 +44,10 @@ export class ProductsService {
         store : store
       };
 
-      let key = firebase.database().ref(`/products`).push(newProduct).key;   
-      firebase.database().ref(`/products-stores/${store}/${key}`).set(newProduct);
+      let key = this.db.database.ref(`/products`).push(newProduct).key;   
+      this.db.database.ref(`/products-stores/${store}/${key}`).set(newProduct);
       this.setCategories(product, store, key);     
-      this.uploadImages(product.images, store);
+      this.uploadImages(product.images, store, key);
     });  	
   }
 
@@ -57,10 +58,10 @@ export class ProductsService {
       price : product.price
     };
 
-    firebase.database().ref(`products/${product.productId}`).update(updatedProduct);
+    this.db.database.ref(`products/${product.productId}`).update(updatedProduct);
 
     this.db.object(`products/${product.productId}`).subscribe((databaseProduct) => {      
-      firebase.database().ref(`/products-stores/${databaseProduct.store}/${product.productId}`).update(updatedProduct);
+      this.db.database.ref(`/products-stores/${databaseProduct.store}/${product.productId}`).update(updatedProduct);
       this.setCategories(product, databaseProduct.store, product.productId);
     });
     
@@ -68,12 +69,12 @@ export class ProductsService {
 
   setCategories(product, store, productId) {
 
-    firebase.database().ref(`/products/${productId}/categories`).remove();
-    firebase.database().ref(`/products-stores/${store}/${productId}/categories`).remove();
+    this.db.database.ref(`/products/${productId}/categories`).remove();
+    this.db.database.ref(`/products-stores/${store}/${productId}/categories`).remove();
     
     product.selectedCategories.forEach((category) => {      
-      firebase.database().ref(`/products/${productId}/categories/${category}`).set(true);
-      firebase.database().ref(`/products-stores/${store}/${productId}/categories/${category}`).set(true);
+      this.db.database.ref(`/products/${productId}/categories/${category}`).set(true);
+      this.db.database.ref(`/products-stores/${store}/${productId}/categories/${category}`).set(true);
     });
   }
 
@@ -81,7 +82,7 @@ export class ProductsService {
     return Object.keys(product.categories);
   }
 
-  uploadImages(files : any[], store : any) {
+  uploadImages(files : any[], store : any, productKey) {
     files.forEach((file) => {
       let byteString = atob(file.src.split(',')[1]);
       let mimeString = file.src.split(',')[0].split(':')[1].split(';')[0]
@@ -96,10 +97,50 @@ export class ProductsService {
       /*UPLOAD ADDITIONAL INFO*/
       let uuid = UUID.UUID();
       let ext = mimeString.split('/')[1];      
-      let metadata = { contentType: mimeString };
+      let metadata = { 
+        contentType: mimeString
+      };
       console.log(uuid);
-      firebase.storage().ref(`${store}/${uuid}.${ext}`).put(blob, metadata);   
+      let uploadTask = firebase.storage().ref(`${store}/${productKey}/${uuid}.${ext}`).put(blob, metadata);
+      uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, (snapshot) => {
+        let up = snapshot as firebase.storage.UploadTaskSnapshot;
+        let progress = (up.bytesTransferred / up.totalBytes) * 100;
+        console.log(uuid, 'Upload is ' + progress + '% done');
+      });
+
+      uploadTask.then((snapshot) => {        
+        let image = {
+          downloadURL: snapshot.downloadURL,
+          uuid: uuid,
+          imageExt: ext
+        };
+        this.db.database.ref(`/products/${productKey}/pictures/`).push(image);
+        this.db.database.ref(`/products-stores/${store}/${productKey}/pictures/`).push(image);
+      });   
     });      
+  }
+
+  getImagesFrom(thisProduct) {
+    return this.db.list(`/products/${thisProduct}/pictures/`);
+  }
+
+  removeImageFrom(productId, image, uuid, ext) {
+    this.getStoreFrom(productId).subscribe(store => {
+      console.log(store.$value);
+      firebase.storage().ref(`${store.$value}/${productId}/${uuid}.${ext}`).delete().then((success) => {
+        this.db.database.ref(`/products/${productId}/pictures/${image}`).remove();
+        this.db.database.ref(`/products-stores/${store.$value}/${productId}/pictures/${image}`).remove();
+      });
+    });     
+  }
+
+  getStoreFrom(thisProduct) {
+    return this.db.object(`/products/${thisProduct}/store`); 
+  }
+
+  deleteProduct(key, store) {
+    this.db.database.ref(`/products/${key}`).remove();
+    this.db.database.ref(`/products-stores/${store}/${key}`).remove();
   }
 
 }

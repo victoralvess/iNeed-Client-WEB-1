@@ -31,6 +31,7 @@
     "fuse.js": "^3.0.5",
     "jquery": "^3.2.1",
     "ngx-bootstrap": "^1.8.0",
+    "ngx-modialog": "^3.0.2",
     "ngx-pagination": "^3.0.1",
     "primeng": "^4.1.1",
     "primeui": "^4.1.15",
