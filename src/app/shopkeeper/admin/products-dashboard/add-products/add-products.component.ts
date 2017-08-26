@@ -12,8 +12,9 @@ import * as firebase from 'firebase';
   styleUrls: ['./add-products.component.css']
 })
 export class AddProductsComponent implements OnInit {
- categories: SelectItem[] = [{ label : '123', value : '123' }];
   stores = [];
+  categories: SelectItem[];
+  
   selectAtLeastOneStore : boolean = true; 
   whitespaceError : boolean = false;
   productsForm : FormGroup;

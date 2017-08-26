@@ -31,7 +31,7 @@
 	    			<a class="no-decoration" href="/shopkeeper/dashboard/admin/products/edit/{{product.$key}}">
 	    				<span class="material-icons">edit</span>
 	    			</a>
-	    			<a href="/shopkeeper/dashboard/admin/products/delete/{{product.$key}}">
+	    			<a (click)="deleteProduct(product.$key, product.store)">
 	    				<span class="material-icons">delete</span>
 	    			</a>
 	    		</td>

@@ -3,6 +3,7 @@ import { ProductsService } from '../services/products.service';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { SelectItem } from 'primeng/primeng';
+import { FirebaseListObservable } from 'angularfire2/database';
 
 @Component({
   selector: 'app-edit-products',
@@ -16,6 +17,8 @@ export class EditProductsComponent implements OnInit {
 	user : firebase.User;
 	productId : any;
   categories: SelectItem[];
+
+  images : FirebaseListObservable<any>;
 
   constructor(private fb: FormBuilder, private productsService : ProductsService, private activatedRoute: ActivatedRoute) { 
 
@@ -59,6 +62,7 @@ export class EditProductsComponent implements OnInit {
         this.categories = auxArray;
       });
 
+      this.images = productsService.getImagesFrom(this.productId);
     });
   }
 
@@ -76,6 +80,10 @@ export class EditProductsComponent implements OnInit {
     data.productId = this.productId;
 
     this.productsService.updateProduct(data);
+  }
+
+  removeImage(key, uuid, ext) {
+    this.productsService.removeImageFrom(this.productId, key, uuid, ext);
   }
 
 }
