@@ -14,15 +14,23 @@ export class EditProductsComponent implements OnInit {
 
   whitespaceError : boolean = false;
   productsForm : FormGroup;
-	user : firebase.User;
-	productId : any;
+  user : firebase.User;
+  productId : any;
   categories: SelectItem[];
+  imagesToShow = [];
+  removedImages = [];
+  overlayText = 'Remover';
+  productStore = '';
+  productsPics = [];
+  hasLessThanLimit : boolean = false;
+  upToLimitPics : number;
+  picsLimit = 5;
+  savedPicsQty = 0;
+  filesFromImageUpload = [];
+  
+  constructor(private fb: FormBuilder, private productsService : ProductsService, private activatedRoute: ActivatedRoute, private router : Router) { 
 
-  images : FirebaseListObservable<any>;
-
-  constructor(private fb: FormBuilder, private productsService : ProductsService, private activatedRoute: ActivatedRoute) { 
-
-  	this.productsForm = new FormGroup({
+    this.productsForm = new FormGroup({
       name : new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])),
       description: new FormControl('', Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])),
       price: new FormControl('', Validators.required),
@@ -45,14 +53,24 @@ export class EditProductsComponent implements OnInit {
 
       this.productId = params['productId'];
 
-  		this.productsService.db.object(`products/${this.productId}`).subscribe((foundProduct) => {
-  			this.productsForm = fb.group({
-		  		name : [foundProduct.name, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])],
-		  		description: [foundProduct.description, Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])],
-		  		price: [foundProduct.price, Validators.required],
-          selectedCategories: new FormControl(this.productsService.getCategoriesFrom(foundProduct), Validators.required)
-		    });
-  		});
+      this.productsService.db.object(`products/${this.productId}`)
+      .subscribe((foundProduct) => {
+
+        this.productsPics = foundProduct.pictures;
+        this.savedPicsQty = foundProduct.pictures.length;
+        this.imagesToShow = this.toObjectArray(foundProduct.pictures);
+        this.upToLimitPics = this.upToLimitPictures(foundProduct.pictures); //QUANTAS FALTAM ATÉ O LIMITE DE 5 IMAGENS
+        this.hasLessThanLimit = (this.savedPicsQty < this.picsLimit);
+
+        this.productStore = foundProduct.store;
+
+        this.productsForm = fb.group({
+          name : [foundProduct.name, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])],
+          description: [foundProduct.description, Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])],
+          price: [foundProduct.price, Validators.required],
+          selectedCategories: [foundProduct.categories, Validators.required]
+        });
+      });
 
       productsService.getAllCategories().subscribe((category) => {
         let auxArray = [];
@@ -61,29 +79,95 @@ export class EditProductsComponent implements OnInit {
         });
         this.categories = auxArray;
       });
-
-      this.images = productsService.getImagesFrom(this.productId);
     });
   }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   updateProduct(data) {
-  	
+    
     if(data.name.trim().length < 3 || data.description.trim().length < 20) {
-    	this.whitespaceError = true;
-    	return;
+      this.whitespaceError = true;
+      return;
     } else {
-    	this.whitespaceError = false;
+      this.whitespaceError = false;
+    }    
+    
+    data.productId = this.productId;
+    data.productStore = this.productStore;
+    data.images = [];
+
+    if(this.productsPics.length > 0) {
+      data.images = this.productsPics;
+    } else if(this.removedImages.length == this.savedPicsQty) {
+      alert('O produto precisa de, pelo menos, 1 imagem. As imagens atuais NÃO foram alteradas');
+      data.images = this.removedImages;
     }
 
-    data.productId = this.productId;
+    if(this.hasLessThanLimit && this.filesFromImageUpload.length > 0) {
+      data.images = data.images.concat(this.filesFromImageUpload);
+    }
 
-    this.productsService.updateProduct(data);
+   this.productsService.updateProduct(data);
+
+   this.router.navigate(['/shopkeeper/dashboard/admin/products/']);
+  }
+ 
+  removeImage(image) {
+    let key = image.$key;
+
+    if(this.toggleRemoveOverlay(image)) {
+      this.removedImages.push(image.$value);
+      this.productsPics.splice(this.productsPics.indexOf(image.$value), 1);
+      this.upToLimitPics++;
+    } else {   
+      this.removedImages.splice(this.removedImages.indexOf(image.$value), 1);
+      this.productsPics.push(image.$value);
+      this.upToLimitPics--;
+    }    
+
+    this.hasLessThanLimit = (this.upToLimitPics > 0);
   }
 
-  removeImage(key, uuid, ext) {
-    this.productsService.removeImageFrom(this.productId, key, uuid, ext);
+  toggleRemoveOverlay(image) : boolean {
+    image.isRemoved = !image.isRemoved;
+    image.overlayText=(image.isRemoved)?'Removido':'Remover'
+    return image.isRemoved;
+  }
+
+  upToLimitPictures(arr : any[]) : number {
+    return  this.picsLimit - arr.length;
+  }
+
+  imageFinishedUploading(file) {
+    if(file.file.type != 'image/jpeg' && file.file.type != 'image/png') {
+      return;
+    }
+    console.log('toRemove', file.src);
+    this.filesFromImageUpload.push(file.src);  
+  }
+
+  imageRemoved(file) {
+    this.filesFromImageUpload.splice(this.filesFromImageUpload.indexOf(file.src), 1);
+  }
+
+  uploadStateChange(state: boolean) {
+    console.log(JSON.stringify(state));
+  } 
+
+  toObjectArray(arr) : object[] {
+    let rv = [];
+    for (let i = 0; i < arr.length; ++i) {    
+      if (arr[i] !== undefined) {
+        rv.push({
+          $key : i,
+          $value : arr[i],
+          isRemoved : false,
+          overlayText: 'Remover'
+        });
+      }
+    }
+    return rv;
   }
 
 }
