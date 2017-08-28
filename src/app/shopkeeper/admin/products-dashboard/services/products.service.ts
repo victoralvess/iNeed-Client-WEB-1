@@ -3,10 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AuthService } from '../../../../shared/services/services-auth/auth.service';
 
-import { UUID } from 'angular2-uuid';
-
 import * as firebase from 'firebase/app';
-import 'rxjs/add/operator/map';
 
 import { AddProductsComponent } from '../add-products/add-products.component'
 @Injectable()
@@ -41,13 +38,13 @@ export class ProductsService {
         name : product.name,
         description : product.description,
         price : product.price,
-        store : store
+        store : store,
+        categories : product.selectedCategories,
+        pictures : product.images
       };
 
       let key = this.db.database.ref(`/products`).push(newProduct).key;   
       this.db.database.ref(`/products-stores/${store}/${key}`).set(newProduct);
-      this.setCategories(product, store, key);     
-      this.uploadImages(product.images, store, key);
     });  	
   }
 
@@ -55,82 +52,20 @@ export class ProductsService {
     let updatedProduct = {
       name : product.name,
       description : product.description,
-      price : product.price
-    };
+      price : product.price,
+      categories : product.selectedCategories,
+      pictures : product.images
+    };    
 
     this.db.database.ref(`products/${product.productId}`).update(updatedProduct);
-
-    this.db.object(`products/${product.productId}`).subscribe((databaseProduct) => {      
-      this.db.database.ref(`/products-stores/${databaseProduct.store}/${product.productId}`).update(updatedProduct);
-      this.setCategories(product, databaseProduct.store, product.productId);
-    });
-    
+    this.db.database.ref(`/products-stores/${product.productStore}/${product.productId}`).update(updatedProduct);
   }
-
-  setCategories(product, store, productId) {
-
-    this.db.database.ref(`/products/${productId}/categories`).remove();
-    this.db.database.ref(`/products-stores/${store}/${productId}/categories`).remove();
-    
-    product.selectedCategories.forEach((category) => {      
-      this.db.database.ref(`/products/${productId}/categories/${category}`).set(true);
-      this.db.database.ref(`/products-stores/${store}/${productId}/categories/${category}`).set(true);
-    });
-  }
-
-  getCategoriesFrom(product) {
-    return Object.keys(product.categories);
-  }
-
-  uploadImages(files : any[], store : any, productKey) {
-    files.forEach((file) => {
-      let byteString = atob(file.src.split(',')[1]);
-      let mimeString = file.src.split(',')[0].split(':')[1].split(';')[0]
-
-      let arrayBuffer = new ArrayBuffer(byteString.length);
-      let uInt8Array = new Uint8Array(arrayBuffer);
-      for (let i = 0; i < byteString.length; i++) {
-          uInt8Array[i] = byteString.charCodeAt(i);
-      }
-
-      let blob = new Blob([arrayBuffer]);
-      /*UPLOAD ADDITIONAL INFO*/
-      let uuid = UUID.UUID();
-      let ext = mimeString.split('/')[1];      
-      let metadata = { 
-        contentType: mimeString
-      };
-      console.log(uuid);
-      let uploadTask = firebase.storage().ref(`${store}/${productKey}/${uuid}.${ext}`).put(blob, metadata);
-      uploadTask.on(firebase.storage.TaskEvent.STATE_CHANGED, (snapshot) => {
-        let up = snapshot as firebase.storage.UploadTaskSnapshot;
-        let progress = (up.bytesTransferred / up.totalBytes) * 100;
-        console.log(uuid, 'Upload is ' + progress + '% done');
-      });
-
-      uploadTask.then((snapshot) => {        
-        let image = {
-          downloadURL: snapshot.downloadURL,
-          uuid: uuid,
-          imageExt: ext
-        };
-        this.db.database.ref(`/products/${productKey}/pictures/`).push(image);
-        this.db.database.ref(`/products-stores/${store}/${productKey}/pictures/`).push(image);
-      });   
-    });      
-  }
-
-  getImagesFrom(thisProduct) {
-    return this.db.list(`/products/${thisProduct}/pictures/`);
-  }
-
-  removeImageFrom(productId, image, uuid, ext) {
+  
+  removeImageFrom(productId, imageKey) {
     this.getStoreFrom(productId).subscribe(store => {
-      console.log(store.$value);
-      firebase.storage().ref(`${store.$value}/${productId}/${uuid}.${ext}`).delete().then((success) => {
-        this.db.database.ref(`/products/${productId}/pictures/${image}`).remove();
-        this.db.database.ref(`/products-stores/${store.$value}/${productId}/pictures/${image}`).remove();
-      });
+      //console.log(store.$value);
+      this.db.database.ref(`/products/${productId}/pictures/${imageKey}`).remove();
+      this.db.database.ref(`/products-stores/${store.$value}/${productId}/pictures/${imageKey}`).remove();
     });     
   }
 

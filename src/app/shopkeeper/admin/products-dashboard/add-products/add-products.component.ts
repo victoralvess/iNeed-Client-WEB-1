@@ -115,7 +115,7 @@ export class AddProductsComponent implements OnInit {
     if(file.file.type != 'image/jpeg' && file.file.type != 'image/png') {
       return;
     }
-    this.files.push(file);  
+    this.files.push(file.src);  
   }
 
   imageRemoved(file) {

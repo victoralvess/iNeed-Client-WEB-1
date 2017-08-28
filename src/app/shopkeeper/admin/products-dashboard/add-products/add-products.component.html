@@ -26,7 +26,7 @@
   </div>
   <aside *ngIf="whitespaceError" class="alert alert-danger">Boa tentativa, mas hoje não. Preencha os campos com caracteres válidos</aside>
   <p-multiSelect [options]="categories" formControlName ="selectedCategories" defaultLabel="Escolha"></p-multiSelect>
-  <image-upload [max]="2" [extensions]="['jpeg','png']"
+  <image-upload [max]="5" [extensions]="['jpeg','png']"
   (onFileUploadFinish)="imageFinishedUploading($event)"
   (onRemove)="imageRemoved($event)" 
   (isPending)="uploadStateChange($event)"></image-upload>

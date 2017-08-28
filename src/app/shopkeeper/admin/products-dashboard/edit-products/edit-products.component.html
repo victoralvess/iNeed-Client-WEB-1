@@ -19,8 +19,15 @@
 </div>
 <aside *ngIf="whitespaceError" class="alert alert-danger">Boa tentativa, mas hoje não. Preencha os campos com caracteres válidos</aside>
 <p-multiSelect [options]="categories" formControlName ="selectedCategories"></p-multiSelect>
-<div *ngFor="let image of images | async">
-  <img width="150" height="150" [src]="image.downloadURL" (click)="removeImage(image.$key, image.uuid, image.imageExt)">
+<div class="container" *ngFor="let image of images; let i = index">
+  <img [src]="image.$value" class="image">
+  <div class="overlay" [ngClass]="{'removed': image.isRemoved }" (click)="removeImage(image)">
+    <div class="text">{{ image.overlayText }}</div>
+  </div>
 </div>
+<image-upload *ngIf="hasLessThanLimit" [max]="upToLimitPics" [extensions]="['jpeg','png']"
+  (onFileUploadFinish)="imageFinishedUploading($event)"
+  (onRemove)="imageRemoved($event)" 
+  (isPending)="uploadStateChange($event)"></image-upload>
 <button class="btn" type="submit" [disabled]="!productsForm.valid">Atualizar</button>	  
 </form>	 
