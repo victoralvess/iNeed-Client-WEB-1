@@ -29,7 +29,6 @@ export class EditProductsComponent implements OnInit {
   filesFromImageUpload = [];
   
   constructor(private fb: FormBuilder, private productsService : ProductsService, private activatedRoute: ActivatedRoute, private router : Router) { 
-
     this.productsForm = new FormGroup({
       name : new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])),
       description: new FormControl('', Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])),
@@ -168,6 +167,10 @@ export class EditProductsComponent implements OnInit {
       }
     }
     return rv;
+  }
+
+  removeImage(key, uuid, ext) {
+    this.productsService.removeImageFrom(this.productId, key, uuid, ext);
   }
 
 }

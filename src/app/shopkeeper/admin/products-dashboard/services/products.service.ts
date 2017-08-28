@@ -65,7 +65,7 @@ export class ProductsService {
     this.getStoreFrom(productId).subscribe(store => {
       this.db.database.ref(`/products/${productId}/pictures/${imageKey}`).remove();
       this.db.database.ref(`/products-stores/${store.$value}/${productId}/pictures/${imageKey}`).remove();
-    });     
+    });  
   }
 
   getStoreFrom(thisProduct) {
@@ -76,5 +76,4 @@ export class ProductsService {
     this.db.database.ref(`/products/${key}`).remove();
     this.db.database.ref(`/products-stores/${store}/${key}`).remove();
   }
-
 }
