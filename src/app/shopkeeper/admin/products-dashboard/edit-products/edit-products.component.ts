@@ -27,6 +27,7 @@ export class EditProductsComponent implements OnInit {
   savedPicsQty = 0;
   filesFromImageUpload = [];  
 
+
   constructor(private fb: FormBuilder, private productsService : ProductsService, private activatedRoute: ActivatedRoute, private router : Router) { 
 
   	this.productsForm = new FormGroup({
@@ -77,8 +78,7 @@ export class EditProductsComponent implements OnInit {
           auxArray.push({ label : cat.value, value : cat.$key });
         });
         this.categories = auxArray;
-      });
-    });
+      });   
   }
 
   ngOnInit() { }
@@ -168,5 +168,4 @@ export class EditProductsComponent implements OnInit {
     }
     return rv;
   }
-  
 }
