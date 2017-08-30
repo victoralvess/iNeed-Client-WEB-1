@@ -18,7 +18,7 @@ export class ProductsService {
   getUser() {
   	return this.db.object(`users/${this.user.uid}`);
   }
-
+ 
   getAllCategories() {
     return this.db.list(`/categories`); 
   }
@@ -27,7 +27,7 @@ export class ProductsService {
 		return this.db.list(`/products-stores/${thisStore}`, {
       query : params || {
         orderByChild: 'name'
-      }
+      } 
 		}); 
   }
 
@@ -45,37 +45,46 @@ export class ProductsService {
 
       let key = this.db.database.ref(`/products`).push(newProduct).key;   
       this.db.database.ref(`/products-stores/${store}/${key}`).set(newProduct);
+      product.selectedCategories.forEach((category) => {
+        this.db.database.ref(`/products-categories/${category}/${key}`).set(newProduct);
+      });      
     });  	
   }
 
   updateProduct(product) {
+    
+    console.log('stooooooooooore', product.productStore);
     let updatedProduct = {
       name : product.name,
       description : product.description,
       price : product.price,
       categories : product.selectedCategories,
-      pictures : product.images
-    };    
+      pictures : product.images,
+      store : product.productStore
+    };  
 
-    this.db.database.ref(`products/${product.productId}`).update(updatedProduct);
-    this.db.database.ref(`/products-stores/${product.productStore}/${product.productId}`).update(updatedProduct);
-  }
-  
-  removeImageFrom(productId, imageKey) {
-    this.getStoreFrom(productId).subscribe(store => {
-      //console.log(store.$value);
-      this.db.database.ref(`/products/${productId}/pictures/${imageKey}`).remove();
-      this.db.database.ref(`/products-stores/${store.$value}/${productId}/pictures/${imageKey}`).remove();
-    });     
-  }
+    let updates = {};
+    updates[`/products/${product.productId}`] = updatedProduct;
+    updates[`/products-stores/${product.productStore}/${product.productId}`] = updatedProduct;
+    
+    product.selectedCategories.forEach((category) => {
+        updates[`/products-categories/${category}/${product.productId}`] = updatedProduct;
+    }); 
 
-  getStoreFrom(thisProduct) {
-    return this.db.object(`/products/${thisProduct}/store`); 
+    this.db.database.ref().update(updates);
   }
 
-  deleteProduct(key, store) {
+  getProductFrom(id) {
+    return this.db.object(`/products/${id}`); 
+  }
+
+  deleteProduct(key, categories, store) {    
     this.db.database.ref(`/products/${key}`).remove();
     this.db.database.ref(`/products-stores/${store}/${key}`).remove();
+    categories.forEach((category) => {
+      this.db.database.ref(`/products-categories/${category}/${key}`).remove();
+    }); 
+    
   }
 
 }

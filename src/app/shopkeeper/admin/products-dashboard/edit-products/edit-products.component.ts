@@ -26,6 +26,11 @@ export class EditProductsComponent implements OnInit {
   picsLimit = 5;
   savedPicsQty = 0;
   filesFromImageUpload = [];  
+  filesFromImageUploadAux = [];
+  activatedRouteSubscription;
+  productsSubscription;
+  categoriesSubscription;
+  products;
 
 
   constructor(private fb: FormBuilder, private productsService : ProductsService, private activatedRoute: ActivatedRoute, private router : Router) { 
@@ -49,11 +54,12 @@ export class EditProductsComponent implements OnInit {
         return value;
     });
 
-    this.activatedRoute.params.subscribe((params: Params) => {
+    this.activatedRouteSubscription = this.activatedRoute.params.subscribe((params: Params) => {
 
       this.productId = params['productId'];
 
-  		this.productsService.db.object(`products/${this.productId}`)
+  		this.products = this.productsService.db.object(`products/${this.productId}`);
+      this.productsSubscription = this.products
       .subscribe((foundProduct) => {
 
         this.picsArray = foundProduct.pictures;
@@ -64,6 +70,7 @@ export class EditProductsComponent implements OnInit {
         this.hasLessThanLimit = (this.savedPicsQty < this.picsLimit);
 
         this.productStore = foundProduct.store;
+        console.log('stoooooooooooore',foundProduct.store);
   			this.productsForm = fb.group({
 		  		name : [foundProduct.name, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])],
 		  		description: [foundProduct.description, Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])],
@@ -72,7 +79,7 @@ export class EditProductsComponent implements OnInit {
 		    });
   		});
 
-      productsService.getAllCategories().subscribe((category) => {
+      this.categoriesSubscription = productsService.getAllCategories().subscribe((category) => {
         let auxArray = [];
         category.forEach(cat => {
           auxArray.push({ label : cat.value, value : cat.$key });
@@ -82,6 +89,13 @@ export class EditProductsComponent implements OnInit {
   }
 
   ngOnInit() { }
+
+  ngOnDestroy() {
+    console.log('onDestroy');
+    this.activatedRouteSubscription.unsubscribe();
+    this.productsSubscription.unsubscribe();
+    this.categoriesSubscription.unsubscribe();
+  }  
 
   updateProduct(data) {
   	
@@ -96,9 +110,14 @@ export class EditProductsComponent implements OnInit {
     data.productStore = this.productStore;
     data.images = [];
 
+    while(this.filesFromImageUpload.length > this.upToLimitPics){
+        this.filesFromImageUploadAux.splice(this.filesFromImageUpload.length - 1, 1);
+    }
+    
+
     if(this.picsArray.length > 0) {
       data.images = this.picsArray;
-    } else if(this.removedImages.length == this.savedPicsQty) {
+    } else if((this.removedImages.length == this.savedPicsQty) && !(this.filesFromImageUpload.length > 0)) {
       alert('O produto precisa de, pelo menos, 1 imagem. As imagens atuais NÃO foram alteradas');
       data.images = this.removedImages;
     }
@@ -113,8 +132,7 @@ export class EditProductsComponent implements OnInit {
   }
  
   removeImage(image) {
-    let key = image.$key;
-
+    
     if(this.toggleRemoveOverlay(image)) {
       this.removedImages.push(image.$value);
       this.picsArray.splice(this.picsArray.indexOf(image.$value), 1);
@@ -124,7 +142,7 @@ export class EditProductsComponent implements OnInit {
       this.picsArray.push(image.$value);
       this.upToLimitPics--;
     }    
-
+    console.log('uptoLimit', this.upToLimitPics);
     this.hasLessThanLimit = (this.upToLimitPics > 0);
   }
 
@@ -143,11 +161,14 @@ export class EditProductsComponent implements OnInit {
       return;
     }
     console.log('toRemove', file.src);
+    
     this.filesFromImageUpload.push(file.src);  
+    console.log('uptoLimit', this.upToLimitPics);
   }
 
-  imageRemoved(file) {
+  imageRemoved(file) {    
     this.filesFromImageUpload.splice(this.filesFromImageUpload.indexOf(file.src), 1);
+    console.log('uptoLimit', this.upToLimitPics);
   }
 
   uploadStateChange(state: boolean) {
