@@ -6,6 +6,9 @@ import { AuthService } from '../../../../shared/services/services-auth/auth.serv
 import * as firebase from 'firebase/app';
 
 import { AddProductsComponent } from '../add-products/add-products.component'
+
+import { ProductsDashboardComponent } from '../products-dashboard.component';
+
 @Injectable()
 export class ProductsService {
 
@@ -43,11 +46,32 @@ export class ProductsService {
         pictures : product.images
       };
 
-      let key = this.db.database.ref(`/products`).push(newProduct).key;   
-      this.db.database.ref(`/products-stores/${store}/${key}`).set(newProduct);
+      let productsRef = this.db.database.ref(`/products`);
+      let newFirebaseProduct = productsRef.push(newProduct);      
+      
+      let key = newFirebaseProduct.key;   
+      
+      let linkProductToStoreRef = this.db.database.ref(`/products-stores/${store}/${key}`);
+      linkProductToStoreRef.set(newProduct);
+
+      newFirebaseProduct.once('value', (snapshot) => {
+        if(ProductsDashboardComponent.savedProducts[`${store}`] != null) {
+          ProductsDashboardComponent.savedProducts[`${store}`] += JSON.stringify(snapshot.val());
+        } else {
+          ProductsDashboardComponent.products = this.getProductsFrom(store);
+          ProductsDashboardComponent.products.subscribe((products) => {
+            ProductsDashboardComponent.savedProducts[`${store}`] += JSON.stringify(products); 
+          });
+        }
+
+        console.log(ProductsDashboardComponent.savedProducts[`${store}`]);
+        //ProductsDashboardComponent.savedProducts[`${store}`] = snapshot.val();
+      });
+
       product.selectedCategories.forEach((category) => {
         this.db.database.ref(`/products-categories/${category}/${key}`).set(newProduct);
-      });      
+      });                 
+      
     });  	
   }
 
@@ -72,10 +96,6 @@ export class ProductsService {
     }); 
 
     this.db.database.ref().update(updates);
-  }
-
-  getProductFrom(id) {
-    return this.db.object(`/products/${id}`); 
   }
 
   deleteProduct(key, categories, store) {    

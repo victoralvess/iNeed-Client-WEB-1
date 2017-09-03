@@ -54,7 +54,12 @@ export class AddProductsComponent implements OnInit {
     this.userSubscription = productsService.getUser().subscribe((user) => {
     	console.log('worksat', user.worksAt);
 	   	user.worksAt.forEach(store => {
-	   		this.stores.push({id : store, checked : false});
+	   		this.stores.push({
+          id : store.storeId,
+          storeName : store.storeName,
+          storeAddress : store.storeAddress,
+          checked : false
+        });
 	    });
  		});
 

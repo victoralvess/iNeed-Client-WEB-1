@@ -9,6 +9,10 @@ import { PaginationInstance } from 'ngx-pagination';
 
 import { Modal } from 'ngx-modialog/plugins/bootstrap';
 
+import { Observable } from 'rxjs/Observable';
+import * as Rx from 'rxjs';
+
+
 @Component({
   selector: 'app-products-dashboard',
   templateUrl: './products-dashboard.component.html',
@@ -16,8 +20,10 @@ import { Modal } from 'ngx-modialog/plugins/bootstrap';
 })
 export class ProductsDashboardComponent implements OnInit {
 
+  public static savedProducts = {};
+
 	stores : any[];
-	products : FirebaseListObservable<any[]>;
+	public static products;
 	user : firebase.User;
   query : any;
   currentPage = 1;
@@ -34,9 +40,8 @@ export class ProductsDashboardComponent implements OnInit {
   constructor(private router : Router, private productsService : ProductsService, private modal : Modal) { 
     this.userSubscription = productsService.getUser().subscribe((user) => {
       this.stores = user.worksAt;
-      this.lastSelected = this.stores[0];
-      this.products = this.productsService.getProductsFrom(this.stores[0]);
-      this.productsSubscription = this.productsService.getProductsFrom(this.stores[0]).subscribe(store => console.log(store));
+      this.lastSelected = this.stores[0].storeId;      
+      this.getProducts(this.lastSelected);
     });
   } 
 
@@ -44,14 +49,40 @@ export class ProductsDashboardComponent implements OnInit {
 
   ngOnDestroy() {
     console.log('onDestroy');
-    this.products.subscribe().unsubscribe();
+    ProductsDashboardComponent.products.subscribe().unsubscribe();
     this.userSubscription.unsubscribe();
     this.productsSubscription.unsubscribe();
+    ProductsDashboardComponent.savedProducts = {};
+    
   }  
 
   onChange(value) {
     this.lastSelected = value;
-  	this.products = this.productsService.getProductsFrom(value);
+    let localProducts;
+    try {
+      localProducts = JSON.parse(ProductsDashboardComponent.savedProducts[`${this.lastSelected}`]);
+      ProductsDashboardComponent.products = Rx.Observable.of(localProducts);
+      this.updateProductsSubscription();
+      } catch(e) {
+        this.getProducts(this.lastSelected);
+      }
+    console.log('onChange',localProducts);
+  }
+
+  getProducts(storeId) {    
+    ProductsDashboardComponent.products = this.productsService.getProductsFrom(storeId);
+    this.updateProductsSubscription();
+  }
+
+  updateProductsSubscription() {    
+    this.productsSubscription = ProductsDashboardComponent.products.subscribe((products) => {
+      ProductsDashboardComponent.savedProducts[`${this.lastSelected}`] = JSON.stringify(products); 
+      console.log('prodSubs');
+    });
+  }
+
+  get products() {
+    return ProductsDashboardComponent.products;
   }
 
   addNewProduct() {
@@ -85,5 +116,11 @@ export class ProductsDashboardComponent implements OnInit {
       });
     });
     
+  }
+}
+
+export class SavedProducts {
+  constructor() {
+
   }
 }
