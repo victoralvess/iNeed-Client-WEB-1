@@ -19,7 +19,7 @@ const routes: Routes = [
           { path: 'stores', loadChildren: './admin/stores-dashboard/stores-dashboard.module#StoresDashboardModule' }
         ] 
       }
-    ]
+    ] 
   },
   { path: 'chat', canActivate: [MustBeLoggedInGuard], loadChildren: './chat/chat.module#ChatModule' },
   { path: '**', redirectTo: 'dashboard', pathMatch: 'full' }

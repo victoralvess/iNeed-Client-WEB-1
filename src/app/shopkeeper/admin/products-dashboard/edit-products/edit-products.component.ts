@@ -5,6 +5,8 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 import { SelectItem } from 'primeng/primeng';
 import { FirebaseListObservable } from 'angularfire2/database';
 
+import 'rxjs/add/operator/map';
+
 @Component({
   selector: 'app-edit-products',
   templateUrl: './edit-products.component.html',
@@ -19,16 +21,22 @@ export class EditProductsComponent implements OnInit {
   categories: SelectItem[];
   imagesToShow = [];
   removedImages = [];
-  overlayText = 'Remover';
   productStore = '';
-  productsPics = [];
+  picsArray = [];
   hasLessThanLimit : boolean = false;
   upToLimitPics : number;
   picsLimit = 5;
   savedPicsQty = 0;
-  filesFromImageUpload = [];
-  
+  filesFromImageUpload = [];  
+  filesFromImageUploadAux = [];
+  activatedRouteSubscription;
+  productsSubscription;
+  categoriesSubscription;
+  products;
+
+
   constructor(private fb: FormBuilder, private productsService : ProductsService, private activatedRoute: ActivatedRoute, private router : Router) { 
+
     this.productsForm = new FormGroup({
       name : new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])),
       description: new FormControl('', Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])),
@@ -48,21 +56,22 @@ export class EditProductsComponent implements OnInit {
         return value;
     });
 
-    this.activatedRoute.params.subscribe((params: Params) => {
+    this.activatedRouteSubscription = this.activatedRoute.params.subscribe((params: Params) => {
 
       this.productId = params['productId'];
 
-      this.productsService.db.object(`products/${this.productId}`)
-      .subscribe((foundProduct) => {
+      this.products = this.productsService.db.object(`products/${this.productId}`);
+      this.productsSubscription = this.products.subscribe((foundProduct) => {
 
-        this.productsPics = foundProduct.pictures;
+        this.picsArray = foundProduct.pictures;
         this.savedPicsQty = foundProduct.pictures.length;
+
         this.imagesToShow = this.toObjectArray(foundProduct.pictures);
-        this.upToLimitPics = this.upToLimitPictures(foundProduct.pictures); //QUANTAS FALTAM ATÉ O LIMITE DE 5 IMAGENS
+        this.upToLimitPics = this.upToLimitPictures(foundProduct.pictures);
         this.hasLessThanLimit = (this.savedPicsQty < this.picsLimit);
 
         this.productStore = foundProduct.store;
-
+        console.log('stoooooooooooore',foundProduct.store);
         this.productsForm = fb.group({
           name : [foundProduct.name, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])],
           description: [foundProduct.description, Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])],
@@ -70,18 +79,26 @@ export class EditProductsComponent implements OnInit {
           selectedCategories: [foundProduct.categories, Validators.required]
         });
       });
-
-      productsService.getAllCategories().subscribe((category) => {
-        let auxArray = [];
-        category.forEach(cat => {
-          auxArray.push({ label : cat.value, value : cat.$key });
-        });
-        this.categories = auxArray;
-      });
     });
+
+    this.categoriesSubscription = productsService.getAllCategories().subscribe((categories) => {
+      let auxArray = [];
+      categories.forEach((category) => {
+        auxArray.push({ label : category.value, value : category.$key });
+      });
+      this.categories = auxArray;
+    });   
+
   }
 
   ngOnInit() { }
+
+  ngOnDestroy() {
+    console.log('onDestroy');
+    this.activatedRouteSubscription.unsubscribe();
+    this.productsSubscription.unsubscribe();
+    this.categoriesSubscription.unsubscribe();
+  }  
 
   updateProduct(data) {
     
@@ -96,9 +113,14 @@ export class EditProductsComponent implements OnInit {
     data.productStore = this.productStore;
     data.images = [];
 
-    if(this.productsPics.length > 0) {
-      data.images = this.productsPics;
-    } else if(this.removedImages.length == this.savedPicsQty) {
+    while(this.filesFromImageUpload.length > this.upToLimitPics){
+        this.filesFromImageUploadAux.splice(this.filesFromImageUpload.length - 1, 1);
+    }
+    
+
+    if(this.picsArray.length > 0) {
+      data.images = this.picsArray;
+    } else if((this.removedImages.length == this.savedPicsQty) && !(this.filesFromImageUpload.length > 0)) {
       alert('O produto precisa de, pelo menos, 1 imagem. As imagens atuais NÃO foram alteradas');
       data.images = this.removedImages;
     }
@@ -113,18 +135,17 @@ export class EditProductsComponent implements OnInit {
   }
  
   removeImage(image) {
-    let key = image.$key;
-
+    
     if(this.toggleRemoveOverlay(image)) {
       this.removedImages.push(image.$value);
-      this.productsPics.splice(this.productsPics.indexOf(image.$value), 1);
+      this.picsArray.splice(this.picsArray.indexOf(image.$value), 1);
       this.upToLimitPics++;
     } else {   
       this.removedImages.splice(this.removedImages.indexOf(image.$value), 1);
-      this.productsPics.push(image.$value);
+      this.picsArray.push(image.$value);
       this.upToLimitPics--;
     }    
-
+    console.log('uptoLimit', this.upToLimitPics);
     this.hasLessThanLimit = (this.upToLimitPics > 0);
   }
 
@@ -143,11 +164,14 @@ export class EditProductsComponent implements OnInit {
       return;
     }
     console.log('toRemove', file.src);
+    
     this.filesFromImageUpload.push(file.src);  
+    console.log('uptoLimit', this.upToLimitPics);
   }
 
-  imageRemoved(file) {
+  imageRemoved(file) {    
     this.filesFromImageUpload.splice(this.filesFromImageUpload.indexOf(file.src), 1);
+    console.log('uptoLimit', this.upToLimitPics);
   }
 
   uploadStateChange(state: boolean) {
@@ -168,9 +192,4 @@ export class EditProductsComponent implements OnInit {
     }
     return rv;
   }
-
-  removeImage(key, uuid, ext) {
-    this.productsService.removeImageFrom(this.productId, key, uuid, ext);
-  }
-
 }

@@ -24,6 +24,9 @@ export class AddProductsComponent implements OnInit {
   files = [];
   growlMessages : Message[] = [];
 
+  userSubscription;
+  categoriesSubscription;
+
   constructor(private fb: FormBuilder, private productsService : ProductsService) { 
   	this.productsForm = new FormGroup({
   		name : new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])),
@@ -48,14 +51,19 @@ export class AddProductsComponent implements OnInit {
         return value;
     });
  
-    productsService.getUser().subscribe((user) => {
+    this.userSubscription = productsService.getUser().subscribe((user) => {
     	console.log('worksat', user.worksAt);
 	   	user.worksAt.forEach(store => {
-	   		this.stores.push({id : store, checked : false});
+	   		this.stores.push({
+          id : store.storeId,
+          storeName : store.storeName,
+          storeAddress : store.storeAddress,
+          checked : false
+        });
 	    });
  		});
 
-    productsService.getAllCategories().subscribe((category) => {
+    this.categoriesSubscription = productsService.getAllCategories().subscribe((category) => {
       let auxArray = [];
       category.forEach(cat => {
         auxArray.push({ label : cat.value, value : cat.$key });
@@ -65,6 +73,12 @@ export class AddProductsComponent implements OnInit {
   }
 
   ngOnInit() {}  
+
+  ngOnDestroy() {
+    console.log('onDestroy');
+    this.userSubscription.unsubscribe();
+    this.categoriesSubscription.unsubscribe();
+  }  
 
   addNewProduct(data) {
     
@@ -95,7 +109,7 @@ export class AddProductsComponent implements OnInit {
     }
 
     data.images = this.files;
-    console.log(this.files);
+    console.log(this.stores);
     data.stores = this.stores
               		.filter(store => store.checked)
               		.map(store => store.id);
