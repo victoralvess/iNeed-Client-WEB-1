@@ -20,17 +20,16 @@ import * as Rx from 'rxjs';
 })
 export class ProductsDashboardComponent implements OnInit {
 
-  public static savedProducts = {};
-
 	stores : any[];
-	public static products;
+	products;
 	user : firebase.User;
   query : any;
   currentPage = 1;
   userSubscription;
   productsSubscription;
   lastSelected;
-  
+  productsSubject;
+
   public paginationComponentConfig: PaginationInstance = {
     id: 'products-pagination',
     itemsPerPage: 10,
@@ -38,51 +37,40 @@ export class ProductsDashboardComponent implements OnInit {
   };
 
   constructor(private router : Router, private productsService : ProductsService, private modal : Modal) { 
+		this.productsSubject = new Rx.Subject<string>();
+		this.productsSubject.asObservable().subscribe((storeId) => {
+  		this.getProducts(storeId);
+  	});
+
     this.userSubscription = productsService.getUser().subscribe((user) => {
       this.stores = user.worksAt;
       this.lastSelected = this.stores[0].storeId;      
-      this.getProducts(this.lastSelected);
+      this.productsSubject.next(this.lastSelected); 
     });
-  } 
+  } 	
 
   ngOnInit() { }
 
   ngOnDestroy() {
     console.log('onDestroy');
-    ProductsDashboardComponent.products.subscribe().unsubscribe();
+    this.products.subscribe().unsubscribe();
     this.userSubscription.unsubscribe();
     this.productsSubscription.unsubscribe();
-    ProductsDashboardComponent.savedProducts = {};
     
   }  
 
   onChange(value) {
-    this.lastSelected = value;
-    let localProducts;
-    try {
-      localProducts = JSON.parse(ProductsDashboardComponent.savedProducts[`${this.lastSelected}`]);
-      ProductsDashboardComponent.products = Rx.Observable.of(localProducts);
-      this.updateProductsSubscription();
-      } catch(e) {
-        this.getProducts(this.lastSelected);
-      }
-    console.log('onChange',localProducts);
+    this.lastSelected = value;   
+    this.productsSubject.next(this.lastSelected);
   }
 
   getProducts(storeId) {    
-    ProductsDashboardComponent.products = this.productsService.getProductsFrom(storeId);
+    this.products = this.productsService.getProductsFrom(storeId);
     this.updateProductsSubscription();
   }
 
   updateProductsSubscription() {    
-    this.productsSubscription = ProductsDashboardComponent.products.subscribe((products) => {
-      ProductsDashboardComponent.savedProducts[`${this.lastSelected}`] = JSON.stringify(products); 
-      console.log('prodSubs');
-    });
-  }
-
-  get products() {
-    return ProductsDashboardComponent.products;
+    this.productsSubscription = this.products.subscribe();
   }
 
   addNewProduct() {
@@ -90,6 +78,9 @@ export class ProductsDashboardComponent implements OnInit {
   }
 
   deleteProduct(key, categories, store) {
+  	console.log('delete', key);
+  	console.log('delete', categories);
+  	console.log('delete', store);
     const deleteModal = this.modal.confirm()
                       .size('lg')
                       .showClose(false)

@@ -8,6 +8,7 @@ import * as firebase from 'firebase/app';
 import { AddProductsComponent } from '../add-products/add-products.component'
 
 import { ProductsDashboardComponent } from '../products-dashboard.component';
+import * as Rx from 'rxjs';
 
 @Injectable()
 export class ProductsService {
@@ -53,21 +54,7 @@ export class ProductsService {
       
       let linkProductToStoreRef = this.db.database.ref(`/products-stores/${store}/${key}`);
       linkProductToStoreRef.set(newProduct);
-
-      newFirebaseProduct.once('value', (snapshot) => {
-        if(ProductsDashboardComponent.savedProducts[`${store}`] != null) {
-          ProductsDashboardComponent.savedProducts[`${store}`] += JSON.stringify(snapshot.val());
-        } else {
-          ProductsDashboardComponent.products = this.getProductsFrom(store);
-          ProductsDashboardComponent.products.subscribe((products) => {
-            ProductsDashboardComponent.savedProducts[`${store}`] += JSON.stringify(products); 
-          });
-        }
-
-        console.log(ProductsDashboardComponent.savedProducts[`${store}`]);
-        //ProductsDashboardComponent.savedProducts[`${store}`] = snapshot.val();
-      });
-
+      
       product.selectedCategories.forEach((category) => {
         this.db.database.ref(`/products-categories/${category}/${key}`).set(newProduct);
       });                 
@@ -98,12 +85,12 @@ export class ProductsService {
     this.db.database.ref().update(updates);
   }
 
-  deleteProduct(key, categories, store) {    
-    this.db.database.ref(`/products/${key}`).remove();
+  deleteProduct(key, categories, store) { 
+    let productsRef = this.db.database.ref(`/products`);
+    productsRef.child(`${key}`).remove();
     this.db.database.ref(`/products-stores/${store}/${key}`).remove();
     categories.forEach((category) => {
       this.db.database.ref(`/products-categories/${category}/${key}`).remove();
     }); 
-    
   }
 }
