@@ -17,6 +17,13 @@ export class ShopkeeperComponent implements OnInit, AfterViewInit {
 
   constructor(private afAuth: AngularFireAuth, private service: AuthService, private router: Router) {
     this.user = afAuth.auth.currentUser;
+
+    this.afAuth.auth.onAuthStateChanged((user) => {
+      if(!user) {
+        console.log('mata tuto chessus');
+        this.router.navigate(['/subscribe/signin']);       
+      }
+    });
   }
 
 

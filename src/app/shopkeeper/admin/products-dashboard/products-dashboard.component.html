@@ -27,7 +27,7 @@
 		    <tbody>	    	
 		    	<tr *ngFor="let product of products | async | search : query | paginate: paginationComponentConfig">
 		    		<td>{{ product.name }}</td>
-		    		<td>{{ product.price }}</td>
+		    		<td>{{ product.price | currency:'BRL':true:'2.2-2' }}</td>
 		    		<td>{{ product.upVotesCount || "0" }}</td>
 		    		<td>{{ product.downVotesCount || "0" }}</td>
 		    		<td>
@@ -66,4 +66,4 @@
 		</pagination-template>	  
 	</div>
 </div>
-<button class="fab" (click)="addNewProduct()"><span class="material-icons">add</span></button>
+<a class="fab" href="/shopkeeper/dashboard/admin/products/add" target="_blank"><span class="fab-text material-icons">add</span></a>

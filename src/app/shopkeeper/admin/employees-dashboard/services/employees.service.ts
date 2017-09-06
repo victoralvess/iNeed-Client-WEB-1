@@ -5,14 +5,10 @@ import { AuthService } from '../../../../shared/services/services-auth/auth.serv
 
 import * as firebase from 'firebase/app';
 
-import { Subject } from 'rxjs/Subject';
-
-
 @Injectable()
-export class ProductsService {
+export class EmployeesService {
 
 	user : firebase.User;
-  databaseChanged = new Subject<string>();
 
   constructor(public db : AngularFireDatabase, private auth : AuthService) {
   	this.user = firebase.auth().currentUser;  	
@@ -26,8 +22,8 @@ export class ProductsService {
     return this.db.list(`/categories`); 
   }
 
-  getProductsFrom(thisStore, params?) {
-		return this.db.list(`/products-stores/${thisStore}`, {
+  getEmployeesFrom(thisStore, params?) {
+		return this.db.list(`/employees-stores/${thisStore}`, {
       query : params || {
         orderByChild: 'name'
       } 
@@ -56,51 +52,40 @@ export class ProductsService {
       
       product.selectedCategories.forEach((category) => {
         this.db.database.ref(`/products-categories/${category}/${key}`).set(newProduct);
-      }); 
-
-      this.verifyChangesOnProducts(key, 'Sucesso!', 'O produto foi cadastrado com êxito!');          
+      });                 
       
     });  	
   }
 
-  updateProduct(product) {
+  updateEmployee(employee) {
     
-    console.log('stooooooooooore', product.productStore);
+    console.log('stooooooooooore', employee.productStore);
     let updatedProduct = {
-      name : product.name,
-      description : product.description,
-      price : product.price,
-      categories : product.selectedCategories,
-      pictures : product.images,
-      store : product.productStore
+      name : employee.name,
+      description : employee.description,
+      price : employee.price,
+      categories : employee.selectedCategories,
+      pictures : employee.images,
+      store : employee.productStore
     };  
 
     let updates = {};
-    updates[`/products/${product.productId}`] = updatedProduct;
-    updates[`/products-stores/${product.productStore}/${product.productId}`] = updatedProduct;
+    updates[`/products/${employee.productId}`] = updatedProduct;
+    updates[`/products-stores/${employee.productStore}/${employee.productId}`] = updatedProduct;
     
-    product.selectedCategories.forEach((category) => {
-        updates[`/products-categories/${category}/${product.productId}`] = updatedProduct;
+    employee.selectedCategories.forEach((category) => {
+        updates[`/products-categories/${category}/${employee.productId}`] = updatedProduct;
     }); 
 
     this.db.database.ref().update(updates);
-
-    this.verifyChangesOnProducts(product.productId, 'Sucesso!', `O produto ${product.productId} foi atualizado com êxito!`);
-
   }
 
-  deleteProduct(key, categories, store) { 
+  deleteEmployee(key, categories, store) { 
     let productsRef = this.db.database.ref(`/products`);
     productsRef.child(`${key}`).remove();
     this.db.database.ref(`/products-stores/${store}/${key}`).remove();
     categories.forEach((category) => {
       this.db.database.ref(`/products-categories/${category}/${key}`).remove();
     }); 
-  }
-
-  verifyChangesOnProducts(productKey, successSummary, successMessage) {    
-    this.db.database.ref(`/products/${productKey}`).once('value', (s) => {
-      this.databaseChanged.next(JSON.stringify({ severity: 'success', summary: successSummary, detail: successMessage }));
-    });  
   }
 }

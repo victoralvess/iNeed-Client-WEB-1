@@ -72,7 +72,17 @@ export class AddProductsComponent implements OnInit {
      });
   }
 
-  ngOnInit() {}  
+  ngOnInit() {
+
+    this.productsService.databaseChanged.asObservable().subscribe((notification) => {
+      console.log('foi');
+      this.growlMessages.push(JSON.parse(notification));
+      setTimeout(() => {
+        this.growlMessages = [];
+      }, 7000)
+    });
+
+  }  
 
   ngOnDestroy() {
     console.log('onDestroy');
@@ -104,9 +114,9 @@ export class AddProductsComponent implements OnInit {
       this.growlMessages = [{severity: 'error', summary: 'Erro', detail: 'Adicione alguma imagem (.png, .jpg, .jpeg) antes de continuar!'}];  
       setTimeout(() => {
         this.growlMessages = [];
-      }, 5000)
+      }, 7000)
       return;
-    }
+    } 
 
     data.images = this.files;
     console.log(this.stores);
@@ -115,13 +125,6 @@ export class AddProductsComponent implements OnInit {
               		.map(store => store.id);
 
     this.productsService.addProduct(data);
-
-    firebase.database().ref(`/products-stores`).limitToLast(1).on('child_added', (snapshot) => {
-      this.growlMessages = [{severity: 'success', summary: 'Sucesso', detail: 'O produto foi cadastrado com êxito!'}];  
-      setTimeout(() => {
-        this.growlMessages = [];
-      }, 5000)
-    });
   }
   
   imageFinishedUploading(file) {

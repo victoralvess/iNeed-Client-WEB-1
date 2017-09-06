@@ -1,0 +1,67 @@
+<p *ngIf="!(employees | async)">LOADING</p>
+<div *ngIf="(employees | async)">
+	<div class="row">
+		<div class="input-group">
+			<input class="form-control" type="text" name="search-employees" placeholder="Pesquisar funcionários" [(ngModel)]="query">
+			<span class="input-group-btn">
+	    	<button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
+	  	</span>    	
+	  </div>
+	  <select class="form-control" (change)="onChange($event.target.value)">
+	  	<option *ngFor="let store of stores" [value]="store.storeId" [selected]="(store.storeId == lastSelected)">{{ store.storeName + " - " + store.storeAddress }}</option>
+	  </select>
+	</div>
+
+	<div class="row">  
+	  <div class="table-responsive" style="max-height: 560px;overflow-y: auto">
+	  	<table class="table table-striped">
+	  		<thead>
+	  			<tr>
+			    	<th>Funcionário</th>
+			    	<th><span class="material-icons">email</span></th>
+			    	<th>Nível de Permissão</th>
+			    	<th>Ações</th>
+			    </tr>
+		    </thead>	    
+		    <tbody>	    	
+		    	<tr *ngFor="let employee of employees | async | search : query | paginate: paginationComponentConfig">
+		    		<td>{{ employee.name }}</td>
+		    		<td>{{ employee.email }}</td>
+		    		<td>{{ bindPermissionLevel(employee.permissionLevel) }}</td>
+		    		<td>
+		    			<a class="no-decoration" href="/shopkeeper/dashboard/admin/employee/edit/{{employee.$key}}">
+		    				<span class="material-icons">edit</span>
+		    			</a>
+		    			<a (click)="deleteEmployee(employee.$key, employee.categories, employee.store)">
+		    				<span class="material-icons">delete</span>
+		    			</a>
+		    		</td>
+		    	</tr>	 	  	
+		    </tbody>
+	  	</table>	  		
+	  </div>
+	  <pagination-template #pagination="paginationApi"
+											     [id]="paginationComponentConfig.id"
+											     (pageChange)="paginationComponentConfig.currentPage = $event">
+	    <div class="pagination">
+	        <div class="pagination-previous" [class.disabled]="pagination.isFirstPage()">
+	            <a *ngIf="!pagination.isFirstPage()" (click)="pagination.previous()"><span class="material-icons">navigate_before</span></a>
+	        </div>
+
+	        <div *ngFor="let page of pagination.pages" [class.current]="pagination.getCurrent() === page.value">
+	            <a (click)="pagination.setCurrent(page.value)" *ngIf="pagination.getCurrent() !== page.value">
+	                <span>{{ page.label }}</span>
+	            </a>
+	            <div *ngIf="pagination.getCurrent() === page.value">
+	                <span>{{ page.label }}</span>
+	            </div>
+	        </div>
+
+	        <div class="pagination-next" [class.disabled]="pagination.isLastPage()">
+	            <a *ngIf="!pagination.isLastPage()" (click)="pagination.next()"><span class="material-icons">navigate_next</span></a>
+	        </div>
+	    </div>
+		</pagination-template>	  
+	</div>
+</div>
+<button class="fab" (click)="addNewEmployee()"><span class="material-icons">add</span></button>

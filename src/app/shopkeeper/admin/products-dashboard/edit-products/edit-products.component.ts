@@ -6,6 +6,7 @@ import { SelectItem } from 'primeng/primeng';
 import { FirebaseListObservable } from 'angularfire2/database';
 
 import 'rxjs/add/operator/map';
+import { Message } from 'primeng/primeng';
 
 @Component({
   selector: 'app-edit-products',
@@ -33,7 +34,7 @@ export class EditProductsComponent implements OnInit {
   productsSubscription;
   categoriesSubscription;
   products;
-
+  growlMessages : Message[] = [];
 
   constructor(private fb: FormBuilder, private productsService : ProductsService, private activatedRoute: ActivatedRoute, private router : Router) { 
 
@@ -91,7 +92,15 @@ export class EditProductsComponent implements OnInit {
 
   }
 
-  ngOnInit() { }
+  ngOnInit() { 
+    this.productsService.databaseChanged.asObservable().subscribe((notification) => {
+      console.log('foi');
+      this.growlMessages.push(JSON.parse(notification));
+      setTimeout(() => {
+        this.growlMessages = [];
+      }, 7000)
+    });
+  }
 
   ngOnDestroy() {
     console.log('onDestroy');
@@ -131,7 +140,6 @@ export class EditProductsComponent implements OnInit {
 
    this.productsService.updateProduct(data);
 
-   this.router.navigate(['/shopkeeper/dashboard/admin/products/']);
   }
  
   removeImage(image) {

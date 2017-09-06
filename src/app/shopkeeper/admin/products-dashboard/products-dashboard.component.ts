@@ -3,15 +3,15 @@ import { FirebaseListObservable } from 'angularfire2/database';
 import { ProductsService } from './services/products.service';
 import { Router } from '@angular/router';
 
-import * as firebase from 'firebase';
+import { AngularFireAuth } from 'angularfire2/auth';
+
+import * as firebase from 'firebase/app';
 import 'rxjs/add/operator/map';
 import { PaginationInstance } from 'ngx-pagination';
 
 import { Modal } from 'ngx-modialog/plugins/bootstrap';
 
-import { Observable } from 'rxjs/Observable';
-import * as Rx from 'rxjs';
-
+import { Subject } from 'rxjs/Subject';
 
 @Component({
   selector: 'app-products-dashboard',
@@ -28,7 +28,7 @@ export class ProductsDashboardComponent implements OnInit {
   userSubscription;
   productsSubscription;
   lastSelected;
-  productsSubject;
+  productsSubject = new Subject<string>();    
 
   public paginationComponentConfig: PaginationInstance = {
     id: 'products-pagination',
@@ -36,10 +36,11 @@ export class ProductsDashboardComponent implements OnInit {
     currentPage: 1
   };
 
-  constructor(private router : Router, private productsService : ProductsService, private modal : Modal) { 
-		this.productsSubject = new Rx.Subject<string>();
+  constructor(private router : Router, private productsService : ProductsService, private modal : Modal, private afAuth : AngularFireAuth) { 
+		
 		this.productsSubject.asObservable().subscribe((storeId) => {
-  		this.getProducts(storeId);
+  		this.products = this.productsService.getProductsFrom(storeId);
+      this.productsSubscription = this.products.subscribe();
   	});
 
     this.userSubscription = productsService.getUser().subscribe((user) => {
@@ -47,34 +48,24 @@ export class ProductsDashboardComponent implements OnInit {
       this.lastSelected = this.stores[0].storeId;      
       this.productsSubject.next(this.lastSelected); 
     });
+
+
+    this.afAuth.auth.onAuthStateChanged((user) => {
+      if(!user) {
+        console.log('destrói tuto chessus');        
+        this.products.subscribe().unsubscribe();
+        this.userSubscription.unsubscribe();
+        this.productsSubscription.unsubscribe();
+        this.productsSubject.unsubscribe();
+      }
+    });
   } 	
 
   ngOnInit() { }
 
-  ngOnDestroy() {
-    console.log('onDestroy');
-    this.products.subscribe().unsubscribe();
-    this.userSubscription.unsubscribe();
-    this.productsSubscription.unsubscribe();
-    
-  }  
-
   onChange(value) {
     this.lastSelected = value;   
     this.productsSubject.next(this.lastSelected);
-  }
-
-  getProducts(storeId) {    
-    this.products = this.productsService.getProductsFrom(storeId);
-    this.updateProductsSubscription();
-  }
-
-  updateProductsSubscription() {    
-    this.productsSubscription = this.products.subscribe();
-  }
-
-  addNewProduct() {
-    this.router.navigate(['/shopkeeper/dashboard/admin/products/add']);
   }
 
   deleteProduct(key, categories, store) {
@@ -107,11 +98,5 @@ export class ProductsDashboardComponent implements OnInit {
       });
     });
     
-  }
-}
-
-export class SavedProducts {
-  constructor() {
-
   }
 }
