@@ -8,7 +8,7 @@
 	  	</span>    	
 	  </div>
 	  <select class="form-control" (change)="onChange($event.target.value)">
-	  	<option *ngFor="let store of stores" [value]="store" [selected]="(store == lastSelected)">{{ store }}</option>
+	  	<option *ngFor="let store of stores" [value]="store.storeId" [selected]="(store.storeId == lastSelected)">{{ store.storeName + " - " + store.storeAddress }}</option>
 	  </select>
 	</div>
 
@@ -27,7 +27,7 @@
 		    <tbody>	    	
 		    	<tr *ngFor="let product of products | async | search : query | paginate: paginationComponentConfig">
 		    		<td>{{ product.name }}</td>
-		    		<td>{{ product.price }}</td>
+		    		<td>{{ product.price | currency:'BRL':true:'2.2-2' }}</td>
 		    		<td>{{ product.upVotesCount || "0" }}</td>
 		    		<td>{{ product.downVotesCount || "0" }}</td>
 		    		<td>
@@ -66,4 +66,4 @@
 		</pagination-template>	  
 	</div>
 </div>
-<button class="fab" (click)="addNewProduct()"><span class="material-icons">add</span></button>
+<a class="fab" href="/shopkeeper/dashboard/admin/products/add" target="_blank"><span class="fab-text material-icons">add</span></a>

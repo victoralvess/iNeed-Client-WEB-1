@@ -14,6 +14,14 @@
 	color: white;
 }
 
+.fab-text {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 28%;
+  top: 27%;
+}
+
 .no-decoration:focus, .no-decoration:hover {
 	text-decoration: none;
 }

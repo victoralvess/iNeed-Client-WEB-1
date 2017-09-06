@@ -8,7 +8,6 @@ import { ProductsDashboardRoutingModule } from './products-dashboard-routing.mod
 import { ProductsDashboardComponent } from './products-dashboard.component';
 import { AddProductsComponent } from './add-products/add-products.component';
 import { EditProductsComponent } from './edit-products/edit-products.component';
-import { SearchPipe } from '../../../shared/pipes/search.pipe';
 import { ProductsService } from './services/products.service';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { NgxPaginationModule } from 'ngx-pagination'; 
@@ -17,6 +16,8 @@ import { ImageUploadModule } from 'angular2-image-upload';
 
 import { ModalModule } from 'ngx-modialog';
 import { BootstrapModalModule } from 'ngx-modialog/plugins/bootstrap';
+
+import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
 
 @NgModule({
   imports: [
@@ -31,10 +32,11 @@ import { BootstrapModalModule } from 'ngx-modialog/plugins/bootstrap';
     GrowlModule,
     ImageUploadModule.forRoot(),
     ModalModule.forRoot(),
-    BootstrapModalModule
+    BootstrapModalModule,
+    SearchPipeModule
   ],
-  declarations: [SearchPipe, ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
-  exports: [SearchPipe, ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
+  declarations: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
+  exports: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
   providers: [ProductsService] 
 })
 export class ProductsDashboardModule { }

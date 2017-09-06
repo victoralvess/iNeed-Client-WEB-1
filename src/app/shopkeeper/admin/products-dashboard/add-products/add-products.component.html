@@ -20,7 +20,7 @@
   <div class="form-group" [formGroup]="storesGroup">
     <label for="product-stores">Vendido em:</label>
     <div *ngFor="let store of stores">
-    	<input name="stores" type="checkbox" value="{{ store.id }}" [(ngModel)]="store.checked" [formControl]="storesGroup.controls['storesList']">	{{ store.id }}
+    	<input name="stores" type="checkbox" value="{{ store.id }}" [(ngModel)]="store.checked" [formControl]="storesGroup.controls['storesList']">	{{ store.storeName + " - " + store.storeAddress }}
     </div>	  
     <aside *ngIf="!selectAtLeastOneStore" class="alert alert-danger">Onde será vendido? Escolha, ao menos, uma loja.</aside> 	 
   </div>
@@ -32,4 +32,4 @@
   (isPending)="uploadStateChange($event)"></image-upload>
 	<button class="btn" type="submit" [disabled]="!productsForm.valid">Adicionar</button>	  
 </form>
-<p-growl [value]="growlMessages"></p-growl>
+<p-growl [value]="growlMessages"></p-growl> 

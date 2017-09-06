@@ -3,11 +3,15 @@ import { FirebaseListObservable } from 'angularfire2/database';
 import { ProductsService } from './services/products.service';
 import { Router } from '@angular/router';
 
-import * as firebase from 'firebase';
+import { AngularFireAuth } from 'angularfire2/auth';
+
+import * as firebase from 'firebase/app';
 import 'rxjs/add/operator/map';
 import { PaginationInstance } from 'ngx-pagination';
 
 import { Modal } from 'ngx-modialog/plugins/bootstrap';
+
+import { Subject } from 'rxjs/Subject';
 
 @Component({
   selector: 'app-products-dashboard',
@@ -17,48 +21,57 @@ import { Modal } from 'ngx-modialog/plugins/bootstrap';
 export class ProductsDashboardComponent implements OnInit {
 
 	stores : any[];
-	products : FirebaseListObservable<any[]>;
+	products;
 	user : firebase.User;
   query : any;
   currentPage = 1;
   userSubscription;
   productsSubscription;
   lastSelected;
-  
+  productsSubject = new Subject<string>();    
+
   public paginationComponentConfig: PaginationInstance = {
     id: 'products-pagination',
     itemsPerPage: 10,
     currentPage: 1
   };
 
-  constructor(private router : Router, private productsService : ProductsService, private modal : Modal) { 
+  constructor(private router : Router, private productsService : ProductsService, private modal : Modal, private afAuth : AngularFireAuth) { 
+		
+		this.productsSubject.asObservable().subscribe((storeId) => {
+  		this.products = this.productsService.getProductsFrom(storeId);
+      this.productsSubscription = this.products.subscribe();
+  	});
+
     this.userSubscription = productsService.getUser().subscribe((user) => {
       this.stores = user.worksAt;
-      this.lastSelected = this.stores[0];
-      this.products = this.productsService.getProductsFrom(this.stores[0]);
-      this.productsSubscription = this.productsService.getProductsFrom(this.stores[0]).subscribe(store => console.log(store));
+      this.lastSelected = this.stores[0].storeId;      
+      this.productsSubject.next(this.lastSelected); 
     });
-  } 
+
+
+    this.afAuth.auth.onAuthStateChanged((user) => {
+      if(!user) {
+        console.log('destrói tuto chessus');        
+        this.products.subscribe().unsubscribe();
+        this.userSubscription.unsubscribe();
+        this.productsSubscription.unsubscribe();
+        this.productsSubject.unsubscribe();
+      }
+    });
+  } 	
 
   ngOnInit() { }
 
-  ngOnDestroy() {
-    console.log('onDestroy');
-    this.products.subscribe().unsubscribe();
-    this.userSubscription.unsubscribe();
-    this.productsSubscription.unsubscribe();
-  }  
-
   onChange(value) {
-    this.lastSelected = value;
-  	this.products = this.productsService.getProductsFrom(value);
-  }
-
-  addNewProduct() {
-    this.router.navigate(['/shopkeeper/dashboard/admin/products/add']);
+    this.lastSelected = value;   
+    this.productsSubject.next(this.lastSelected);
   }
 
   deleteProduct(key, categories, store) {
+  	console.log('delete', key);
+  	console.log('delete', categories);
+  	console.log('delete', store);
     const deleteModal = this.modal.confirm()
                       .size('lg')
                       .showClose(false)

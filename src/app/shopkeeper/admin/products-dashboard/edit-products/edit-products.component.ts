@@ -5,6 +5,9 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 import { SelectItem } from 'primeng/primeng';
 import { FirebaseListObservable } from 'angularfire2/database';
 
+import 'rxjs/add/operator/map';
+import { Message } from 'primeng/primeng';
+
 @Component({
   selector: 'app-edit-products',
   templateUrl: './edit-products.component.html',
@@ -14,8 +17,8 @@ export class EditProductsComponent implements OnInit {
 
   whitespaceError : boolean = false;
   productsForm : FormGroup;
-	user : firebase.User;
-	productId : any;
+  user : firebase.User;
+  productId : any;
   categories: SelectItem[];
   imagesToShow = [];
   removedImages = [];
@@ -31,11 +34,11 @@ export class EditProductsComponent implements OnInit {
   productsSubscription;
   categoriesSubscription;
   products;
-
+  growlMessages : Message[] = [];
 
   constructor(private fb: FormBuilder, private productsService : ProductsService, private activatedRoute: ActivatedRoute, private router : Router) { 
 
-  	this.productsForm = new FormGroup({
+    this.productsForm = new FormGroup({
       name : new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])),
       description: new FormControl('', Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])),
       price: new FormControl('', Validators.required),
@@ -58,9 +61,8 @@ export class EditProductsComponent implements OnInit {
 
       this.productId = params['productId'];
 
-  		this.products = this.productsService.db.object(`products/${this.productId}`);
-      this.productsSubscription = this.products
-      .subscribe((foundProduct) => {
+      this.products = this.productsService.db.object(`products/${this.productId}`);
+      this.productsSubscription = this.products.subscribe((foundProduct) => {
 
         this.picsArray = foundProduct.pictures;
         this.savedPicsQty = foundProduct.pictures.length;
@@ -71,24 +73,34 @@ export class EditProductsComponent implements OnInit {
 
         this.productStore = foundProduct.store;
         console.log('stoooooooooooore',foundProduct.store);
-  			this.productsForm = fb.group({
-		  		name : [foundProduct.name, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])],
-		  		description: [foundProduct.description, Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])],
-		  		price: [foundProduct.price, Validators.required],
+        this.productsForm = fb.group({
+          name : [foundProduct.name, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])],
+          description: [foundProduct.description, Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])],
+          price: [foundProduct.price, Validators.required],
           selectedCategories: [foundProduct.categories, Validators.required]
-		    });
-  		});
-
-      this.categoriesSubscription = productsService.getAllCategories().subscribe((category) => {
-        let auxArray = [];
-        category.forEach(cat => {
-          auxArray.push({ label : cat.value, value : cat.$key });
         });
-        this.categories = auxArray;
-      });   
+      });
+    });
+
+    this.categoriesSubscription = productsService.getAllCategories().subscribe((categories) => {
+      let auxArray = [];
+      categories.forEach((category) => {
+        auxArray.push({ label : category.value, value : category.$key });
+      });
+      this.categories = auxArray;
+    });   
+
   }
 
-  ngOnInit() { }
+  ngOnInit() { 
+    this.productsService.databaseChanged.asObservable().subscribe((notification) => {
+      console.log('foi');
+      this.growlMessages.push(JSON.parse(notification));
+      setTimeout(() => {
+        this.growlMessages = [];
+      }, 7000)
+    });
+  }
 
   ngOnDestroy() {
     console.log('onDestroy');
@@ -98,12 +110,12 @@ export class EditProductsComponent implements OnInit {
   }  
 
   updateProduct(data) {
-  	
+    
     if(data.name.trim().length < 3 || data.description.trim().length < 20) {
-    	this.whitespaceError = true;
-    	return;
+      this.whitespaceError = true;
+      return;
     } else {
-    	this.whitespaceError = false;
+      this.whitespaceError = false;
     }    
     
     data.productId = this.productId;
@@ -128,7 +140,6 @@ export class EditProductsComponent implements OnInit {
 
    this.productsService.updateProduct(data);
 
-   this.router.navigate(['/shopkeeper/dashboard/admin/products/']);
   }
  
   removeImage(image) {

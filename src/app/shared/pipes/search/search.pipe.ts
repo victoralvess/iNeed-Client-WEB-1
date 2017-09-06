@@ -12,9 +12,6 @@ export class SearchPipe implements PipeTransform {
   	} 
 		
 		query = query.trim().replace(/\s\s+/g, " ");
-		if(query.length < 3 || query.length > 40) {
-			return list;
-		}	
 
   	let options = {
 		  shouldSort: true,
