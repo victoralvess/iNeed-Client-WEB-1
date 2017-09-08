@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
-import { Shopkeeper } from '../../shared/classes/shopkeeper';
+import { Shopkeeper } from '../../shared/models/shopkeeper.model';
 import { AuthService } from '../../shared/services/services-auth/auth.service';
 import * as firebase from 'firebase/app';
 

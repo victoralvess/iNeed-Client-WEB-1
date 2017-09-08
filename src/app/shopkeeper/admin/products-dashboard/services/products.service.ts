@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AuthService } from '../../../../shared/services/services-auth/auth.service';
+import { Http } from '@angular/http';
 
 import * as firebase from 'firebase/app';
 
@@ -11,10 +12,12 @@ import { Subject } from 'rxjs/Subject';
 @Injectable()
 export class ProductsService {
 
+  optimizationAPI = 'http://localhost:8081';
+
 	user : firebase.User;
   databaseChanged = new Subject<string>();
 
-  constructor(public db : AngularFireDatabase, private auth : AuthService) {
+  constructor(public db : AngularFireDatabase, private auth : AuthService, private http : Http) {
   	this.user = firebase.auth().currentUser;  	
   }
 
@@ -102,5 +105,9 @@ export class ProductsService {
     this.db.database.ref(`/products/${productKey}`).once('value', (s) => {
       this.databaseChanged.next(JSON.stringify({ severity: 'success', summary: successSummary, detail: successMessage }));
     });  
+  }
+
+  optmizeImage(file) {    
+    return this.http.post(`${this.optimizationAPI}/ws/0/optmize`, file);
   }
 }

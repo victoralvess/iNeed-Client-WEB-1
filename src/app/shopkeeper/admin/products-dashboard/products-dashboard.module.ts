@@ -10,7 +10,7 @@ import { AddProductsComponent } from './add-products/add-products.component';
 import { EditProductsComponent } from './edit-products/edit-products.component';
 import { ProductsService } from './services/products.service';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import { NgxPaginationModule } from 'ngx-pagination'; 
+import { NgxPaginationModule } from 'ngx-pagination';
 import { MultiSelectModule, GrowlModule } from 'primeng/primeng';
 import { ImageUploadModule } from 'angular2-image-upload';
 
@@ -37,7 +37,6 @@ import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.modul
   ],
   declarations: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
   exports: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
-  providers: [ProductsService] 
+  providers: [ProductsService]
 })
 export class ProductsDashboardModule { }
- 

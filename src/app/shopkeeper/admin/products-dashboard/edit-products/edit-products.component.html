@@ -27,7 +27,10 @@
       <div class="text">{{ image.overlayText }}</div>
     </div>
   </div>
-  <image-upload *ngIf="hasLessThanLimit" [max]="upToLimitPics" [extensions]="['jpeg','png']"
+  <image-upload *ngIf="hasLessThanLimit" [max]="upToLimitPics" [extensions]="['jpeg','png']" 
+                [buttonCaption]="'Escolha'"
+                [dropBoxMessage]="'Solte suas imagens aqui!'"
+                [fileTooLargeMessage]="'Imagem muito grande!'" 
     (onFileUploadFinish)="imageFinishedUploading($event)"
     (onRemove)="imageRemoved($event)" 
     (isPending)="uploadStateChange($event)"></image-upload>

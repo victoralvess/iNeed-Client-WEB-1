@@ -50,3 +50,7 @@
 .pagination>div.current, .pagination>div:not(.disabled):hover {
     border-color: #340054;
 }
+
+.clickable {
+	cursor: pointer;
+}
