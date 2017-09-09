@@ -18,6 +18,7 @@ import { ModalModule } from 'ngx-modialog';
 import { BootstrapModalModule } from 'ngx-modialog/plugins/bootstrap';
 
 import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
+import { NotificationsService } from '../../../shared/services/notifications/notifications.service';
 
 @NgModule({
   imports: [
@@ -37,6 +38,6 @@ import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.modul
   ],
   declarations: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
   exports: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
-  providers: [ProductsService]
+  providers: [ProductsService, NotificationsService]
 })
 export class ProductsDashboardModule { }

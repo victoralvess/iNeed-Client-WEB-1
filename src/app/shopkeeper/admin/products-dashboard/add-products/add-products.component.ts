@@ -76,7 +76,7 @@ export class AddProductsComponent implements OnInit {
 
     this.productsService.databaseChanged.asObservable().subscribe((notification) => {
       console.log('foi');
-      this.growlMessages.push(JSON.parse(notification));
+      this.growlMessages.push(notification);
       setTimeout(() => {
         this.growlMessages = [];
       }, 7000)
@@ -120,8 +120,7 @@ export class AddProductsComponent implements OnInit {
       this.files.forEach((file, idx, arr) => {
         this.productsService.optmizeImage(file).subscribe((res) => {
           let response : any = res;
-          let body = response._body;
-          let base64image = body.split('{')[1].split('}')[0]; 
+          let base64image = response._body;
           data.images.push(base64image);
           if(idx == this.files.length - 1) {
             this.addProduct(data);

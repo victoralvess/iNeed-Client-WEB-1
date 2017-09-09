@@ -38,6 +38,7 @@ export class EditProductsComponent implements OnInit {
   categoriesSubscription;
   products;
   growlMessages : Message[] = [];
+  originalPics;
 
   constructor(private fb: FormBuilder, private productsService : ProductsService, private activatedRoute: ActivatedRoute, private router : Router, private DomSanitizer:DomSanitizer) {
 
@@ -69,6 +70,7 @@ export class EditProductsComponent implements OnInit {
 
         this.picsArray = foundProduct.pictures;
         this.savedPicsQty = foundProduct.pictures.length;
+        this.originalPics = this.picsArray;
 
         this.imagesToShow = this.toObjectArray(foundProduct.pictures);
         this.upToLimitPics = this.upToLimitPictures(foundProduct.pictures);
@@ -132,36 +134,49 @@ export class EditProductsComponent implements OnInit {
         this.filesFromImageUploadAux.splice(this.filesFromImageUpload.length - 1, 1);
     }
 
-    if((this.removedImages.length == this.savedPicsQty) && !(this.filesFromImageUpload.length > 0)) {
+    let wantsUpdatePics = (this.filesFromImageUpload.length > 0);
+    let allRemoved = (this.removedImages.length == this.savedPicsQty);
+    if(allRemoved && !wantsUpdatePics) {
       alert('O produto precisa de, pelo menos, 1 imagem. As imagens atuais NÃO foram alteradas');
       this.removedImages.forEach(value => {
         /****************************** P.O.G. ******************************/
+        let valAux = value.changingThisBreaksApplicationSecurity || '';
+        if(valAux == '') {
+          value.changingThisBreaksApplicationSecurity = valAux;
+        }
         data.images.push(value.changingThisBreaksApplicationSecurity);
       });
-      this.alterProduct(data);
-      return;
-    }
-
-    if(this.hasLessThanLimit && this.filesFromImageUpload.length > 0) {
+      this.alterProduct(data); 
+    } else if(this.hasLessThanLimit && wantsUpdatePics) {
       console.log('less and files');
-      this.filesFromImageUpload.forEach((file, idx, arr) => {
-        this.productsService.optmizeImage(file).subscribe((res) => {
-          let response : any = res;
-          let body = response._body;
-          let base64image = body.split('{')[1].split('}')[0]; 
-          data.images.push(base64image);
-          if(idx == this.filesFromImageUpload.length - 1) {
-            if(this.picsArray.length > 0) {
-              this.picsArray.forEach(value => {
-                data.images.push(value);
-              });
-            }
-            console.log('files', data.images);
-            this.alterProduct(data);
-          }
-        });
-      });
+       this.updatePics(data);      
+    } else if((this.removedImages.length > 0)) {
+      if(wantsUpdatePics) {
+        this.updatePics(data);
+      } else {
+        data.images = this.originalPics;
+        this.alterProduct(data);
+      }
     }
+  }
+
+  updatePics(data) {
+    this.filesFromImageUpload.forEach((file, idx, arr) => {             
+      this.productsService.optmizeImage(file).subscribe((res) => {
+        let response : any = res;
+        let base64image = response._body;
+        data.images.push(base64image);
+        if(idx == this.filesFromImageUpload.length - 1) {
+          if(this.picsArray.length > 0) {
+            this.picsArray.forEach(value => {
+              data.images.push(value);
+            });
+          }
+          console.log('files', data.images);
+          this.alterProduct(data);
+        }
+      });
+    });
   }
 
   alterProduct(data) {
@@ -223,7 +238,12 @@ export class EditProductsComponent implements OnInit {
     let rv = [];
     for (let i = 0; i < arr.length; ++i) {
       if (arr[i] !== undefined) {
-        let val : string = arr[i];
+        /****************************** P.O.G. ******************************/
+        let val = arr[i];
+        let valAux = val.changingThisBreaksApplicationSecurity || '';
+        if(valAux != '') {
+          val = valAux;
+        }
         rv.push({
           $key : i,
           $value : this.DomSanitizer.bypassSecurityTrustUrl(val),

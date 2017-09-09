@@ -8,6 +8,8 @@ import * as firebase from 'firebase/app';
 
 import { Subject } from 'rxjs/Subject';
 
+import { NotificationsService } from '../../../../shared/services/notifications/notifications.service';
+import { Message } from 'primeng/primeng';
 
 @Injectable()
 export class ProductsService {
@@ -15,26 +17,26 @@ export class ProductsService {
   optimizationAPI = 'http://localhost:8081';
 
 	user : firebase.User;
-  databaseChanged = new Subject<string>();
+  databaseChanged = new Subject<Message>();
 
-  constructor(public db : AngularFireDatabase, private auth : AuthService, private http : Http) {
-  	this.user = firebase.auth().currentUser;  	
+  constructor(public db : AngularFireDatabase, private auth : AuthService, private http : Http, private notifications : NotificationsService) {
+  	this.user = firebase.auth().currentUser;
   }
 
   getUser() {
   	return this.db.object(`users/${this.user.uid}`);
   }
- 
+
   getAllCategories() {
-    return this.db.list(`/categories`); 
+    return this.db.list(`/categories`);
   }
 
   getProductsFrom(thisStore, params?) {
 		return this.db.list(`/products-stores/${thisStore}`, {
       query : params || {
         orderByChild: 'name'
-      } 
-		}); 
+      }
+		});
   }
 
   addProduct(product) {
@@ -50,24 +52,24 @@ export class ProductsService {
       };
 
       let productsRef = this.db.database.ref(`/products`);
-      let newFirebaseProduct = productsRef.push(newProduct);      
-      
-      let key = newFirebaseProduct.key;   
-      
+      let newFirebaseProduct = productsRef.push(newProduct);
+
+      let key = newFirebaseProduct.key;
+
       let linkProductToStoreRef = this.db.database.ref(`/products-stores/${store}/${key}`);
       linkProductToStoreRef.set(newProduct);
-      
+
       product.selectedCategories.forEach((category) => {
         this.db.database.ref(`/products-categories/${category}/${key}`).set(newProduct);
-      }); 
+      });
 
-      this.verifyChangesOnProducts(key, 'Sucesso!', 'O produto foi cadastrado com êxito!');          
-      
-    });  	
+      this.verifyChangesOnProducts(key, 'Sucesso!', 'O produto foi cadastrado com êxito!');
+
+    });
   }
 
   updateProduct(product) {
-    
+
     console.log('stooooooooooore', product.productStore);
     let updatedProduct = {
       name : product.name,
@@ -76,15 +78,15 @@ export class ProductsService {
       categories : product.selectedCategories,
       pictures : product.images,
       store : product.productStore
-    };  
+    };
 
     let updates = {};
     updates[`/products/${product.productId}`] = updatedProduct;
     updates[`/products-stores/${product.productStore}/${product.productId}`] = updatedProduct;
-    
+
     product.selectedCategories.forEach((category) => {
         updates[`/products-categories/${category}/${product.productId}`] = updatedProduct;
-    }); 
+    });
 
     this.db.database.ref().update(updates);
 
@@ -92,22 +94,22 @@ export class ProductsService {
 
   }
 
-  deleteProduct(key, categories, store) { 
+  deleteProduct(key, categories, store) {
     let productsRef = this.db.database.ref(`/products`);
     productsRef.child(`${key}`).remove();
     this.db.database.ref(`/products-stores/${store}/${key}`).remove();
     categories.forEach((category) => {
       this.db.database.ref(`/products-categories/${category}/${key}`).remove();
-    }); 
+    });
   }
 
-  verifyChangesOnProducts(productKey, successSummary, successMessage) {    
+  verifyChangesOnProducts(productKey, successSummary, successMessage) {
     this.db.database.ref(`/products/${productKey}`).once('value', (s) => {
-      this.databaseChanged.next(JSON.stringify({ severity: 'success', summary: successSummary, detail: successMessage }));
-    });  
+      this.databaseChanged.next(this.notifications.success(successSummary, successMessage));
+    });
   }
 
-  optmizeImage(file) {    
+  optmizeImage(file) {
     return this.http.post(`${this.optimizationAPI}/ws/0/optmize`, file);
   }
 }
