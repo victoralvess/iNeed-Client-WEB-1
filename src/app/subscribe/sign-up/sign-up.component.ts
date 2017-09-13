@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Shopkeeper } from '../../shared/classes/shopkeeper';
+import { Shopkeeper } from '../../shared/models/shopkeeper.model';
 import { AuthService } from '../../shared/services/services-auth/auth.service';
 
 @Component({

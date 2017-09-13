@@ -8,6 +8,9 @@ import { FirebaseListObservable } from 'angularfire2/database';
 import 'rxjs/add/operator/map';
 import { Message } from 'primeng/primeng';
 
+import { User } from 'firebase/app';
+import { DomSanitizer } from '@angular/platform-browser';
+
 @Component({
   selector: 'app-edit-products',
   templateUrl: './edit-products.component.html',
@@ -17,7 +20,7 @@ export class EditProductsComponent implements OnInit {
 
   whitespaceError : boolean = false;
   productsForm : FormGroup;
-  user : firebase.User;
+  user : User;
   productId : any;
   categories: SelectItem[];
   imagesToShow = [];
@@ -28,15 +31,16 @@ export class EditProductsComponent implements OnInit {
   upToLimitPics : number;
   picsLimit = 5;
   savedPicsQty = 0;
-  filesFromImageUpload = [];  
+  filesFromImageUpload = [];
   filesFromImageUploadAux = [];
   activatedRouteSubscription;
   productsSubscription;
   categoriesSubscription;
   products;
   growlMessages : Message[] = [];
+  originalPics;
 
-  constructor(private fb: FormBuilder, private productsService : ProductsService, private activatedRoute: ActivatedRoute, private router : Router) { 
+  constructor(private fb: FormBuilder, private productsService : ProductsService, private activatedRoute: ActivatedRoute, private router : Router, private DomSanitizer:DomSanitizer) {
 
     this.productsForm = new FormGroup({
       name : new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])),
@@ -66,12 +70,14 @@ export class EditProductsComponent implements OnInit {
 
         this.picsArray = foundProduct.pictures;
         this.savedPicsQty = foundProduct.pictures.length;
+        this.originalPics = this.picsArray;
 
         this.imagesToShow = this.toObjectArray(foundProduct.pictures);
         this.upToLimitPics = this.upToLimitPictures(foundProduct.pictures);
         this.hasLessThanLimit = (this.savedPicsQty < this.picsLimit);
 
         this.productStore = foundProduct.store;
+        console.log('stoooooooooooore',foundProduct);
         console.log('stoooooooooooore',foundProduct.store);
         this.productsForm = fb.group({
           name : [foundProduct.name, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])],
@@ -88,11 +94,11 @@ export class EditProductsComponent implements OnInit {
         auxArray.push({ label : category.value, value : category.$key });
       });
       this.categories = auxArray;
-    });   
+    });
 
   }
 
-  ngOnInit() { 
+  ngOnInit() {
     this.productsService.databaseChanged.asObservable().subscribe((notification) => {
       console.log('foi');
       this.growlMessages.push(JSON.parse(notification));
@@ -107,17 +113,19 @@ export class EditProductsComponent implements OnInit {
     this.activatedRouteSubscription.unsubscribe();
     this.productsSubscription.unsubscribe();
     this.categoriesSubscription.unsubscribe();
-  }  
+  }
+
+  dataImagesAux = [];
 
   updateProduct(data) {
-    
+
     if(data.name.trim().length < 3 || data.description.trim().length < 20) {
       this.whitespaceError = true;
       return;
     } else {
       this.whitespaceError = false;
-    }    
-    
+    }
+
     data.productId = this.productId;
     data.productStore = this.productStore;
     data.images = [];
@@ -125,34 +133,68 @@ export class EditProductsComponent implements OnInit {
     while(this.filesFromImageUpload.length > this.upToLimitPics){
         this.filesFromImageUploadAux.splice(this.filesFromImageUpload.length - 1, 1);
     }
-    
 
-    if(this.picsArray.length > 0) {
-      data.images = this.picsArray;
-    } else if((this.removedImages.length == this.savedPicsQty) && !(this.filesFromImageUpload.length > 0)) {
+    let wantsUpdatePics = (this.filesFromImageUpload.length > 0);
+    let allRemoved = (this.removedImages.length == this.savedPicsQty);
+    if(allRemoved && !wantsUpdatePics) {
       alert('O produto precisa de, pelo menos, 1 imagem. As imagens atuais NÃO foram alteradas');
-      data.images = this.removedImages;
+      this.removedImages.forEach(value => {
+        /****************************** P.O.G. ******************************/
+        let valAux = value.changingThisBreaksApplicationSecurity || '';
+        if(valAux == '') {
+          value.changingThisBreaksApplicationSecurity = valAux;
+        }
+        data.images.push(value.changingThisBreaksApplicationSecurity);
+      });
+      this.alterProduct(data); 
+    } else if(this.hasLessThanLimit && wantsUpdatePics) {
+      console.log('less and files');
+       this.updatePics(data);      
+    } else if((this.removedImages.length > 0)) {
+      if(wantsUpdatePics) {
+        this.updatePics(data);
+      } else {
+        data.images = this.originalPics;
+        this.alterProduct(data);
+      }
     }
-
-    if(this.hasLessThanLimit && this.filesFromImageUpload.length > 0) {
-      data.images = data.images.concat(this.filesFromImageUpload);
-    }
-
-   this.productsService.updateProduct(data);
-
   }
- 
+
+  updatePics(data) {
+    this.filesFromImageUpload.forEach((file, idx, arr) => {             
+      this.productsService.optmizeImage(file).subscribe((res) => {
+        let response : any = res;
+        let base64image = response._body;
+        data.images.push(base64image);
+        if(idx == this.filesFromImageUpload.length - 1) {
+          if(this.picsArray.length > 0) {
+            this.picsArray.forEach(value => {
+              data.images.push(value);
+            });
+          }
+          console.log('files', data.images);
+          this.alterProduct(data);
+        }
+      });
+    });
+  }
+
+  alterProduct(data) {
+   this.productsService.updateProduct(data);
+   this.router.navigate(['/shopkeeper/dashboard/admin/products']);
+  }
+
   removeImage(image) {
-    
+
     if(this.toggleRemoveOverlay(image)) {
       this.removedImages.push(image.$value);
       this.picsArray.splice(this.picsArray.indexOf(image.$value), 1);
       this.upToLimitPics++;
-    } else {   
+    } else {
       this.removedImages.splice(this.removedImages.indexOf(image.$value), 1);
       this.picsArray.push(image.$value);
       this.upToLimitPics--;
-    }    
+    }
     console.log('uptoLimit', this.upToLimitPics);
     this.hasLessThanLimit = (this.upToLimitPics > 0);
   }
@@ -167,32 +209,44 @@ export class EditProductsComponent implements OnInit {
     return  this.picsLimit - arr.length;
   }
 
-  imageFinishedUploading(file) {
-    if(file.file.type != 'image/jpeg' && file.file.type != 'image/png') {
+  imageFinishedUploading(event) {
+    if((event.file.type != 'image/jpeg' && event.file.type != 'image/png') || (event.file.size > 1100000)) {
+      this.growlMessages = [{severity: 'error', summary: 'Erro', detail: 'Remova as imagens com mais de 1MB. Elas não serão adicionadas!'}];
+      setTimeout(() => {
+        this.growlMessages = [];
+      }, 7000)
       return;
     }
-    console.log('toRemove', file.src);
-    
-    this.filesFromImageUpload.push(file.src);  
+
+    console.log('toRemove', event.src);
+
+    this.filesFromImageUpload.push(event.file);
+    console.log('toUp', this.filesFromImageUpload);
     console.log('uptoLimit', this.upToLimitPics);
   }
 
-  imageRemoved(file) {    
-    this.filesFromImageUpload.splice(this.filesFromImageUpload.indexOf(file.src), 1);
+  imageRemoved(event) {
+    this.filesFromImageUpload.splice(this.filesFromImageUpload.indexOf(event.file), 1);
     console.log('uptoLimit', this.upToLimitPics);
   }
 
   uploadStateChange(state: boolean) {
     console.log(JSON.stringify(state));
-  } 
+  }
 
   toObjectArray(arr) : object[] {
     let rv = [];
-    for (let i = 0; i < arr.length; ++i) {    
+    for (let i = 0; i < arr.length; ++i) {
       if (arr[i] !== undefined) {
+        /****************************** P.O.G. ******************************/
+        let val = arr[i];
+        let valAux = val.changingThisBreaksApplicationSecurity || '';
+        if(valAux != '') {
+          val = valAux;
+        }
         rv.push({
           $key : i,
-          $value : arr[i],
+          $value : this.DomSanitizer.bypassSecurityTrustUrl(val),
           isRemoved : false,
           overlayText: 'Remover'
         });

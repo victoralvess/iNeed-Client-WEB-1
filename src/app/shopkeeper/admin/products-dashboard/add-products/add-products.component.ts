@@ -4,30 +4,34 @@ import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms'
 import { SelectItem } from 'primeng/primeng';
 
 import { Message } from 'primeng/primeng';
-import * as firebase from 'firebase';
+import { User } from 'firebase/app';
+import { Store } from '../../../models/store.model';
+import { Category } from '../../../models/category.model';
 
-@Component({ 
+@Component({
   selector: 'app-add-products',
   templateUrl: './add-products.component.html',
   styleUrls: ['./add-products.component.css']
 })
 export class AddProductsComponent implements OnInit {
-  stores = [];
-  categories: SelectItem[];
-  
-  selectAtLeastOneStore : boolean = true; 
+
+  stores : Store[] = [];
+  categories: SelectItem[] = [];
+  /******************PARA TRATAR ERROS******************/
+  selectAtLeastOneStore : boolean = true;
   whitespaceError : boolean = false;
+
   productsForm : FormGroup;
   storesGroup : FormGroup;
-	user : firebase.User;
-  selectedCategories: any[];
+	user : User;
+  selectedCategories: FormControl[];
   files = [];
   growlMessages : Message[] = [];
 
   userSubscription;
   categoriesSubscription;
 
-  constructor(private fb: FormBuilder, private productsService : ProductsService) { 
+  constructor(private fb: FormBuilder, private productsService : ProductsService) {
   	this.productsForm = new FormGroup({
   		name : new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])),
   		description: new FormControl('', Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])),
@@ -47,51 +51,47 @@ export class AddProductsComponent implements OnInit {
           this.whitespaceError = true;
         } else {
           this.whitespaceError = false;
-        } 
+        }
         return value;
     });
- 
+
     this.userSubscription = productsService.getUser().subscribe((user) => {
     	console.log('worksat', user.worksAt);
 	   	user.worksAt.forEach(store => {
-	   		this.stores.push({
-          id : store.storeId,
-          storeName : store.storeName,
-          storeAddress : store.storeAddress,
-          checked : false
-        });
+	   		this.stores.push(new Store(store.storeId, store.storeName, store.storeAddress));
 	    });
  		});
 
-    this.categoriesSubscription = productsService.getAllCategories().subscribe((category) => {
-      let auxArray = [];
-      category.forEach(cat => {
-        auxArray.push({ label : cat.value, value : cat.$key });
+    this.categoriesSubscription = productsService.getAllCategories().subscribe((categories) => {
+      let aux = [];
+      categories.forEach((category) => {
+        aux.push(new Category(category.value, category.$key));
       });
-      this.categories = auxArray;
+      this.categories = aux;
      });
+
   }
 
   ngOnInit() {
 
     this.productsService.databaseChanged.asObservable().subscribe((notification) => {
       console.log('foi');
-      this.growlMessages.push(JSON.parse(notification));
+      this.growlMessages.push(notification);
       setTimeout(() => {
         this.growlMessages = [];
       }, 7000)
     });
 
-  }  
+  }
 
   ngOnDestroy() {
     console.log('onDestroy');
     this.userSubscription.unsubscribe();
     this.categoriesSubscription.unsubscribe();
-  }  
+  }
 
   addNewProduct(data) {
-    
+
     if(data.name.trim().length < 3 || data.description.trim().length < 20) {
     	this.whitespaceError = true;
     	return;
@@ -109,37 +109,57 @@ export class AddProductsComponent implements OnInit {
     if(!this.selectAtLeastOneStore) {
     	return;
     }
-
+    data.images = [];
     if(this.files.length == 0) {
-      this.growlMessages = [{severity: 'error', summary: 'Erro', detail: 'Adicione alguma imagem (.png, .jpg, .jpeg) antes de continuar!'}];  
+      this.growlMessages = [{severity: 'error', summary: 'Erro', detail: 'Adicione alguma imagem (.png, .jpg, .jpeg) antes de continuar!'}];
       setTimeout(() => {
         this.growlMessages = [];
       }, 7000)
       return;
-    } 
+    } else {    
+      this.files.forEach((file, idx, arr) => {
+        this.productsService.optmizeImage(file).subscribe((res) => {
+          let response : any = res;
+          let base64image = response._body;
+          data.images.push(base64image);
+          if(idx == this.files.length - 1) {
+            this.addProduct(data);
+          }
+        });
+      });
+    }    
+  }
 
-    data.images = this.files;
+  addProduct(data) {
     console.log(this.stores);
     data.stores = this.stores
-              		.filter(store => store.checked)
-              		.map(store => store.id);
+                  .filter(store => store.checked)
+                  .map(store => store.id);
 
     this.productsService.addProduct(data);
   }
-  
-  imageFinishedUploading(file) {
-    console.log(file, file.file.type);
-    if(file.file.type != 'image/jpeg' && file.file.type != 'image/png') {
+
+  imageFinishedUploading(event) {
+    console.log(event, event.file.type);
+    if((event.file.type != 'image/jpeg' && event.file.type != 'image/png') || (event.file.size > 1100000)) {
+      this.growlMessages = [{severity: 'error', summary: 'Erro', detail: 'Remova as imagens com mais de 1MB. Elas não serão adicionadas!'}];
+      setTimeout(() => {
+        this.growlMessages = [];
+      }, 7000)
       return;
     }
-    this.files.push(file.src);  
+
+    this.files.push(event.file);
+    console.log(this.files);
   }
 
-  imageRemoved(file) {
-    this.files.splice(this.files.indexOf(file.src), 1);
+
+  imageRemoved(event) {
+    this.files.splice(this.files.indexOf(event.file), 1);
+    console.log(this.files);
   }
 
   uploadStateChange(state: boolean) {
     console.log(JSON.stringify(state));
-  } 
+  }
 }

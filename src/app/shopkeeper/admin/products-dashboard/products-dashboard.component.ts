@@ -28,7 +28,7 @@ export class ProductsDashboardComponent implements OnInit {
   userSubscription;
   productsSubscription;
   lastSelected;
-  productsSubject = new Subject<string>();    
+  productsSubject = new Subject<string>();
 
   public paginationComponentConfig: PaginationInstance = {
     id: 'products-pagination',
@@ -36,8 +36,8 @@ export class ProductsDashboardComponent implements OnInit {
     currentPage: 1
   };
 
-  constructor(private router : Router, private productsService : ProductsService, private modal : Modal, private afAuth : AngularFireAuth) { 
-		
+  constructor(private router : Router, private productsService : ProductsService, private modal : Modal, private afAuth : AngularFireAuth) {
+
 		this.productsSubject.asObservable().subscribe((storeId) => {
   		this.products = this.productsService.getProductsFrom(storeId);
       this.productsSubscription = this.products.subscribe();
@@ -45,26 +45,27 @@ export class ProductsDashboardComponent implements OnInit {
 
     this.userSubscription = productsService.getUser().subscribe((user) => {
       this.stores = user.worksAt;
-      this.lastSelected = this.stores[0].storeId;      
-      this.productsSubject.next(this.lastSelected); 
+      this.lastSelected = this.stores[0].storeId;
+      this.productsSubject.next(this.lastSelected);
     });
 
 
     this.afAuth.auth.onAuthStateChanged((user) => {
       if(!user) {
-        console.log('destrói tuto chessus');        
+        console.log('destrói tuto chessus');
         this.products.subscribe().unsubscribe();
         this.userSubscription.unsubscribe();
         this.productsSubscription.unsubscribe();
         this.productsSubject.unsubscribe();
       }
     });
-  } 	
+  }
 
   ngOnInit() { }
 
   onChange(value) {
-    this.lastSelected = value;   
+    this.lastSelected = value;
+    this.query = "";
     this.productsSubject.next(this.lastSelected);
   }
 
@@ -94,9 +95,9 @@ export class ProductsDashboardComponent implements OnInit {
           this.productsService.deleteProduct(key, categories, store);
         }
       }).catch((err) => {
-        
+
       });
     });
-    
+
   }
 }
