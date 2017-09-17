@@ -8,13 +8,17 @@ import { ProductsDashboardRoutingModule } from './products-dashboard-routing.mod
 import { ProductsDashboardComponent } from './products-dashboard.component';
 import { AddProductsComponent } from './add-products/add-products.component';
 import { EditProductsComponent } from './edit-products/edit-products.component';
-import { DeleteProductsComponent } from './delete-products/delete-products.component';
-import { SearchPipe } from '../../../shared/pipes/search.pipe';
 import { ProductsService } from './services/products.service';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import { NgxPaginationModule } from 'ngx-pagination'; 
+import { NgxPaginationModule } from 'ngx-pagination';
 import { MultiSelectModule, GrowlModule } from 'primeng/primeng';
 import { ImageUploadModule } from 'angular2-image-upload';
+
+import { ModalModule } from 'ngx-modialog';
+import { BootstrapModalModule } from 'ngx-modialog/plugins/bootstrap';
+
+import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
+import { NotificationsService } from '../../../shared/services/notifications/notifications.service';
 
 @NgModule({
   imports: [
@@ -27,10 +31,13 @@ import { ImageUploadModule } from 'angular2-image-upload';
     ProductsDashboardRoutingModule,
     MultiSelectModule,
     GrowlModule,
-    ImageUploadModule.forRoot()
+    ImageUploadModule.forRoot(),
+    ModalModule.forRoot(),
+    BootstrapModalModule,
+    SearchPipeModule
   ],
-  declarations: [SearchPipe, ProductsDashboardComponent, AddProductsComponent, EditProductsComponent, DeleteProductsComponent],
-  exports: [SearchPipe, ProductsDashboardComponent, AddProductsComponent, EditProductsComponent, DeleteProductsComponent],
-  providers: [ProductsService] 
+  declarations: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
+  exports: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
+  providers: [ProductsService, NotificationsService]
 })
 export class ProductsDashboardModule { }

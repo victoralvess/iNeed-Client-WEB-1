@@ -6,7 +6,7 @@ import 'rxjs/add/operator/map';
 import { Router } from '@angular/router';
 
 import * as firebase from 'firebase/app';
-import { Message } from '../../shared/classes/message';
+import { Message } from '../../shared/models/message.model';
 
 @Component({
     selector: 'app-chat',

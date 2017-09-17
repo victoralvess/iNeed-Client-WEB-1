@@ -2,19 +2,25 @@ import { Injectable } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AuthService } from '../../../../shared/services/services-auth/auth.service';
-
-import { UUID } from 'angular2-uuid';
+import { Http } from '@angular/http';
 
 import * as firebase from 'firebase/app';
-import 'rxjs/add/operator/map';
+
+import { Subject } from 'rxjs/Subject';
+
+import { NotificationsService } from '../../../../shared/services/notifications/notifications.service';
+import { Message } from 'primeng/primeng';
 
 @Injectable()
 export class ProductsService {
 
-	user : firebase.User;
+  optimizationAPI = 'http://localhost:8081';
 
-  constructor(public db : AngularFireDatabase, private auth : AuthService) {
-  	this.user = firebase.auth().currentUser;  	
+	user : firebase.User;
+  databaseChanged = new Subject<Message>();
+
+  constructor(public db : AngularFireDatabase, private auth : AuthService, private http : Http, private notifications : NotificationsService) {
+  	this.user = firebase.auth().currentUser;
   }
 
   getUser() {
@@ -22,15 +28,15 @@ export class ProductsService {
   }
 
   getAllCategories() {
-    return this.db.list(`/categories`); 
+    return this.db.list(`/categories`);
   }
 
-  getProductsFrom(thisStore, query?) {
+  getProductsFrom(thisStore, params?) {
 		return this.db.list(`/products-stores/${thisStore}`, {
-      query : query || {
+      query : params || {
         orderByChild: 'name'
       }
-		}); 
+		});
   }
 
   addProduct(product) {
@@ -40,66 +46,70 @@ export class ProductsService {
         name : product.name,
         description : product.description,
         price : product.price,
-        store : store
+        store : store,
+        categories : product.selectedCategories,
+        pictures : product.images
       };
 
-      let key = firebase.database().ref(`/products`).push(newProduct).key;   
-      firebase.database().ref(`/products-stores/${store}/${key}`).set(newProduct);
-      this.setCategories(product, store, key);     
-      this.uploadImages(product.images, store);
-    });  	
+      let productsRef = this.db.database.ref(`/products`);
+      let newFirebaseProduct = productsRef.push(newProduct);
+
+      let key = newFirebaseProduct.key;
+
+      let linkProductToStoreRef = this.db.database.ref(`/products-stores/${store}/${key}`);
+      linkProductToStoreRef.set(newProduct);
+
+      product.selectedCategories.forEach((category) => {
+        this.db.database.ref(`/products-categories/${category}/${key}`).set(newProduct);
+      });
+
+      this.verifyChangesOnProducts(key, 'Sucesso!', 'O produto foi cadastrado com êxito!');
+
+    });
   }
 
   updateProduct(product) {
+
+    console.log('stooooooooooore', product.productStore);
     let updatedProduct = {
       name : product.name,
       description : product.description,
-      price : product.price
+      price : product.price,
+      categories : product.selectedCategories,
+      pictures : product.images,
+      store : product.productStore
     };
 
-    firebase.database().ref(`products/${product.productId}`).update(updatedProduct);
+    let updates = {};
+    updates[`/products/${product.productId}`] = updatedProduct;
+    updates[`/products-stores/${product.productStore}/${product.productId}`] = updatedProduct;
 
-    this.db.object(`products/${product.productId}`).subscribe((databaseProduct) => {      
-      firebase.database().ref(`/products-stores/${databaseProduct.store}/${product.productId}`).update(updatedProduct);
-      this.setCategories(product, databaseProduct.store, product.productId);
+    product.selectedCategories.forEach((category) => {
+        updates[`/products-categories/${category}/${product.productId}`] = updatedProduct;
     });
-    
+
+    this.db.database.ref().update(updates);
+
+    this.verifyChangesOnProducts(product.productId, 'Sucesso!', `O produto ${product.productId} foi atualizado com êxito!`);
+
   }
 
-  setCategories(product, store, productId) {
-
-    firebase.database().ref(`/products/${productId}/categories`).remove();
-    firebase.database().ref(`/products-stores/${store}/${productId}/categories`).remove();
-    
-    product.selectedCategories.forEach((category) => {      
-      firebase.database().ref(`/products/${productId}/categories/${category}`).set(true);
-      firebase.database().ref(`/products-stores/${store}/${productId}/categories/${category}`).set(true);
+  deleteProduct(key, categories, store) {
+    let productsRef = this.db.database.ref(`/products`);
+    productsRef.child(`${key}`).remove();
+    this.db.database.ref(`/products-stores/${store}/${key}`).remove();
+    categories.forEach((category) => {
+      this.db.database.ref(`/products-categories/${category}/${key}`).remove();
     });
   }
 
-  getCategoriesFrom(product) {
-    return Object.keys(product.categories);
+  verifyChangesOnProducts(productKey, successSummary, successMessage) {
+    this.db.database.ref(`/products/${productKey}`).once('value', (s) => {
+      this.databaseChanged.next(this.notifications.success(successSummary, successMessage));
+    });
   }
 
-  uploadImages(files : any[], store : any) {
-    files.forEach((file) => {
-      let byteString = atob(file.src.split(',')[1]);
-      let mimeString = file.src.split(',')[0].split(':')[1].split(';')[0]
-
-      let arrayBuffer = new ArrayBuffer(byteString.length);
-      let uInt8Array = new Uint8Array(arrayBuffer);
-      for (let i = 0; i < byteString.length; i++) {
-          uInt8Array[i] = byteString.charCodeAt(i);
-      }
-
-      let blob = new Blob([arrayBuffer]);
-      /*UPLOAD ADDITIONAL INFO*/
-      let uuid = UUID.UUID();
-      let ext = mimeString.split('/')[1];      
-      let metadata = { contentType: mimeString };
-      console.log(uuid);
-      firebase.storage().ref(`${store}/${uuid}.${ext}`).put(blob, metadata);   
-    });      
+  optmizeImage(file) {
+    return this.http.post(`${this.optimizationAPI}/ws/0/optmize`, file);
   }
-
 }

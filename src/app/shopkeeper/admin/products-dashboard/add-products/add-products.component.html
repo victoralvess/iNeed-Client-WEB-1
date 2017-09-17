@@ -4,7 +4,7 @@
     <input required type="text" class="form-control" id="product-name" placeholder="Como seus clientes verão o produto" [formControl]="productsForm.controls['name']">
     <aside *ngIf="productsForm.controls['name'].hasError('required') && productsForm.controls['name'].touched" class="alert alert-danger">Seus clientes não podem achar um produto sem nome!</aside>
     <aside *ngIf="productsForm.controls['name'].hasError('minlength') && productsForm.controls['name'].touched" class="alert alert-danger">O nome do produto deve ter, pelo menos, 3 caracteres.</aside>
-    <aside *ngIf="productsForm.controls['name'].hasError('maxlength') && productsForm.controls['name'].touched" class="alert alert-danger">O nome do produto deve ter, no máximo, 40 caracteres.</aside> 	 	
+    <aside *ngIf="productsForm.controls['name'].hasError('maxlength') && productsForm.controls['name'].touched" class="alert alert-danger">O nome do produto deve ter, no máximo, 40 caracteres.</aside>
   </div>
   <div class="form-group">
     <label for="product-description">Descrição:</label>
@@ -20,16 +20,19 @@
   <div class="form-group" [formGroup]="storesGroup">
     <label for="product-stores">Vendido em:</label>
     <div *ngFor="let store of stores">
-    	<input name="stores" type="checkbox" value="{{ store.id }}" [(ngModel)]="store.checked" [formControl]="storesGroup.controls['storesList']">	{{ store.id }}
-    </div>	  
-    <aside *ngIf="!selectAtLeastOneStore" class="alert alert-danger">Onde será vendido? Escolha, ao menos, uma loja.</aside> 	 
+    	<input name="stores" type="checkbox" value="{{ store.id }}" [(ngModel)]="store.checked" [formControl]="storesGroup.controls['storesList']">	{{ store.name + " - " + store.address }}
+    </div>
+    <aside *ngIf="!selectAtLeastOneStore" class="alert alert-danger">Onde será vendido? Escolha, ao menos, uma loja.</aside>
   </div>
   <aside *ngIf="whitespaceError" class="alert alert-danger">Boa tentativa, mas hoje não. Preencha os campos com caracteres válidos</aside>
   <p-multiSelect [options]="categories" formControlName ="selectedCategories" defaultLabel="Escolha"></p-multiSelect>
-  <image-upload [max]="2" [extensions]="['jpeg','png']"
+  <image-upload [max]="5" [extensions]="['jpeg','png']"
+                [buttonCaption]="'Escolha'"
+                [dropBoxMessage]="'Solte suas imagens aqui!'"
+                [fileTooLargeMessage]="'Imagem muito grande!'" 
   (onFileUploadFinish)="imageFinishedUploading($event)"
-  (onRemove)="imageRemoved($event)" 
+  (onRemove)="imageRemoved($event)"
   (isPending)="uploadStateChange($event)"></image-upload>
-	<button class="btn" type="submit" [disabled]="!productsForm.valid">Adicionar</button>	  
+	<button class="btn" type="submit" [disabled]="!productsForm.valid">Adicionar</button>
 </form>
-<p-growl [value]="growlMessages"></p-growl>  
+<p-growl [value]="growlMessages"></p-growl>
