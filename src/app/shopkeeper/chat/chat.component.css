@@ -1,0 +1,263 @@
+@charset "UTF-8";
+
+.container {   
+  height: 100%;
+  overflow: hidden;
+  width: 100%;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-flow: column wrap;
+      flex-flow: column wrap;  
+}
+
+.contacts {
+  -ms-flex-preferred-size: 100%;
+      flex-basis: 100%;
+  width: 240px;
+  overflow-y: hidden;
+  background-color: #340054;
+  background-size: 6px 6px;
+  max-height: 100%;
+  overflow-y: auto; 
+}
+.contacts .buttons {
+  margin-right: 6px;
+}
+.contacts .buttons::after {
+  content: " ";
+  display: block;
+  clear: both;
+  height: 0;
+  visibility: hidden;
+  font-size: 0;
+}
+.contacts button {
+  float: right;
+  height: 30px;
+  width: 30px;
+  margin: 8px 6px 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  font-family: Fontawesome;
+  color: skyblue;
+  background: whitesmoke;
+  cursor: pointer;  
+}
+.contacts ul {
+  width: calc(100% - 12px * 2);
+  margin: 0 12px;
+  padding: 0;
+  list-style: none;  
+}
+.contacts li {
+  position: relative;
+  width: 100%;
+  height: 84px;
+  margin-bottom: 12px;
+  border-radius: 2px;
+  background: whitesmoke;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.contacts li::before {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 12px;
+  height: 48px;
+  width: 48px;
+  border-radius: 30px;
+  background: gainsboro;
+}
+
+.contacts li:hover::after {
+  height: 24px;
+  width: 24px;
+  margin: 0;
+}
+
+.messages, .form {  
+  width: calc(100% - 240px);
+}
+
+.messages {
+  -webkit-box-flex: 1;
+      -ms-flex: 1 1px;
+          flex: 1 1px;
+  background: #F0F0F0;
+  height: 100%;
+  bottom: 0;
+}
+.messages .messages-container {
+  list-style: none;
+  margin: 0;
+  padding: 36px;
+  height: 100%
+}
+.messages .messages-container::after {
+  content: " ";
+  display: block;
+  clear: both;
+  height: 0;
+  visibility: hidden;
+  font-size: 0;
+}
+
+.messages .message-body {
+  float: left;
+  clear: both;
+  line-height: 1.4em;
+  max-width: 90%;
+  margin: 12px;
+  padding: 0.7em 16px;
+  border-radius: 18px;
+  color: whitesmoke;
+  background: #340054;  
+}
+
+.messages .message-body.other {
+  border-bottom-left-radius: 2px;
+}
+.messages .message-body.me {
+  float: right;
+  border-bottom-right-radius: 2px;
+}
+
+.form {
+  background: gainsboro;
+}
+
+.form-inner {
+  height: 60px;
+  width: calc(100% - 12px * 2);
+  margin: 12px;
+  border-radius: 2px;
+  background: whitesmoke;
+  z-index: 8001;
+}
+
+.form-inner textarea {
+  width: calc(100% - 75px);
+  height: calc(100% - 11px);
+  background: transparent;
+  border-color: transparent;
+  resize: none;
+  outline-color: transparent;
+}
+
+.form-inner button {
+  float: right;
+  height: 100%;
+  width: 60px;
+  padding: 1px 0;
+  border: 0;
+  border-radius: 0 2px 2px 0;
+  font: 30px/60px sans-serif;
+  color: whitesmoke;
+  background: #340054;
+  cursor: pointer;
+}
+
+.small-screen .container {
+  -ms-flex-line-pack: center;
+      align-content: center;
+}
+.small-screen .stack-wrap {
+  position: relative;
+  -webkit-box-flex: 1;
+      -ms-flex: 1 1px;
+          flex: 1 1px;
+}
+.small-screen .stack-wrap div {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+}
+.small-screen .contacts {
+  left: 0;
+  width: 66px;
+}
+.small-screen .contacts .buttons {
+  display: none;
+}
+.small-screen .contacts ul {
+  width: 100%;
+  margin: 0;
+}
+.small-screen .contacts li { 
+  height: 66px;
+  margin: 0;
+  background: transparent;
+}
+.small-screen .contacts li::before {
+  top: 9px;
+  left: 9px;
+  background: whitesmoke;
+}
+.small-screen .contacts li::after {
+  top: -2px;
+  right: 2px;
+}
+.small-screen .messages {
+  left: 66px;
+  right: 0;
+  width: auto;
+}
+.small-screen .form {
+  width: 100%;
+  z-index: 8001;
+}
+
+.consumer-name {
+  position: absolute;
+  top: 30px;
+  left: 70px;
+}
+
+.bottom-to-top {
+  position: absolute;
+  width: calc(100% - 240px);
+  top: 0;
+  bottom: 0;
+  height: calc(100% - 84px);
+  z-index: 0;
+}
+
+img.consumer-img {    
+  position: absolute;
+  top: 18px;
+  left: 12px;
+  height: 48px;
+  width: 48px;
+  border-radius: 50%;
+}
+
+@media (max-width: 599px) {
+  .bottom-to-top {
+    position: absolute;
+    left: 66px;
+    right: 0;
+    width: auto;
+    z-index: 0;
+  }
+  img.consumer-img {
+    top: 9px;
+    left: 9px;
+  }
+}
+
+.scrollable {
+  position:absolute;
+  bottom:0px;
+  right:0px;
+  left:0px;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+li.message-body {
+  word-wrap: break-word;
+} 

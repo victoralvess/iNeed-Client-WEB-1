@@ -1,0 +1,55 @@
+.footer {
+  position: relative;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  background-color: #340054;
+}
+
+.footer .container {
+  padding-left: 20%;
+  color: white;
+}
+
+
+.no-list-style {
+	list-style: none;
+}
+
+.no-list-style li {	
+	margin: 10px 0;
+}
+
+.no-list-style li a {
+	font-weight: bold;
+	color: orange;
+}
+
+.no-list-style li a:hover {
+	text-decoration: none;
+}
+
+.mb20 {
+	margin-bottom: 20px;
+}
+
+.grey-text {
+	padding-top: 20px;
+	font-size: 10px;
+	text-decoration: none;
+	color: whitesmoke;
+}
+
+@media screen and (max-width: 767px) {
+	.footer .container {
+		text-align: center
+	}
+
+	.footer-title {
+		margin-left: -30px;
+	}
+
+	.no-list-style li a {
+		margin-left: -30px;
+	}
+}

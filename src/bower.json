@@ -1,0 +1,21 @@
+{
+  "name": "iNeedWebProject",
+  "homepage": "https://github.com/EZLEV/iNeedWebProject",
+  "authors": [
+    "Victor <victoralves28.pg@gmail.com>"
+  ],
+  "description": "",
+  "main": "index.html",
+  "license": "null",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "assets",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}

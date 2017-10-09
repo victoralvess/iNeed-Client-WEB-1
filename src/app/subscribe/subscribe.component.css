@@ -1,0 +1,6 @@
+.center-outlet {
+    position: absolute;
+    width: 100%;
+    min-width: 22em;
+    top: 25%;
+}

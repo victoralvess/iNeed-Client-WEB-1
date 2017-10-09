@@ -1,0 +1,37 @@
+<div #container class="container" style="position:absolute;width: 100%; padding-right: 0px; padding-left: 0px;">
+  <div #contacts class="contacts">
+    <ul>
+      <li *ngFor="let consumer of [1,2,3]">
+      	<img class="consumer-img" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"/>
+      </li>
+    </ul>
+  </div>
+  <div #messagesList class="messages">
+    <div class="bottom-to-top">
+      <div #scrollable class="scrollable">
+        <div *ngIf="messagesAreLoading">
+          <div class="loader tri"></div>
+          <div class="loader tri2"></div>
+          <div class="loader tri3"></div>
+          <div class="loader tri4"></div>
+          <div class="loader circ"></div>
+          <div class="loader circ2"></div>
+        </div>
+        <ul *ngIf="!(messagesAreLoading)" class="messages-container">
+          <li class="message-body" *ngFor="let message of (messagesObservable | async)"
+              [class.other]="(message.sentFrom != user.uid)"
+              [class.me]="(message.sentFrom == user.uid)">
+            {{message.message}}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div #stackWrap class="stack-wrap"></div>
+  <div class="form">
+    <div class="form-inner">
+      <textarea [(ngModel)]="textAreaInput" (keyup.enter)="send(textAreaInput)"></textarea>
+      <button (click)="send(textAreaInput)">✚</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,69 @@
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row" style="padding: 16px">
+            <button type="button" class="btn btn-primary btn-block" (click)="onClickSignInGoogle()">
+                <span class="glyphicon"
+                      [ngClass]="{
+                                          'glyphicon-refresh': btnLoadingGoogle,
+                                          'glyphicon-refresh-animate': btnLoadingGoogle
+                                      }"
+                ></span>
+                Criar conta com o Google</button>
+
+            <div class="space"></div>
+
+            <p align="center">OU</p>
+            <hr style="margin: 10px">
+
+            <form #formSignUp="ngForm" (ngSubmit)="onClickSignUp()">
+                <div class="form-group" [class.has-error]="!name.valid && name.touched">
+                    <input type="text" class="form-control" id="inputName" placeholder="Nome completo" name="name" minlength="5"
+                           [(ngModel)]="shopkeeper.name" required #name="ngModel">
+                </div>
+
+                <div class="alert alert-danger" role="alert" *ngIf="!name.valid && name.touched">
+                    <p class="small">Nome completo é obrigatório</p>
+                </div>
+
+                <div class="form-group" [class.has-error]="!email.valid && email.touched">
+                    <input type="email" class="form-control" id="inputEmail" placeholder="E-Mail" name="email"
+                           [(ngModel)]="shopkeeper.email" required email #email="ngModel">
+                </div>
+
+                <div class="alert alert-danger" role="alert" *ngIf="!email.valid && email.touched">
+                    <p class="small">E-Mail deve ser um endereço de e-mail válido</p>
+                </div>
+
+                <div class="form-group" [class.has-error]="!password.valid && password.touched">
+                    <input type="password" class="form-control" id="inputPassword" minlength="6" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,15}"
+                           placeholder="Senha" name="password" [(ngModel)]="shopkeeper.password" required #password="ngModel">
+                </div>
+
+                <div class="alert alert-danger" role="alert" *ngIf="!password.valid && password.touched">
+                    <p class="small">Deve conter pelo menos um número e uma letra maiúscula e minúscula, de 8 até 15 caracteres</p>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-block" [disabled]="!formSignUp.valid">
+                    <span class="glyphicon"
+                          [ngClass]="{
+                                          'glyphicon-refresh': btnLoadingEmail,
+                                          'glyphicon-refresh-animate': btnLoadingEmail
+                                      }"
+                    ></span>
+                    Continuar
+                </button>
+            </form>
+
+            <div style="margin-top: 1em;" class="alert alert-danger" role="alert"
+                 *ngIf="!shopkeeperLoggedStatus">
+                <p class="small" align="center">Não foi possivel criar sua conta no iNeed.<br>
+                    Esse e-mail já pode estar cadastrado.</p>
+            </div>
+
+            <hr>
+            <p class="small">Possui uma conta? <a routerLink="/subscribe/signin">Clique aqui</a> para logar.
+            </p>
+        </div>
+    </div>
+</div>
+

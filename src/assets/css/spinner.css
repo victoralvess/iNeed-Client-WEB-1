@@ -1,0 +1,73 @@
+.loader {border-radius: 50%;margin: 0 auto; position: absolute; top: 40%; left: 0;right: 0;
+  height: 50px;
+  width: 50px;
+}
+.tri {
+  animation: translateRotation 1.5s infinite reverse;
+  -webkit-animation: translateRotation 1.5s infinite reverse;
+  border-left: 60px solid transparent;
+  border-right: 60px solid transparent;
+  border-top: 0 solid transparent;
+  border-bottom: 60px solid #4b1093;
+  width: 0px;
+  z-index: 2;
+}
+.tri2 {
+  animation: translateRotation 1.5s infinite;
+  -webkit-animation: translateRotation 1.5s infinite;
+  border-left: 40px solid transparent;
+  border-right: 40px solid transparent;
+  border-top: 0px solid transparent;
+  border-bottom: 40px solid #340054;
+  width: 0px;
+  z-index: 1;
+}
+.tri3 {
+  animation: translateRotation 1.5s infinite;
+  -webkit-animation: translateRotation 1.5s infinite;
+  border-left: 40px solid transparent;
+  border-right: 40px solid transparent;
+  border-top: 40px solid #eb3aff;
+  border-bottom: 0px solid transparent;
+  width: 0px;
+  z-index: 1;
+}
+.tri4 {
+  animation: translateRotation 1.5s infinite reverse;
+  -webkit-animation: translateRotation 1.5s infinite reverse;
+  border-left: 60px solid transparent;
+  border-right: 60px solid transparent;
+  border-top: 60px solid #ab70ff;
+  border-bottom: 0px solid transparent;
+  width: 0px;
+  z-index: 2;
+}
+.circ {
+  border: 30px solid rgba(255, 255, 255, 0.1);
+}
+.circ2 {
+  border: 25px solid #ffffff;
+  box-sizing: border-box;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.15), 0 -2px 1px rgba(0, 0, 0, 0.15), -2px 0 1px rgba(0, 0, 0, 0.15), 2px 0 1px rgba(0, 0, 0, 0.15);
+  margin-top: 30px;
+  z-index: 90;
+}
+/* ANIMATE */
+@-webkit-keyframes translateRotation {
+  0% {
+    -webkit-transform: rotate(0deg);
+  }
+  100% {
+    -webkit-transform: rotate(360deg);
+  }
+}
+.plug {
+  display: inline-block;
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  color: #FFF;
+  font-size: 1.2em;
+  font-family: Sans-Serif;
+  font-weight: bold;
+}
