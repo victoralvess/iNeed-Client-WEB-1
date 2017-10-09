@@ -55,7 +55,11 @@ export class AddProductsComponent implements OnInit {
         return value;
     });
 
+<<<<<<< HEAD
     this.userSubscription = productsService.getUser().subscribe((user) => {
+=======
+    this.userSubscription = productsService.getUser().subscribe((user: any) => {
+>>>>>>> stores-module
     	console.log('worksat', user.worksAt);
 	   	user.worksAt.forEach(store => {
 	   		this.stores.push(new Store(store.storeId, store.storeName, store.storeAddress));
@@ -80,7 +84,11 @@ export class AddProductsComponent implements OnInit {
       setTimeout(() => {
         this.growlMessages = [];
       }, 7000)
+<<<<<<< HEAD
     });
+=======
+    }); 
+>>>>>>> stores-module
 
   }
 

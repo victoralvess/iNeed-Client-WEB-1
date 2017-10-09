@@ -2,8 +2,13 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../out-tsc/app",
+<<<<<<< HEAD
     "module": "es2015",
     "baseUrl": "",
+=======
+    "baseUrl": "./",
+    "module": "es2015",
+>>>>>>> stores-module
     "types": []
   },
   "exclude": [
