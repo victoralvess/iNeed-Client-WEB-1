@@ -1,6 +1,10 @@
 import { browser, by, element } from 'protractor';
 
+<<<<<<< HEAD
+export class INeedWebProjectPage {
+=======
 export class AppPage {
+>>>>>>> stores-module
   navigateTo() {
     return browser.get('/');
   }

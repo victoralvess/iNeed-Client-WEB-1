@@ -4,7 +4,11 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { AuthService } from '../../../../shared/services/services-auth/auth.service';
 import { Http } from '@angular/http';
 
+<<<<<<< HEAD
+import * as firebase from 'firebase/app';
+=======
 import * as firebase from 'firebase';
+>>>>>>> stores-module
 
 import { Subject } from 'rxjs/Subject';
 
@@ -18,6 +22,11 @@ export class ProductsService {
 
 	user : firebase.User;
   databaseChanged = new Subject<Message>();
+<<<<<<< HEAD
+
+  constructor(public db : AngularFireDatabase, private auth : AuthService, private http : Http, private notifications : NotificationsService) {
+  	this.user = firebase.auth().currentUser;
+=======
   pictureAdded = new Subject<any>();
 picsUploaded = 0;
   constructor(public db : AngularFireDatabase, private auth : AuthService, private http : Http, private notifications : NotificationsService) {
@@ -31,6 +40,7 @@ picsUploaded = 0;
           
 this.picsUploaded++;
     });
+>>>>>>> stores-module
   }
 
   getUser() {
@@ -42,7 +52,15 @@ this.picsUploaded++;
   }
 
   getProductsFrom(thisStore, params?) {
+<<<<<<< HEAD
+		return this.db.list(`/products-stores/${thisStore}`, {
+      query : params || {
+        orderByChild: 'name'
+      }
+		});
+=======
 		return this.db.list(`/products-stores/${thisStore}`);
+>>>>>>> stores-module
   }
 
   addProduct(product) {
@@ -54,13 +72,29 @@ this.picsUploaded++;
         price : product.price,
         store : store,
         categories : product.selectedCategories,
+<<<<<<< HEAD
+        pictures : product.images
+      };
+
+      let productsRef = this.db.database.ref(`/products`);
+=======
       };
 
       let productsRef = this.db.app.database().ref(`/products`);
+>>>>>>> stores-module
       let newFirebaseProduct = productsRef.push(newProduct);
 
       let key = newFirebaseProduct.key;
 
+<<<<<<< HEAD
+      let linkProductToStoreRef = this.db.database.ref(`/products-stores/${store}/${key}`);
+      linkProductToStoreRef.set(newProduct);
+
+      product.selectedCategories.forEach((category) => {
+        this.db.database.ref(`/products-categories/${category}/${key}`).set(newProduct);
+      });
+
+=======
       let linkProductToStoreRef = this.db.app.database().ref(`/products-stores/${store}/${key}`);
       linkProductToStoreRef.set(newProduct);
 let picIndex = 0;
@@ -87,6 +121,7 @@ let picIndex = 0;
       
       
       */
+>>>>>>> stores-module
       this.verifyChangesOnProducts(key, 'Sucesso!', 'O produto foi cadastrado com êxito!');
 
     });
@@ -112,12 +147,29 @@ let picIndex = 0;
         updates[`/products-categories/${category}/${product.productId}`] = updatedProduct;
     });
 
+<<<<<<< HEAD
+    this.db.database.ref().update(updates);
+=======
     this.db.app.database().ref().update(updates);
+>>>>>>> stores-module
 
     this.verifyChangesOnProducts(product.productId, 'Sucesso!', `O produto ${product.productId} foi atualizado com êxito!`);
 
   }
 
+<<<<<<< HEAD
+  deleteProduct(key, categories, store) {
+    let productsRef = this.db.database.ref(`/products`);
+    productsRef.child(`${key}`).remove();
+    this.db.database.ref(`/products-stores/${store}/${key}`).remove();
+    categories.forEach((category) => {
+      this.db.database.ref(`/products-categories/${category}/${key}`).remove();
+    });
+  }
+
+  verifyChangesOnProducts(productKey, successSummary, successMessage) {
+    this.db.database.ref(`/products/${productKey}`).once('value', (s) => {
+=======
   deleteProduct(key, categories, store, picsQty) {
     let productsRef = this.db.app.database().ref(`/products`);
     productsRef.child(`${key}`).remove();
@@ -133,6 +185,7 @@ let picIndex = 0;
 
   verifyChangesOnProducts(productKey, successSummary, successMessage) {
     this.db.app.database().ref(`/products/${productKey}`).once('value', (s) => { 
+>>>>>>> stores-module
       this.databaseChanged.next(this.notifications.success(successSummary, successMessage));
     });
   }

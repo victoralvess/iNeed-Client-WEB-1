@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+import {Component, OnInit} from '@angular/core';
+=======
 import { Component, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
@@ -9,10 +12,41 @@ import { LocationService } from '../services/location/location.service';
 import { StoresService } from '../services/stores.service';
 import { Store } from '../models/store.model';
 import { StoreLocation } from '../models/store-location.model';
+>>>>>>> stores-module
 
 @Component({
   selector: 'app-add-stores',
   templateUrl: './add-stores.component.html',
+<<<<<<< HEAD
+  styleUrls: ['./add-stores.component.css']
+})
+export class AddStoresComponent implements OnInit {
+
+  zipCode: String;
+  color1: string;
+  user: firebase.User;
+  selectedCategories: any[];
+  files = [];
+
+  color2: string = '#1976D2';
+
+  constructor() {
+  }
+
+  ngOnInit() {
+  }
+
+  imageFinishedUploading(file) {
+    console.log(file, file.file.type);
+    if (file.file.type != 'image/jpeg' && file.file.type != 'image/png') {
+      return;
+    }
+    this.files.push(file);
+  }
+
+  imageRemoved(file) {
+    this.files.splice(this.files.indexOf(file.src), 1);
+=======
   styleUrls: ['./add-stores.component.scss']
 })
 export class AddStoresComponent implements OnDestroy {
@@ -175,9 +209,14 @@ export class AddStoresComponent implements OnDestroy {
   imageRemoved(event: FileHolder) {
     this.files.splice(this.files.indexOf(event.file), 1);
     console.log(this.files);
+>>>>>>> stores-module
   }
 
   uploadStateChange(state: boolean) {
     console.log(JSON.stringify(state));
   }
+<<<<<<< HEAD
+
+=======
+>>>>>>> stores-module
 }

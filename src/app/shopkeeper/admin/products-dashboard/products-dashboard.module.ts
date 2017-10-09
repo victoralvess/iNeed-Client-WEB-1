@@ -20,8 +20,11 @@ import { BootstrapModalModule } from 'ngx-modialog/plugins/bootstrap';
 import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
 import { NotificationsService } from '../../../shared/services/notifications/notifications.service';
 
+<<<<<<< HEAD
+=======
 import { CovalentDialogsModule } from '@covalent/core';
 import { NoConflictStyleCompatibilityMode } from '@angular/material';
+>>>>>>> stores-module
 @NgModule({
   imports: [
     CommonModule,
@@ -36,9 +39,13 @@ import { NoConflictStyleCompatibilityMode } from '@angular/material';
     ImageUploadModule.forRoot(),
     ModalModule.forRoot(),
     BootstrapModalModule,
+<<<<<<< HEAD
+    SearchPipeModule
+=======
     SearchPipeModule,
     CovalentDialogsModule,
     NoConflictStyleCompatibilityMode
+>>>>>>> stores-module
   ],
   declarations: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
   exports: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],

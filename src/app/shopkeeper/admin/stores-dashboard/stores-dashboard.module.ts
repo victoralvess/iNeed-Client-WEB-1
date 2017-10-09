@@ -9,6 +9,9 @@ import {DeleteStoresComponent} from './delete-stores/delete-stores.component';
 import {CodeHighlighterModule, InputMaskModule} from 'primeng/primeng';
 import {FormsModule} from '@angular/forms';
 import {ColorPickerModule} from 'primeng/primeng';
+<<<<<<< HEAD
+import {ImageUploadModule} from 'angular2-image-upload';
+=======
 import { ReactiveFormsModule } from '@angular/forms';
 import { TextMaskModule } from 'angular2-text-mask';
  import { HttpModule } from '@angular/http';
@@ -54,6 +57,7 @@ import {
 
 import { StoresService } from './services/stores.service';
 import { LocationService } from './services/location/location.service';
+>>>>>>> stores-module
 
 @NgModule({
   imports: [
@@ -63,6 +67,11 @@ import { LocationService } from './services/location/location.service';
     ColorPickerModule,
     CodeHighlighterModule,
     ImageUploadModule.forRoot(),
+<<<<<<< HEAD
+    FormsModule
+  ],
+  declarations: [StoresDashboardComponent, AddStoresComponent, EditStoresComponent, DeleteStoresComponent]
+=======
     FormsModule,
     ReactiveFormsModule,
 TextMaskModule,
@@ -105,6 +114,7 @@ CovalentDialogsModule,
   ],
   declarations: [StoresDashboardComponent, AddStoresComponent, EditStoresComponent, DeleteStoresComponent],
   providers: [StoresService, LocationService]
+>>>>>>> stores-module
 })
 export class StoresDashboardModule {
 }
