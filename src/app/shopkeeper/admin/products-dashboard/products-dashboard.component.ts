@@ -34,14 +34,14 @@ export class ProductsDashboardComponent implements OnInit {
     currentPage: 1
   };
 
-  constructor(private productsService : ProductsService, private afAuth: AngularFireAuth, private dialogService: TdDialogService,
-    private _viewContainerRef: ViewContainerRef) {
+  constructor(private productsService: ProductsService, private afAuth: AngularFireAuth, private dialogService: TdDialogService,
+    private viewContainerRef: ViewContainerRef) {
 
       this.productsSubject.asObservable().subscribe((storeId) => {
         this.products = this.productsService.getProductsFrom(storeId);
         this.productsSubscription = this.products.subscribe();
 });
- 
+
     this.userSubscription = productsService.getUser().subscribe((user: any) => {
       this.stores = user.worksAt;
       this.lastSelected = this.stores[0].storeId;
@@ -50,7 +50,7 @@ export class ProductsDashboardComponent implements OnInit {
 
 
     this.afAuth.auth.onAuthStateChanged((user) => {
-      if(!user) {
+      if (!user) {
         console.log('destrói tuto chessus');
         this.products.subscribe().unsubscribe();
         this.userSubscription.unsubscribe();
@@ -64,55 +64,22 @@ export class ProductsDashboardComponent implements OnInit {
 
   onChange(value) {
     this.lastSelected = value;
-    this.query = "";
+    this.query = '';
 
     this.productsSubject.next(this.lastSelected);
   }
 
   deleteProduct(key, categories, store, picsQty) {
-  	console.log('delete', key);
-  	console.log('delete', categories);
-  	console.log('delete', store);
-    console.log('delete', picsQty);/*
-    const deleteModal = this.modal.confirm()
-                      .size('lg')
-                      .showClose(false)
-                      .keyboard(27)
-                      .title('Excluir dados')
-                      .body(`
-                          <div class="alert alert-danger">
-                            <b><span class="material-icons">warning</span> O produto será excluído (permanentemente).</b>
-                          </div>
-                          <p>Você realmente deseja excluir este produto?</p>
-                          `)
-                      .cancelBtn('CANCELAR')
-                      .okBtn('EXCLUIR')
-                      .okBtnClass('btn btn-danger')
-                      .open();
-
-    deleteModal.then((dialogRef) => {
-      dialogRef.result.then((result) => {
-        if(result) {
-          this.productsService.deleteProduct(key, categories, store);
-        }
-      }).catch((err) => {
-
-      });
-    });*/
-
     this.dialogService.openConfirm({
       message: `Você realmente deseja excluir este produto?`,
-      disableClose: true, // defaults to false
-      viewContainerRef: this._viewContainerRef, //OPTIONAL
-      title: '', //OPTIONAL, hides if not provided
-      cancelButton: 'Cancelar', //OPTIONAL, defaults to 'CANCEL'
-      acceptButton: 'Excluir', //OPTIONAL, defaults to 'ACCEPT'
+      disableClose: true,
+      viewContainerRef: this.viewContainerRef,
+      title: '',
+      cancelButton: 'Cancelar',
+      acceptButton: 'Excluir',
     }).afterClosed().subscribe((accept: boolean) => {
       if (accept) {
-        // DO SOMETHING
         this.productsService.deleteProduct(key, categories, store, picsQty);
-      } else {
-        // DO SOMETHING ELSE
       }
     });
 
