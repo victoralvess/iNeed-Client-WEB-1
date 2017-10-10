@@ -1,14 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ProductsService } from './services/products.service';
-import { Router } from '@angular/router';
 
 import { AngularFireAuth } from 'angularfire2/auth';
 
 import * as firebase from 'firebase/app';
 import 'rxjs/add/operator/map';
 import { PaginationInstance } from 'ngx-pagination';
-
-import { Modal } from 'ngx-modialog/plugins/bootstrap';
 
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
@@ -37,7 +34,7 @@ export class ProductsDashboardComponent implements OnInit {
     currentPage: 1
   };
 
-  constructor(private router : Router, private productsService : ProductsService, private modal : Modal, private afAuth : AngularFireAuth, private _dialogService: TdDialogService,
+  constructor(private productsService : ProductsService, private afAuth: AngularFireAuth, private dialogService: TdDialogService,
     private _viewContainerRef: ViewContainerRef) {
 
       this.productsSubject.asObservable().subscribe((storeId) => {
@@ -103,7 +100,7 @@ export class ProductsDashboardComponent implements OnInit {
       });
     });*/
 
-    this._dialogService.openConfirm({
+    this.dialogService.openConfirm({
       message: `Você realmente deseja excluir este produto?`,
       disableClose: true, // defaults to false
       viewContainerRef: this._viewContainerRef, //OPTIONAL
