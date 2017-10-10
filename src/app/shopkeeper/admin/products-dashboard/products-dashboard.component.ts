@@ -1,14 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { ProductsService } from './services/products.service';
 
 import { AngularFireAuth } from 'angularfire2/auth';
 
-import * as firebase from 'firebase/app';
-import 'rxjs/add/operator/map';
+import { User } from 'firebase/app';
 import { PaginationInstance } from 'ngx-pagination';
 
 import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
 import { ViewContainerRef } from '@angular/core';
 import { TdDialogService } from '@covalent/core';
 
@@ -17,17 +15,17 @@ import { TdDialogService } from '@covalent/core';
   templateUrl: './products-dashboard.component.html',
   styleUrls: ['./products-dashboard.component.css']
 })
-export class ProductsDashboardComponent implements OnInit {
+export class ProductsDashboardComponent {
 
   stores: any[];
   products;
-  user: firebase.User;
+  user: User;
   query: any;
   currentPage = 1;
   userSubscription;
   productsSubscription;
   lastSelected;
-  productsSubject = new Subject<string>();
+  products$ = new Subject<string>();
   public paginationComponentConfig: PaginationInstance = {
     id: 'products-pagination',
     itemsPerPage: 10,
@@ -37,7 +35,7 @@ export class ProductsDashboardComponent implements OnInit {
   constructor(private productsService: ProductsService, private afAuth: AngularFireAuth, private dialogService: TdDialogService,
     private viewContainerRef: ViewContainerRef) {
 
-      this.productsSubject.asObservable().subscribe((storeId) => {
+      this.products$.asObservable().subscribe((storeId) => {
         this.products = this.productsService.getProductsFrom(storeId);
         this.productsSubscription = this.products.subscribe();
 });
@@ -45,7 +43,7 @@ export class ProductsDashboardComponent implements OnInit {
     this.userSubscription = productsService.getUser().subscribe((user: any) => {
       this.stores = user.worksAt;
       this.lastSelected = this.stores[0].storeId;
-      this.productsSubject.next(this.lastSelected);
+      this.products$.next(this.lastSelected);
     });
 
 
@@ -55,18 +53,16 @@ export class ProductsDashboardComponent implements OnInit {
         this.products.subscribe().unsubscribe();
         this.userSubscription.unsubscribe();
         this.productsSubscription.unsubscribe();
-        this.productsSubject.unsubscribe();
+        this.products$.unsubscribe();
       }
     });
   }
-
-  ngOnInit() { }
 
   onChange(value) {
     this.lastSelected = value;
     this.query = '';
 
-    this.productsSubject.next(this.lastSelected);
+    this.products$.next(this.lastSelected);
   }
 
   deleteProduct(key, categories, store, picsQty) {
