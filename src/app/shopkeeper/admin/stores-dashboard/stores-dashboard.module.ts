@@ -17,7 +17,6 @@ import { CovalentDialogsModule } from '@covalent/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ImageUploadModule } from 'angular2-image-upload';
 import {
-  MdInput,
   MdAutocompleteModule,
   MdButtonModule,
   MdButtonToggleModule,
@@ -54,7 +53,7 @@ import {
 
 import { StoresService } from './services/stores.service';
 import { LocationService } from './services/location/location.service';
-
+import { NoConflictStyleCompatibilityMode } from '@angular/material';
 @NgModule({
   imports: [
     CommonModule,
@@ -69,6 +68,7 @@ TextMaskModule,
 HttpModule,
 Md2Module,
 CovalentDialogsModule,
+NoConflictStyleCompatibilityMode,
   MdAutocompleteModule,
   MdButtonModule,
   MdButtonToggleModule,

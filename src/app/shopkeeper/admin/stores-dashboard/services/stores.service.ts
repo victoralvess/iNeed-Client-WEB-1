@@ -15,9 +15,12 @@ export class StoresService {
   pictureAdded = new Subject<any>();
   picsUploaded = 0;
 
+  user: firebase.User;
+
   constructor(public db: AngularFireDatabase, private http: Http) {
 
     this.pictureAdded.asObservable().subscribe((store) => {
+      this.user = firebase.auth().currentUser;
       console.log('picsUp', this.picsUploaded);
       this.db.app.database().ref(`/stores/${store.key}/pictures/${this.picsUploaded}`).set(store.url);
       this.picsUploaded++;
@@ -31,6 +34,9 @@ export class StoresService {
   getProductsFrom(thisStore, params?) {
 		return this.db.list(`/products-stores/${thisStore}`);
   }*/
+
+  getAllStores() {
+  }
 
   getAllCategories() {
     return this.db.list(`/categories`);
