@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div class="panel panel-default">
   <div class="panel-heading">Informações da loja</div>
   <div class="panel-body">
@@ -140,3 +141,227 @@
   </div>
 </div>
 
+=======
+<div fxLayout="column">
+  <md-accordion class="headers-align">
+    <md-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle="true">
+    <md-expansion-panel-header>
+      <md-panel-title>
+        Sua loja
+      </md-panel-title>
+      <md-panel-description>
+        Comece pelo básico
+        <md-icon>store</md-icon>
+      </md-panel-description>
+    </md-expansion-panel-header>
+    <form [formGroup]="storeForm">
+      <div fxLayout="column">
+        <div fxFlex="100"> 
+          <md-form-field fxFlex="100">
+            <input mdInput placeholder="Nome da loja" [formControl]="storeForm.controls['name']" required>  
+            <md-hint align="end">{{ storeForm.controls['name'].value.length }} / 45</md-hint>
+            <md-error align="start" *ngIf="storeForm.controls['name'].hasError('maxlength')">
+              O nome é <strong>longo demais</strong>
+            </md-error>
+            <md-error *ngIf="storeForm.controls['name'].hasError('minlength')">
+              O nome é <strong>curto demais</strong>
+            </md-error>
+          </md-form-field>
+        </div>
+        <div fxFlex="100">
+          <md-form-field fxFlex="100">
+            <input mdInput placeholder="CNPJ" [formControl]="storeForm.controls['cnpj']" [textMask]="{mask: cnpjMask, placeholderChar: '\u2000'}" required>  
+            <md-error *ngIf="storeForm.controls['cnpj'].hasError('required') || storeForm.controls['cnpj'].hasError('minlength')">
+              CNPJ <strong>incorreto</strong>
+            </md-error>
+          </md-form-field>  
+        </div>
+        <div fxFlex="100">
+        <md2-colorpicker mdInput fxFlex="100" [formControl]="storeForm.controls['color']" placeholder="Cor da loja" required></md2-colorpicker> </div>
+        <div fxFlex="100">
+        <md-form-field fxFlex="100">
+          <textarea mdInput placeholder="{{ 'Conte-nos mais sobre ' + ((storeForm.controls['name'].value.trim().length > 3) ? storeForm.controls['name'].value : 'a sua loja') }}" [formControl]="storeForm.controls['description']" required></textarea>
+          <md-hint align="end">{{ storeForm.controls['description'].value.length }} / 200</md-hint>
+          <md-error align="start" *ngIf="storeForm.controls['description'].hasError('maxlength')">
+            A descrição é <strong>longa demais</strong>
+          </md-error>
+          <md-error align="start" *ngIf="storeForm.controls['description'].hasError('minlength')">
+            A descrição é <strong>curta demais</strong>
+          </md-error>
+        </md-form-field></div>
+        <div fxFlex="100">
+          <image-upload [max]="5" [extensions]="['jpeg','png']"
+          [buttonCaption]="'Escolha'"
+          [dropBoxMessage]="'Solte suas imagens aqui!'"
+          [fileTooLargeMessage]="'Imagem muito grande!'" 
+          (uploadFinished)="imageFinishedUploading($event)"
+          (removed)="imageRemoved($event)"
+          (uploadStateChanged)="uploadStateChange($event)"></image-upload>
+        </div>  
+        <md-action-row>
+          <button md-button color="primary" (click)="nextStep()" class="text-upper" [disabled]="!storeForm.valid">Próxima</button>
+        </md-action-row>
+      </div>
+    </form>
+    </md-expansion-panel>
+    <md-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle="true">
+    <md-expansion-panel-header>
+      <md-panel-title>
+        Adicionais
+      </md-panel-title>
+      <md-panel-description>
+        Configurações opcionais
+        <md-icon>settings</md-icon>
+      </md-panel-description>
+    </md-expansion-panel-header>
+    <form [formGroup]="extraInfoForm">
+      <div fxLayout="column">
+        <div fxFlex="100">
+        <md-form-field fxFlex="100">
+          <input mdInput placeholder="Telefone" [formControl]="extraInfoForm.controls['phone']" [textMask]="{mask: phoneMask, placeholderChar: '\u2000'}">  
+          <md-error align="start" *ngIf="extraInfoForm.controls['phone'].value.length > 0 &&extraInfoForm.controls['phone'].hasError('minlength')">
+            Telefone <strong>incorreto</strong>
+          </md-error>
+        </md-form-field>
+        </div>
+        <div fxFlex="100">
+        <md-form-field fxFlex="100">
+          <input mdInput placeholder="Celular/Whatsapp" [formControl]="extraInfoForm.controls['cellphone']" [textMask]="{mask: cellphoneMask, placeholderChar: '\u2000'}">  
+          <md-error align="start" *ngIf="extraInfoForm.controls['cellphone'].value.length > 0 &&extraInfoForm.controls['cellphone'].hasError('minlength')">
+            Celular/Wpp <strong>incorreto</strong>
+          </md-error>
+        </md-form-field>
+        </div>
+        <div fxFlex="100">
+        <md-select fxFlex="100" id="options-select"
+            label="Formas de pagamento aceitas"
+            placeholder="Formas de pagamento aceitas"
+            [formControl]="extraInfoForm.controls['mainPaymentWays']" multiple>
+            <md-option value="money">Dinheiro</md-option>
+            <md-option value="credit">Cartão de crédito</md-option>
+            <md-option value="debit">Cartão de débito</md-option>
+          </md-select>
+          </div><div fxFlex="100">
+          <md-select fxFlex="100" id="options-select"
+            label="Principais categorias"
+            placeholder="Principais categorias"
+            [formControl]="extraInfoForm.controls['mainCategories']" multiple>
+            <md-option value="money">Dinheiro</md-option>
+            <md-option value="credit">Cartão de crédito</md-option>
+            <md-option value="debit">Cartão de débito</md-option>
+          </md-select>
+          </div>
+        <md-action-row>
+          <button md-button color="warn" (click)="prevStep()" class="text-upper">Voltar</button>
+          <button md-button color="primary" (click)="nextStep()" class="text-upper" [disabled]="!extraInfoForm.valid">Próxima</button>
+        </md-action-row>
+        </div>
+    </form>
+    </md-expansion-panel>
+    <md-expansion-panel [expanded]="step === 2" (opened)="setStep(2)" hideToggle="true">
+    <md-expansion-panel-header>
+      <md-panel-title>
+        Endereço
+      </md-panel-title>
+      <md-panel-description>
+        Onde fica sua loja
+        <md-icon>map</md-icon>
+      </md-panel-description>
+    </md-expansion-panel-header>
+    <form [formGroup]="addressForm">
+    <div fxLayout="column">
+        <div fxFlex="100">
+      <md-form-field fxFlex="100">
+        <input mdInput placeholder="CEP" [formControl]="addressForm.controls['zipCode']" [textMask]="{mask: zipCodeMask, placeholderChar: '\u2000', keepCharPositions: true}" (blur)="locationByZipCode()" required>  
+        <md-error *ngIf="addressForm.controls['zipCode'].hasError('required') || addressForm.controls['zipCode'].hasError('minlength')">
+          CEP <strong>incorreto</strong>
+        </md-error>
+      </md-form-field>    </div>   <div fxFlex="100">
+      <md-form-field fxFlex="100">       
+        <input mdInput type="text" [formControl] = "addressForm.controls['street']" placeholder="Logradouro">
+        <md-error *ngIf="addressForm.controls['street'].hasError('required')">
+          Insira o nome do <strong>logradouro</strong>
+        </md-error>
+      </md-form-field></div><div fxFlex="100">
+      <md-form-field fxFlex="100">
+        <input mdInput placeholder="Número" [formControl]="addressForm.controls['number']" (blur)="locationByZipCode()" required>
+              
+      <md-error *ngIf="addressForm.controls['zipCode'].hasError('number') || addressForm.controls['zipCode'].hasError('number')">
+        Insira um número       
+      </md-error>   
+      </md-form-field></div><div fxFlex="100">
+      <md-form-field fxFlex="100">
+        <input mdInput placeholder="Bairro" [formControl]="addressForm.controls['vicinity']">
+      </md-form-field> </div><div fxFlex="100">
+      <md-form-field fxFlex="100">
+        <input mdInput placeholder="Cidade" [formControl]="addressForm.controls['city']">
+      </md-form-field> </div>
+      <div fxFlex="100">
+      <md-select id="options-select" fxFlex="100"
+        label="Estado"
+        placeholder="Estado"
+        [formControl]="addressForm.controls['state']">
+        <md-option value="AC">Acre</md-option>
+        <md-option value="AL">Alagoas</md-option>
+        <md-option value="AP">Amapá</md-option>
+        <md-option value="AM">Amazonas</md-option>
+        <md-option value="BA">Bahia</md-option>
+        <md-option value="CE">Ceará</md-option>
+        <md-option value="DF">Distrito Federal</md-option>
+        <md-option value="ES">Espírito Santo</md-option>
+        <md-option value="GO">Goiás</md-option>
+        <md-option value="MA">Maranhão</md-option>
+        <md-option value="MT">Mato Grosso</md-option>
+        <md-option value="MS">Mato Grosso do Sul</md-option>
+        <md-option value="MG">Minas Gerais</md-option>
+        <md-option value="PA">Pará</md-option>
+        <md-option value="PB">Paraíba</md-option>
+        <md-option value="PR">Paraná</md-option>
+        <md-option value="PE">Pernambuco</md-option>
+        <md-option value="PI">Piauí</md-option>
+        <md-option value="RJ">Rio de Janeiro</md-option>
+        <md-option value="RN">Rio Grande do Norte</md-option>
+        <md-option value="RS">Rio Grande do Sul</md-option>
+        <md-option value="RO">Rondônia</md-option>
+        <md-option value="RR">Rorâima</md-option>
+        <md-option value="SC">Santa Catarina</md-option>
+        <md-option value="SP">São Paulo</md-option>
+        <md-option value="SE">Sergipe</md-option>
+        <md-option value="TO">Tocantins</md-option>
+      </md-select>
+      </div>
+      <md-action-row>
+        <button md-button color="warn" (click)="prevStep()" class="text-upper">Voltar</button>
+        <button md-button color="primary" (click)="nextStep()" class="text-upper" [disabled]="!addressForm.valid">Próxima</button>
+      </md-action-row>
+      </div>
+    </form>  
+    </md-expansion-panel>  
+    <md-expansion-panel [expanded]="step === 3" (opened)="setStep(3)" hideToggle="true">
+    <md-expansion-panel-header>
+      <md-panel-title>
+        Confirmação
+      </md-panel-title>
+      <md-panel-description>
+        Leia os termos de uso
+        <md-icon>assignment</md-icon>
+      </md-panel-description>
+    </md-expansion-panel-header>
+    <div>
+      <p>
+        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+        cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+      </p>
+    </div>
+    <md-action-row>
+      <button md-button color="warn" (click)="prevStep()" class="text-upper">Voltar</button>
+      <button md-button color="primary" [disabled]="!(storeForm.valid && addressForm.valid && extraInfoForm.valid)" (click)="storeForm.valid && addressForm.valid && addStore([storeForm.value, addressForm.value, extraInfoForm.value])" class="text-upper">Li e Concordo</button>
+    </md-action-row>
+    </md-expansion-panel>
+  </md-accordion>
+</div>
+>>>>>>> stores-module

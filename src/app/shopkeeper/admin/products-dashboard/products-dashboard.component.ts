@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+<<<<<<< HEAD
 import { FirebaseListObservable } from 'angularfire2/database';
+=======
+>>>>>>> stores-module
 import { ProductsService } from './services/products.service';
 import { Router } from '@angular/router';
 
@@ -12,6 +15,12 @@ import { PaginationInstance } from 'ngx-pagination';
 import { Modal } from 'ngx-modialog/plugins/bootstrap';
 
 import { Subject } from 'rxjs/Subject';
+<<<<<<< HEAD
+=======
+import { Observable } from 'rxjs/Observable';
+import { ViewContainerRef } from '@angular/core';
+import { TdDialogService } from '@covalent/core';
+>>>>>>> stores-module
 
 @Component({
   selector: 'app-products-dashboard',
@@ -20,22 +29,33 @@ import { Subject } from 'rxjs/Subject';
 })
 export class ProductsDashboardComponent implements OnInit {
 
+<<<<<<< HEAD
 	stores : any[];
 	products;
 	user : firebase.User;
   query : any;
+=======
+  stores: any[];
+  products;
+  user: firebase.User;
+  query: any;
+>>>>>>> stores-module
   currentPage = 1;
   userSubscription;
   productsSubscription;
   lastSelected;
   productsSubject = new Subject<string>();
+<<<<<<< HEAD
 
+=======
+>>>>>>> stores-module
   public paginationComponentConfig: PaginationInstance = {
     id: 'products-pagination',
     itemsPerPage: 10,
     currentPage: 1
   };
 
+<<<<<<< HEAD
   constructor(private router : Router, private productsService : ProductsService, private modal : Modal, private afAuth : AngularFireAuth) {
 
 		this.productsSubject.asObservable().subscribe((storeId) => {
@@ -44,6 +64,17 @@ export class ProductsDashboardComponent implements OnInit {
   	});
 
     this.userSubscription = productsService.getUser().subscribe((user) => {
+=======
+  constructor(private router : Router, private productsService : ProductsService, private modal : Modal, private afAuth : AngularFireAuth, private _dialogService: TdDialogService,
+    private _viewContainerRef: ViewContainerRef) {
+
+      this.productsSubject.asObservable().subscribe((storeId) => {
+        this.products = this.productsService.getProductsFrom(storeId);
+        this.productsSubscription = this.products.subscribe();
+});
+ 
+    this.userSubscription = productsService.getUser().subscribe((user: any) => {
+>>>>>>> stores-module
       this.stores = user.worksAt;
       this.lastSelected = this.stores[0].storeId;
       this.productsSubject.next(this.lastSelected);
@@ -66,6 +97,7 @@ export class ProductsDashboardComponent implements OnInit {
   onChange(value) {
     this.lastSelected = value;
     this.query = "";
+<<<<<<< HEAD
     this.productsSubject.next(this.lastSelected);
   }
 
@@ -73,6 +105,17 @@ export class ProductsDashboardComponent implements OnInit {
   	console.log('delete', key);
   	console.log('delete', categories);
   	console.log('delete', store);
+=======
+
+    this.productsSubject.next(this.lastSelected);
+  }
+
+  deleteProduct(key, categories, store, picsQty) {
+  	console.log('delete', key);
+  	console.log('delete', categories);
+  	console.log('delete', store);
+    console.log('delete', picsQty);/*
+>>>>>>> stores-module
     const deleteModal = this.modal.confirm()
                       .size('lg')
                       .showClose(false)
@@ -97,6 +140,25 @@ export class ProductsDashboardComponent implements OnInit {
       }).catch((err) => {
 
       });
+<<<<<<< HEAD
+=======
+    });*/
+
+    this._dialogService.openConfirm({
+      message: `Você realmente deseja excluir este produto?`,
+      disableClose: true, // defaults to false
+      viewContainerRef: this._viewContainerRef, //OPTIONAL
+      title: '', //OPTIONAL, hides if not provided
+      cancelButton: 'Cancelar', //OPTIONAL, defaults to 'CANCEL'
+      acceptButton: 'Excluir', //OPTIONAL, defaults to 'ACCEPT'
+    }).afterClosed().subscribe((accept: boolean) => {
+      if (accept) {
+        // DO SOMETHING
+        this.productsService.deleteProduct(key, categories, store, picsQty);
+      } else {
+        // DO SOMETHING ELSE
+      }
+>>>>>>> stores-module
     });
 
   }

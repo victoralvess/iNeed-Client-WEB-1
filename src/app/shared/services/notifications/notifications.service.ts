@@ -8,14 +8,22 @@ export class NotificationsService {
 
   success(summary : string, detail : string) {
     this._notification = {
+<<<<<<< HEAD
       severity : NotificationsSeverity.SUCCESS.valueOf()
+=======
+      severity : 'success'
+>>>>>>> stores-module
     };
     return this.generateNotification(summary, detail);
   }
 
   error(summary : string, detail : string) {
     this._notification = {
+<<<<<<< HEAD
       severity : NotificationsSeverity.ERROR.valueOf()
+=======
+      severity : 'error'
+>>>>>>> stores-module
     };
     return this.generateNotification(summary, detail);
   }
@@ -27,8 +35,11 @@ export class NotificationsService {
   }
 
 }
+<<<<<<< HEAD
 
 export enum NotificationsSeverity {
   SUCCESS = 'success',
   ERROR = 'error'
 }
+=======
+>>>>>>> stores-module

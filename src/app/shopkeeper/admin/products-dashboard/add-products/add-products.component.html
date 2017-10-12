@@ -30,9 +30,15 @@
                 [buttonCaption]="'Escolha'"
                 [dropBoxMessage]="'Solte suas imagens aqui!'"
                 [fileTooLargeMessage]="'Imagem muito grande!'" 
+<<<<<<< HEAD
   (onFileUploadFinish)="imageFinishedUploading($event)"
   (onRemove)="imageRemoved($event)"
   (isPending)="uploadStateChange($event)"></image-upload>
+=======
+  (uploadFinished)="imageFinishedUploading($event)"
+  (removed)="imageRemoved($event)"
+  (uploadStateChanged)="uploadStateChange($event)"></image-upload>
+>>>>>>> stores-module
 	<button class="btn" type="submit" [disabled]="!productsForm.valid">Adicionar</button>
 </form>
 <p-growl [value]="growlMessages"></p-growl>
