@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
-import { AngularFireDatabase } from 'angularfire2/database';
+import { AngularFireDatabase, FirebaseObjectObservable, FirebaseListObservable } from 'angularfire2/database';
 import { Http } from '@angular/http';
 
 import * as firebase from 'firebase/app';
@@ -12,14 +12,16 @@ export class StoresService {
 
   optimizationAPI = 'http://localhost:8081';
 
-  pictureAdded = new Subject<any>();
+  pictureAdded$ = new Subject<any>();
   picsUploaded = 0;
 
   user: firebase.User;
+  stores$ = new Subject<FirebaseObjectObservable<any>[]>();
 
   constructor(public db: AngularFireDatabase, private http: Http) {
+    this.user = firebase.auth().currentUser;
 
-    this.pictureAdded.asObservable().subscribe((store) => {
+    this.pictureAdded$.asObservable().subscribe((store) => {
       this.user = firebase.auth().currentUser;
       console.log('picsUp', this.picsUploaded);
       this.db.app.database().ref(`/stores/${store.key}/pictures/${this.picsUploaded}`).set(store.url);
@@ -27,15 +29,31 @@ export class StoresService {
     });
   }
 /*
-  getUser() {
-  	return this.db.object(`users/${this.user.uid}`);
-  }
+  
 
   getProductsFrom(thisStore, params?) {
 		return this.db.list(`/products-stores/${thisStore}`);
   }*/
 
+  private getUser() {
+    return this.db.object(`users/${this.user.uid}`);
+  }
+
   getAllStores() {
+    let allStores: FirebaseObjectObservable<any>[] = [];
+    this.getUser().subscribe((user) => {
+      const stores = Object.keys(user.worksAt);
+      stores.forEach((store, index) => {
+        if (user.worksAt[store] === true) {
+          console.log('true');
+          allStores.push(this.db.object(`/stores/${store}`));
+        }
+
+        if (index === stores.length - 1) {
+          this.stores$.next(allStores);
+        }
+      });
+    });
   }
 
   getAllCategories() {
@@ -54,7 +72,7 @@ export class StoresService {
           contentType: 'image/jpeg'
         }).then((snapshot) => {
           console.log('dUrl', snapshot.downloadURL);
-          this.pictureAdded.next({ key: key, url: snapshot.downloadURL });
+          this.pictureAdded$.next({ key: key, url: snapshot.downloadURL });
         });
 
         picIndex++;

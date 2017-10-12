@@ -56,9 +56,9 @@ export class VerifyAuth {
             .map((foundUser) => {
                 console.log(user);
                 console.log(foundUser);
-                if (foundUser.payload.exists()) {
-                    if (foundUser.payload.val().emailVerified) {
-                        if (foundUser.payload.val().profileVerified) {
+                if (foundUser.$exists) {
+                    if (foundUser.emailVerified) {
+                        if (foundUser.profileVerified) {
                             console.log('registro completo');
                             this.router.navigate(['/shopkeeper/dashboard']);
                             return this.CONDITIONS[0];
@@ -112,7 +112,7 @@ export class VerifyAuth {
                                         .child(`${user.uid}`)
                                         .update({
                                             verificationSent: true
-                                        })
+                                        });
                                 });
                         });
                 }
