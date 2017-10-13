@@ -16,25 +16,33 @@ export class ProductsService {
 
   optimizationAPI = 'http://localhost:8081';
 
-	user : firebase.User;
+  user: firebase.User;
   databaseChanged = new Subject<Message>();
   pictureAdded = new Subject<any>();
-picsUploaded = 0;
+  picsUploaded = {};
+  picIndex = {};
+
   constructor(public db : AngularFireDatabase, private auth : AuthService, private http : Http, private notifications : NotificationsService) {
-  	this.user = firebase.auth().currentUser;
+    this.user = firebase.auth().currentUser;
     this.pictureAdded.asObservable().subscribe((product) => {
       console.log('picsUp', this.picsUploaded);
-      
-      this.db.app.database().ref(`/products/${product.key}/pictures/${this.picsUploaded}`).set(product.url);
-          this.db.app.database().ref(`/products-stores/${product.store}/${product.key}/pictures/${this.picsUploaded}`).set(product.url);
-          this.db.app.database().ref(`/products-categories/${product.category}/${product.key}/pictures/${this.picsUploaded}`).set(product.url);
-          
-this.picsUploaded++;
+
+      this.db.app.database().ref(`/products/${product.key}/pictures/${this.picsUploaded[product.key]}`).set(product.url);
+      this.db.app.database().ref(`/products-stores/${product.store}/${product.key}/pictures/${this.picsUploaded[product.key]}`).set(product.url);
+      product.categories.forEach((category) => {
+        this.db.app.database().ref(`/products-categories/${category}/${product.key}/pictures/${this.picsUploaded[product.key]}`).set(product.url);
+      });
+
+      this.picsUploaded[product.key]++;
     });
   }
 
   getUser() {
-  	return this.db.object(`users/${this.user.uid}`);
+    return this.db.object(`users/${this.user.uid}`);
+  }
+
+  getStoresWhereUserWorks() {
+    return this.db.list(`/employees-stores/${this.user.uid}`);
   }
 
   getAllCategories() {
@@ -42,13 +50,12 @@ this.picsUploaded++;
   }
 
   getProductsFrom(thisStore, params?) {
-		return this.db.list(`/products-stores/${thisStore}`);
+    return this.db.list(`/products-stores/${thisStore}`);
   }
 
   addProduct(product) {
     product.stores.forEach((store) => {
-
-      let newProduct = {
+      const newProduct = {
         name : product.name,
         description : product.description,
         price : product.price,
@@ -56,37 +63,29 @@ this.picsUploaded++;
         categories : product.selectedCategories,
       };
 
-      let productsRef = this.db.app.database().ref(`/products`);
-      let newFirebaseProduct = productsRef.push(newProduct);
+      const productsRef = this.db.app.database().ref(`/products`);
+      const key = productsRef.push(newProduct).key;
 
-      let key = newFirebaseProduct.key;
+      this.picsUploaded[key] = 0;
 
-      let linkProductToStoreRef = this.db.app.database().ref(`/products-stores/${store}/${key}`);
-      linkProductToStoreRef.set(newProduct);
-let picIndex = 0;
+      this.db.app.database().ref(`/products-stores/${store}/${key}`).set(newProduct);
+      this.picIndex[key] = 0;
       product.selectedCategories.forEach((category) => {
         this.db.app.database().ref(`/products-categories/${category}/${key}`).set(newProduct);
- 
-      (<string[]>product.images).forEach(product => {
-        firebase.storage().ref(`/${store}/${key}/${picIndex}.jpeg`).putString(product, 'data_url', {
+      });
+console.log('qtd', product.images.length);
+      (<string[]>product.images).forEach((image) => {
+        firebase.storage().ref(`/${store}/${key}/${this.picIndex[key]}.jpeg`).putString(image, 'data_url', {
           contentType: 'image/jpeg'
-        }).then((snapshot) => {          
+        }).then((snapshot) => {
           console.log('dUrl', snapshot.downloadURL);
-          this.pictureAdded.next({ key: key, store: store, category: category, url: snapshot.downloadURL })
+          this.pictureAdded.next({ key: key, store: store, categories: product.selectedCategories, url: snapshot.downloadURL });
         });
 
-        picIndex++;
-          
-        }); 
-      });
-   /*  .then(snapshot => {
-          console.log('dUrl', snapshot.downloadURL);
-            this.db.app.database().ref(`/products/${key}/pictures/${picIndex}`).set(snapshot.downloadURL);
-            this.db.app.database().ref(`/products-stores/${store}/${key}/pictures/${picIndex}`).set(snapshot.downloadURL);
-            this.db.app.database().ref(`/products-categories/${category}/${key}/pictures/${picIndex}`).set(snapshot.downloadURL);
-      
-      
-      */
+        this.picIndex[key]++;
+
+        });
+
       this.verifyChangesOnProducts(key, 'Sucesso!', 'O produto foi cadastrado com êxito!');
 
     });
@@ -126,7 +125,7 @@ let picIndex = 0;
       this.db.app.database().ref(`/products-categories/${category}/${key}`).remove();
     });
 
-    for(let i = 0; i < picsQty; i++) {
+    for (let i = 0; i < picsQty; i++) {
       let fileRef = firebase.storage().ref(`/${store}/${key}/${i}.jpeg`).delete();
     }
   }

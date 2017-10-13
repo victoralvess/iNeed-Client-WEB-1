@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase, FirebaseObjectObservable, FirebaseListObservable } from 'angularfire2/database';
 import { Http } from '@angular/http';
 
-import * as firebase from 'firebase/app';
+import * as firebase from 'firebase';
 
 import { Subject } from 'rxjs/Subject';
 
@@ -25,6 +25,7 @@ export class StoresService {
       this.user = firebase.auth().currentUser;
       console.log('picsUp', this.picsUploaded);
       this.db.app.database().ref(`/stores/${store.key}/pictures/${this.picsUploaded}`).set(store.url);
+      this.db.app.database().ref(`/employees-stores/${this.user.uid}/${store.key}/pictures/${this.picsUploaded}`).set(store.url);
       this.picsUploaded++;
     });
   }
@@ -41,10 +42,10 @@ export class StoresService {
 
   getAllStores() {
     let allStores: FirebaseObjectObservable<any>[] = [];
-    this.getUser().subscribe((user) => {
-      const stores = Object.keys(user.worksAt);
+    /*this.getUser().subscribe((user) => {
+      const stores = Object.keys(user.works);
       stores.forEach((store, index) => {
-        if (user.worksAt[store] === true) {
+        if (user.works[store] === true) {
           console.log('true');
           allStores.push(this.db.object(`/stores/${store}`));
         }
@@ -53,7 +54,27 @@ export class StoresService {
           this.stores$.next(allStores);
         }
       });
-    });
+    });*/
+/*
+    this.db.object(`/employees-stores/${this.user.uid}`).subscribe((storesList) => {
+console.log(storesList);
+      const storesIds = Object.keys(storesList);
+console.log(storesIds);
+      storesIds.forEach((id, index) => {
+console.log(id);
+        if (storesList[id]) {
+if(id != 'store1' && id != 'store2'){
+          console.log('true');
+
+          allStores.push(this.db.object(`/stores/${id}`));}
+        }
+
+        if (index === storesIds.length - 1) {
+          this.stores$.next(allStores);
+        }
+      });
+    });*/
+    return this.db.list(`/employees-stores/${this.user.uid}`);
   }
 
   getAllCategories() {
@@ -61,23 +82,26 @@ export class StoresService {
   }
 
   addStore(store, pictures: string[]) {
+    this.picsUploaded = 0;
 
-      const storesRef = this.db.app.database().ref(`/stores`);
-      const key = storesRef.push(store).key;
+    const storesRef = this.db.app.database().ref(`/stores`);
+    const key = storesRef.push(store).key;
 
-      let picIndex = 0;
+    this.db.app.database().ref(`/employees-stores/${this.user.uid}/${key}`).set(store);
 
-      pictures.forEach((pic) => {
-        firebase.storage().ref(`/${key}/pics/${picIndex}.jpeg`).putString(pic, 'data_url', {
-          contentType: 'image/jpeg'
-        }).then((snapshot) => {
-          console.log('dUrl', snapshot.downloadURL);
-          this.pictureAdded$.next({ key: key, url: snapshot.downloadURL });
-        });
+    let picIndex = 0;
 
-        picIndex++;
+    pictures.forEach((pic) => {
+      firebase.storage().ref(`/${key}/pics/${picIndex}.jpeg`).putString(pic, 'data_url', {
+        contentType: 'image/jpeg'
+      }).then((snapshot) => {
+        console.log('dUrl', snapshot.downloadURL);
+        this.pictureAdded$.next({ key: key, url: snapshot.downloadURL });
+      });
 
-       });
+      picIndex++;
+
+      });
   }
 /*
   updateProduct(product) {
@@ -112,25 +136,27 @@ export class StoresService {
     });
   }*/
 
-  deleteStore(key, picsQty) {
+  deleteStore(key: string, picsQty) {
     const storesRef = this.db.app.database().ref(`/stores`);
     storesRef.child(`${key}`).remove();
     this.db.app.database().ref(`/products-stores/${key}`).remove();
     this.getAllCategories().subscribe((categories) => {
       categories.forEach((category) => {
-        this.db.list(`/products-categories/${category.key}`, {
+        this.db.list(`/products-categories/${category.$key}`, {
           query: {
             orderByChild: 'store',
             equalTo: `${key}`
           }
         }).subscribe((products) => {
           products.forEach((product) => {
-            this.db.app.database().ref(`/products-categories/${category.key}/${product.key}`).remove();
-            this.db.app.database().ref(`/products/${product.key}`).remove();
+            this.db.app.database().ref(`/products-categories/${category.$key}/${product.$key}`).remove();
+            this.db.app.database().ref(`/products/${product.$key}`).remove();
           });
         });
       });
     });
+
+    this.db.list(`/employees-stores/${this.user.uid}/${key}`).remove();
 
     for (let i = 0; i < picsQty; i++) {
       const fileRef = firebase.storage().ref(`/${key}/pics/${i}.jpeg`).delete();

@@ -52,8 +52,10 @@ import {
 
 import { StoresService } from './services/stores.service';
 import { LocationService } from './services/location/location.service';
+import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
 @NgModule({
   imports: [
+    SearchPipeModule,
     CommonModule,
     StoresDashboardRoutingModule,
     InputMaskModule,

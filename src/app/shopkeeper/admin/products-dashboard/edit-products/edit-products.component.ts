@@ -90,7 +90,7 @@ export class EditProductsComponent implements OnInit {
     this.categoriesSubscription = productsService.getAllCategories().subscribe((categories) => {
       let auxArray = [];
       categories.forEach((category) => {
-        auxArray.push({ label : category.payload.val().value, value : category.key });
+        auxArray.push({ label : category.value, value : category.key });
       });
       this.categories = auxArray;
     });

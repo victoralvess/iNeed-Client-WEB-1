@@ -40,9 +40,15 @@ export class ProductsDashboardComponent {
         this.productsSubscription = this.products.subscribe();
 });
 
-    this.userSubscription = productsService.getUser().subscribe((user: any) => {
+  /*  this.userSubscription = productsService.getUser().subscribe((user: any) => {
       this.stores = user.worksAt;
       this.lastSelected = this.stores[0].storeId;
+      this.products$.next(this.lastSelected);
+    });*/
+
+    this.userSubscription = productsService.getStoresWhereUserWorks().subscribe((stores) => {
+      this.stores = stores;
+      this.lastSelected = this.stores[0].$key;
       this.products$.next(this.lastSelected);
     });
 
