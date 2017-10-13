@@ -23,7 +23,15 @@ export class EmployeesService {
   }
 
   getEmployeesFrom(thisStore, params?) {
+<<<<<<< HEAD
+		return this.db.list(`/employees-stores/${thisStore}`, {
+      query : params || {
+        orderByChild: 'name'
+      } 
+		}); 
+=======
 		return this.db.list(`/employees-stores/${thisStore}`); 
+>>>>>>> stores-module
   }
 
   addProduct(product) {
@@ -38,16 +46,28 @@ export class EmployeesService {
         pictures : product.images
       };
 
+<<<<<<< HEAD
+      let productsRef = this.db.database.ref(`/products`);
+=======
       let productsRef = this.db.app.database().ref(`/products`);
+>>>>>>> stores-module
       let newFirebaseProduct = productsRef.push(newProduct);      
       
       let key = newFirebaseProduct.key;   
       
+<<<<<<< HEAD
+      let linkProductToStoreRef = this.db.database.ref(`/products-stores/${store}/${key}`);
+      linkProductToStoreRef.set(newProduct);
+      
+      product.selectedCategories.forEach((category) => {
+        this.db.database.ref(`/products-categories/${category}/${key}`).set(newProduct);
+=======
       let linkProductToStoreRef = this.db.app.database().ref(`/products-stores/${store}/${key}`);
       linkProductToStoreRef.set(newProduct);
       
       product.selectedCategories.forEach((category) => {
         this.db.app.database().ref(`/products-categories/${category}/${key}`).set(newProduct);
+>>>>>>> stores-module
       });                 
       
     });  	
@@ -73,6 +93,17 @@ export class EmployeesService {
         updates[`/products-categories/${category}/${employee.productId}`] = updatedProduct;
     }); 
 
+<<<<<<< HEAD
+    this.db.database.ref().update(updates);
+  }
+
+  deleteEmployee(key, categories, store) { 
+    let productsRef = this.db.database.ref(`/products`);
+    productsRef.child(`${key}`).remove();
+    this.db.database.ref(`/products-stores/${store}/${key}`).remove();
+    categories.forEach((category) => {
+      this.db.database.ref(`/products-categories/${category}/${key}`).remove();
+=======
     this.db.app.database().ref().update(updates);
   }
 
@@ -82,6 +113,7 @@ export class EmployeesService {
     this.db.app.database().ref(`/products-stores/${store}/${key}`).remove();
     categories.forEach((category) => {
       this.db.app.database().ref(`/products-categories/${category}/${key}`).remove();
+>>>>>>> stores-module
     }); 
   }
 }

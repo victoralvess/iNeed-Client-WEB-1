@@ -1,14 +1,24 @@
 import { Component, OnInit } from '@angular/core';
 
+<<<<<<< HEAD
+import { FirebaseListObservable } from 'angularfire2/database';
+=======
+>>>>>>> stores-module
 import { EmployeesService } from './services/employees.service';
 import { Router } from '@angular/router';
 
 import * as firebase from 'firebase/app';
 import { PaginationInstance } from 'ngx-pagination';
 
+<<<<<<< HEAD
+import { Modal } from 'ngx-modialog/plugins/bootstrap';
+
+import { Subject } from 'rxjs/Subject';
+=======
 import { Modal } from 'ngx-modialog/plugins/bootstrap/bundle/ngx-modialog-bootstrap';
 
 import { Subject } from 'rxjs/Subject'; 
+>>>>>>> stores-module
 
 @Component({
   selector: 'app-employees-dashboard',
@@ -16,7 +26,11 @@ import { Subject } from 'rxjs/Subject';
   styleUrls: ['./employees-dashboard.component.css']
 })
 export class EmployeesDashboardComponent implements OnInit {
+<<<<<<< HEAD
+
+=======
 /*
+>>>>>>> stores-module
 	stores : any[];
 	employees;
 	user : firebase.User;
@@ -46,9 +60,15 @@ export class EmployeesDashboardComponent implements OnInit {
     });
      console.log(this.bindPermissionLevel('1'));
   } 	
+<<<<<<< HEAD
+
+  ngOnInit() { }
+
+=======
 */
   ngOnInit() { }
 /*
+>>>>>>> stores-module
   ngOnDestroy() {
     console.log('onDestroy');
     this.employees.subscribe().unsubscribe();
@@ -119,5 +139,9 @@ export class EmployeesDashboardComponent implements OnInit {
   		case 3:
   			return 'Visualizar e Gravar Novos Usuários e Produtos / Ler e Responder Feedbacks';
   	}
+<<<<<<< HEAD
+  }
+=======
   }*/
+>>>>>>> stores-module
 }

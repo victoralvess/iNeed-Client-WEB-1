@@ -5,7 +5,11 @@ import { Observable } from 'rxjs/Observable';
 
 import { AuthService } from '../../../shared/services/services-auth/auth.service';
 import { AngularFireDatabase } from 'angularfire2/database';
+<<<<<<< HEAD
+import { environment } from 'environments/environment';
+=======
 import { environment } from '../../../../environments/environment';
+>>>>>>> stores-module
 
 import 'rxjs/add/operator/map';
 
