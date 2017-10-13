@@ -15,37 +15,96 @@ import { MultiSelectModule, GrowlModule } from 'primeng/primeng';
 import { ImageUploadModule } from 'angular2-image-upload';
 
 import { ModalModule } from 'ngx-modialog';
-import { BootstrapModalModule } from 'ngx-modialog/plugins/bootstrap';
+// import { BootstrapModalModule } from 'ngx-modialog/plugins/bootstrap';
 
 import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
 import { NotificationsService } from '../../../shared/services/notifications/notifications.service';
 
-<<<<<<< HEAD
-=======
 import { CovalentDialogsModule } from '@covalent/core';
-import { NoConflictStyleCompatibilityMode } from '@angular/material';
->>>>>>> stores-module
+import { NoConflictStyleCompatibilityMode, CompatibilityModule } from '@angular/material';
+import {
+  MatAutocompleteModule,
+  MatButtonModule,
+  MatButtonToggleModule,
+  MatCardModule,
+  MatCheckboxModule,
+  MatChipsModule,
+  MatDatepickerModule,
+  MatDialogModule,
+  MatExpansionModule,
+  MatGridListModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule,
+  MatMenuModule,
+  MatNativeDateModule,
+  MatPaginatorModule,
+  MatProgressBarModule,
+  MatProgressSpinnerModule,
+  MatRadioModule,
+  MatRippleModule,
+  MatSelectModule,
+  MatSidenavModule,
+  MatSliderModule,
+  MatSlideToggleModule,
+  MatSnackBarModule,
+  MatSortModule,
+  MatTableModule,
+  MatTabsModule,
+  MatToolbarModule,
+  MatTooltipModule,
+  MatStepperModule
+} from '@angular/material';
+import { FlexLayoutModule } from '@angular/flex-layout';
 @NgModule({
   imports: [
+    FlexLayoutModule,
     CommonModule,
     HttpModule,
     FormsModule,
     ReactiveFormsModule,
     BsDropdownModule.forRoot(),
-		NgxPaginationModule,
+    NgxPaginationModule,
     ProductsDashboardRoutingModule,
     MultiSelectModule,
     GrowlModule,
     ImageUploadModule.forRoot(),
     ModalModule.forRoot(),
-    BootstrapModalModule,
-<<<<<<< HEAD
-    SearchPipeModule
-=======
     SearchPipeModule,
     CovalentDialogsModule,
-    NoConflictStyleCompatibilityMode
->>>>>>> stores-module
+    NoConflictStyleCompatibilityMode,
+    CompatibilityModule,
+    MatAutocompleteModule,
+    MatButtonModule,
+    MatButtonToggleModule,
+    MatCardModule,
+    MatCheckboxModule,
+    MatChipsModule,
+    MatDatepickerModule,
+    MatDialogModule,
+    MatExpansionModule,
+    MatGridListModule,
+    MatIconModule,
+    MatInputModule,
+    MatListModule,
+    MatMenuModule,
+    MatNativeDateModule,
+    MatPaginatorModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatRadioModule,
+    MatRippleModule,
+    MatSelectModule,
+    MatSidenavModule,
+    MatSliderModule,
+    MatSlideToggleModule,
+    MatSnackBarModule,
+    MatSortModule,
+    MatTableModule,
+    MatTabsModule,
+    MatToolbarModule,
+    MatTooltipModule,
+    MatStepperModule
   ],
   declarations: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
   exports: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],

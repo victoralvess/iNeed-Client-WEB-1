@@ -12,12 +12,12 @@ import { EditEmployeesComponent } from './edit-employees/edit-employees.componen
 import { EmployeesService } from './services/employees.service';
 
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
-import { NgxPaginationModule } from 'ngx-pagination'; 
+import { NgxPaginationModule } from 'ngx-pagination';
 import { MultiSelectModule, GrowlModule } from 'primeng/primeng';
 import { ImageUploadModule } from 'angular2-image-upload';
 
 import { ModalModule } from 'ngx-modialog';
-import { BootstrapModalModule } from 'ngx-modialog/plugins/bootstrap';
+// import { BootstrapModalModule } from 'ngx-modialog/plugins/bootstrap';
 import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
 
 @NgModule({
@@ -33,7 +33,6 @@ import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.modul
     GrowlModule,
     ImageUploadModule.forRoot(),
     ModalModule.forRoot(),
-    BootstrapModalModule,
     SearchPipeModule
   ],  
   declarations: [EmployeesDashboardComponent, AddEmployeesComponent, EditEmployeesComponent],

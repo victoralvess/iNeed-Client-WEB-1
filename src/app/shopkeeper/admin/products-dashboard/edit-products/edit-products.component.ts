@@ -3,10 +3,6 @@ import { ProductsService } from '../services/products.service';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Router, ActivatedRoute, Params } from '@angular/router';
 import { SelectItem } from 'primeng/primeng';
-<<<<<<< HEAD
-import { FirebaseListObservable } from 'angularfire2/database';
-=======
->>>>>>> stores-module
 
 import 'rxjs/add/operator/map';
 import { Message } from 'primeng/primeng';
@@ -94,11 +90,7 @@ export class EditProductsComponent implements OnInit {
     this.categoriesSubscription = productsService.getAllCategories().subscribe((categories) => {
       let auxArray = [];
       categories.forEach((category) => {
-<<<<<<< HEAD
-        auxArray.push({ label : category.value, value : category.$key });
-=======
-        auxArray.push({ label : category.payload.val().value, value : category.key });
->>>>>>> stores-module
+        auxArray.push({ label : category.value, value : category.key });
       });
       this.categories = auxArray;
     });
@@ -108,11 +100,7 @@ export class EditProductsComponent implements OnInit {
   ngOnInit() {
     this.productsService.databaseChanged.asObservable().subscribe((notification) => {
       console.log('foi');
-<<<<<<< HEAD
-      this.growlMessages.push(JSON.parse(notification));
-=======
       this.growlMessages.push(notification);
->>>>>>> stores-module
       setTimeout(() => {
         this.growlMessages = [];
       }, 7000)
@@ -210,15 +198,6 @@ export class EditProductsComponent implements OnInit {
     this.hasLessThanLimit = (this.upToLimitPics > 0);
   }
 
-<<<<<<< HEAD
-  toggleRemoveOverlay(image) : boolean {
-    image.isRemoved = !image.isRemoved;
-    image.overlayText=(image.isRemoved)?'Removido':'Remover'
-    return image.isRemoved;
-  }
-
-  upToLimitPictures(arr : any[]) : number {
-=======
   toggleRemoveOverlay(image): boolean {
     image.isRemoved = !image.isRemoved;
     image.overlayText = (image.isRemoved) ? 'Removido' : 'Remover';
@@ -226,7 +205,6 @@ export class EditProductsComponent implements OnInit {
   }
 
   upToLimitPictures(arr: any[]): number {
->>>>>>> stores-module
     return  this.picsLimit - arr.length;
   }
 
