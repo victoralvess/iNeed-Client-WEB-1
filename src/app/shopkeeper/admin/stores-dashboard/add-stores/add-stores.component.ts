@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-import {Component, OnInit} from '@angular/core';
-=======
 import { Component, OnDestroy } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
@@ -8,45 +5,18 @@ import { CustomValidators } from '../../../../shared/validators/custom-validator
 import { Md2Colorpicker, Md2Toast } from 'md2';
 import { FileHolder } from 'angular2-image-upload';
 import { Subject } from 'rxjs/Subject';
+import { Subscription } from 'rxjs/Subscription';
 import { LocationService } from '../services/location/location.service';
 import { StoresService } from '../services/stores.service';
 import { Store } from '../models/store.model';
 import { StoreLocation } from '../models/store-location.model';
->>>>>>> stores-module
+import { Category } from '../../../models/category.model';
+import { ViewContainerRef } from '@angular/core';
+import { TdDialogService } from '@covalent/core';
 
 @Component({
   selector: 'app-add-stores',
   templateUrl: './add-stores.component.html',
-<<<<<<< HEAD
-  styleUrls: ['./add-stores.component.css']
-})
-export class AddStoresComponent implements OnInit {
-
-  zipCode: String;
-  color1: string;
-  user: firebase.User;
-  selectedCategories: any[];
-  files = [];
-
-  color2: string = '#1976D2';
-
-  constructor() {
-  }
-
-  ngOnInit() {
-  }
-
-  imageFinishedUploading(file) {
-    console.log(file, file.file.type);
-    if (file.file.type != 'image/jpeg' && file.file.type != 'image/png') {
-      return;
-    }
-    this.files.push(file);
-  }
-
-  imageRemoved(file) {
-    this.files.splice(this.files.indexOf(file.src), 1);
-=======
   styleUrls: ['./add-stores.component.scss']
 })
 export class AddStoresComponent implements OnDestroy {
@@ -65,13 +35,15 @@ export class AddStoresComponent implements OnDestroy {
 
   private addressReady$ = new Subject<any>();
   private ready;
+  private categoriesReady = false;
+  private categoriesSubscription: Subscription;
+  private categories = [];
 
   private storeForm = new FormGroup({
     name: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(3), CustomValidators.maxLength(45)])),
     cnpj: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(18)])),
     color: new FormControl('#3F51B5', CustomValidators.rgba2hex()),
-    description: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(10), CustomValidators.maxLength(200)
-    ]))
+    description: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(10), CustomValidators.maxLength(200)]))
   });
 
   private addressForm = new FormGroup({
@@ -90,7 +62,7 @@ export class AddStoresComponent implements OnDestroy {
     cellphone: new FormControl('')
   });
 
-  constructor(private toast: Md2Toast, private locationService: LocationService, private storesService: StoresService) {
+  constructor(private toast: Md2Toast, private locationService: LocationService, private storesService: StoresService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService) {
     this.addressReady$.asObservable().subscribe((isReady) => {
       this.ready = isReady;
     });
@@ -105,14 +77,33 @@ export class AddStoresComponent implements OnDestroy {
         this.addressForm.controls['vicinity'].setValue(responses[0].bairro);
         this.addressForm.controls['state'].setValue(responses[0].uf);
 
-        let storeLocation: StoreLocation = {};
-        storeLocation.lat = responses[1].results[0].geometry.location.lat;
-        storeLocation.lng = responses[1].results[0].geometry.location.lng;
-        storeLocation.address = responses[1].results[0].formatted_address;
-        this.store.location = storeLocation;
-
-        this.addressReady$.next(true);
+        console.log(responses[1]);
+        if (responses[1].status === 'OK') {
+          let storeLocation: StoreLocation = {};
+          storeLocation.lat = responses[1].results[0].geometry.location.lat;
+          storeLocation.lng = responses[1].results[0].geometry.location.lng;
+          storeLocation.address = responses[1].results[0].formatted_address;
+          this.store.location = storeLocation;
+          this.addressReady$.next(true);
+        } else {
+          this.dialogService.openAlert({
+            message: 'Esse endereço não foi encontrado com precisão nas nossas bases de dados. Infelizmente o cadastro não poderá ser efetuado com esse endereço.',
+            disableClose: true,
+            viewContainerRef: this.viewContainerRef,
+            title: 'Erro',
+            closeButton: 'ENTENDI',
+          });
+        }
       }
+    });
+
+    this.categoriesSubscription = storesService.getAllCategories().subscribe((categories) => {
+      let aux: Category[] = [];
+      categories.forEach((category) => {
+        aux.push({ label: category.value, value: category.$key });
+      });
+      this.categories = aux;
+      this.categoriesReady = true;
     });
   }
 
@@ -123,7 +114,7 @@ export class AddStoresComponent implements OnDestroy {
 
   locationByZipCode() {
     this.addressReady$.next(false);
-    if (!(this.addressForm.controls['zipCode'].hasError('minlength') || this.addressForm.controls['number'].hasError('minlength'))){
+    if (!(this.addressForm.controls['zipCode'].hasError('minlength') || this.addressForm.controls['number'].hasError('minlength'))) {
       const zipCode = this.addressForm.controls['zipCode'].value;
       const number = this.addressForm.controls['number'].value;
       this.locationService.locationByZipCode(zipCode, number);
@@ -209,14 +200,9 @@ export class AddStoresComponent implements OnDestroy {
   imageRemoved(event: FileHolder) {
     this.files.splice(this.files.indexOf(event.file), 1);
     console.log(this.files);
->>>>>>> stores-module
   }
 
   uploadStateChange(state: boolean) {
     console.log(JSON.stringify(state));
   }
-<<<<<<< HEAD
-
-=======
->>>>>>> stores-module
 }

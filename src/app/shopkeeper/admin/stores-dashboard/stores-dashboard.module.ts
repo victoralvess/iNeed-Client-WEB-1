@@ -9,112 +9,105 @@ import {DeleteStoresComponent} from './delete-stores/delete-stores.component';
 import {CodeHighlighterModule, InputMaskModule} from 'primeng/primeng';
 import {FormsModule} from '@angular/forms';
 import {ColorPickerModule} from 'primeng/primeng';
-<<<<<<< HEAD
-import {ImageUploadModule} from 'angular2-image-upload';
-=======
 import { ReactiveFormsModule } from '@angular/forms';
 import { TextMaskModule } from 'angular2-text-mask';
  import { HttpModule } from '@angular/http';
-import { Md2Module } from 'md2';
-import { CovalentDialogsModule } from '@covalent/core';
+import { Md2Module, NoConflictStyleCompatibilityMode } from 'md2';
+import { CovalentDialogsModule, CovalentDataTableModule } from '@covalent/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ImageUploadModule } from 'angular2-image-upload';
+import { ProductsService } from '../products-dashboard/services/products.service';
+import { NotificationsService } from '../../../shared/services/notifications/notifications.service';
+import { CrudService } from '../../../shared/services/crud-service/crud.service';
 import {
-  MdInput,
-  MdAutocompleteModule,
-  MdButtonModule,
-  MdButtonToggleModule,
-  MdCardModule,
-  MdCheckboxModule,
-  MdChipsModule,
-  MdDatepickerModule,
-  MdDialogModule,
-  MdExpansionModule,
-  MdGridListModule,
-  MdIconModule,
-  MdInputModule,
-  MdListModule,
-  MdMenuModule,
-  MdNativeDateModule,
-  MdPaginatorModule,
-  MdProgressBarModule,
-  MdProgressSpinnerModule,
-  MdRadioModule,
-  MdRippleModule,
-  MdSelectModule,
-  MdSidenavModule,
-  MdSliderModule,
-  MdSlideToggleModule,
-  MdSnackBarModule,
-  MdSortModule,
-  MdTableModule,
-  MdTabsModule,
-  MdToolbarModule,
-  MdTooltipModule,
-  MdStepperModule,
-  MatSelectModule
+  MatAutocompleteModule,
+  MatButtonModule,
+  MatButtonToggleModule,
+  MatCardModule,
+  MatCheckboxModule,
+  MatChipsModule,
+  MatDatepickerModule,
+  MatDialogModule,
+  MatExpansionModule,
+  MatGridListModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule,
+  MatMenuModule,
+  MatNativeDateModule,
+  MatPaginatorModule,
+  MatProgressBarModule,
+  MatProgressSpinnerModule,
+  MatRadioModule,
+  MatRippleModule,
+  MatSelectModule,
+  MatSidenavModule,
+  MatSliderModule,
+  MatSlideToggleModule,
+  MatSnackBarModule,
+  MatSortModule,
+  MatTableModule,
+  MatTabsModule,
+  MatToolbarModule,
+  MatTooltipModule,
+  MatStepperModule
 } from '@angular/material';
 
 import { StoresService } from './services/stores.service';
 import { LocationService } from './services/location/location.service';
->>>>>>> stores-module
-
+import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
 @NgModule({
   imports: [
+    SearchPipeModule,
     CommonModule,
     StoresDashboardRoutingModule,
     InputMaskModule,
     ColorPickerModule,
     CodeHighlighterModule,
     ImageUploadModule.forRoot(),
-<<<<<<< HEAD
-    FormsModule
-  ],
-  declarations: [StoresDashboardComponent, AddStoresComponent, EditStoresComponent, DeleteStoresComponent]
-=======
     FormsModule,
     ReactiveFormsModule,
 TextMaskModule,
 HttpModule,
 Md2Module,
+NoConflictStyleCompatibilityMode,
 CovalentDialogsModule,
-  MdAutocompleteModule,
-  MdButtonModule,
-  MdButtonToggleModule,
-  MdCardModule,
-  MdCheckboxModule,
-  MdChipsModule,
-  MdDatepickerModule,
-  MdDialogModule,
-  MdExpansionModule,
-  MdGridListModule,
-  MdIconModule,
-  MdInputModule,
-  MdListModule,
-  MdMenuModule,
-  MdNativeDateModule,
-  MdPaginatorModule,
-  MdProgressBarModule,
-  MdProgressSpinnerModule,
-  MdRadioModule,
-  MdRippleModule,
-  MdSelectModule,
-  MdSidenavModule,
-  MdSliderModule,
-  MdSlideToggleModule,
-  MdSnackBarModule,
-  MdSortModule,
-  MdTableModule,
-  MdTabsModule,
-  MdToolbarModule,
-  MdTooltipModule,
-  MdStepperModule,
+  MatAutocompleteModule,
+  MatButtonModule,
+  MatButtonToggleModule,
+  MatCardModule,
+  MatCheckboxModule,
+  MatChipsModule,
+  MatDatepickerModule,
+  MatDialogModule,
+  MatExpansionModule,
+  MatGridListModule,
+  MatIconModule,
+  MatInputModule,
+  MatListModule,
+  MatMenuModule,
+  MatNativeDateModule,
+  MatPaginatorModule,
+  MatProgressBarModule,
+  MatProgressSpinnerModule,
+  MatRadioModule,
+  MatRippleModule,
   MatSelectModule,
-  FlexLayoutModule
+  MatSidenavModule,
+  MatSliderModule,
+  MatSlideToggleModule,
+  MatSnackBarModule,
+  MatSortModule,
+  MatTableModule,
+  MatTabsModule,
+  MatToolbarModule,
+  MatTooltipModule,
+  MatStepperModule,
+  FlexLayoutModule,
+  CovalentDataTableModule
   ],
   declarations: [StoresDashboardComponent, AddStoresComponent, EditStoresComponent, DeleteStoresComponent],
-  providers: [StoresService, LocationService]
->>>>>>> stores-module
+  providers: [StoresService, LocationService, ProductsService, NotificationsService, CrudService]
 })
 export class StoresDashboardModule {
 }

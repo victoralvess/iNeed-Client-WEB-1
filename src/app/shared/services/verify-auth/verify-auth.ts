@@ -8,10 +8,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { Http } from '@angular/http';
 import { environment } from '../../../../environments/environment';
 import 'rxjs/add/operator/retry';
-<<<<<<< HEAD
-=======
 import 'rxjs/add/operator/map';
->>>>>>> stores-module
 
 @Injectable()
 export class VerifyAuth {
@@ -59,15 +56,9 @@ export class VerifyAuth {
             .map((foundUser) => {
                 console.log(user);
                 console.log(foundUser);
-<<<<<<< HEAD
-                if (foundUser.$exists()) {
+                if (foundUser.$exists) {
                     if (foundUser.emailVerified) {
                         if (foundUser.profileVerified) {
-=======
-                if (foundUser.payload.exists()) {
-                    if (foundUser.payload.val().emailVerified) {
-                        if (foundUser.payload.val().profileVerified) {
->>>>>>> stores-module
                             console.log('registro completo');
                             this.router.navigate(['/shopkeeper/dashboard']);
                             return this.CONDITIONS[0];
@@ -121,7 +112,7 @@ export class VerifyAuth {
                                         .child(`${user.uid}`)
                                         .update({
                                             verificationSent: true
-                                        })
+                                        });
                                 });
                         });
                 }

@@ -1,119 +1,117 @@
 import { Injectable } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
-import { AngularFireDatabase } from 'angularfire2/database';
-import { Http } from '@angular/http';
 
-import * as firebase from 'firebase/app';
-
+import { AngularFireDatabase, FirebaseObjectObservable, FirebaseListObservable } from 'angularfire2/database';
+import * as firebase from 'firebase';
 import { Subject } from 'rxjs/Subject';
+import { CrudService } from '../../../../shared/services/crud-service/crud.service';
 
 @Injectable()
 export class StoresService {
 
-  optimizationAPI = 'http://localhost:8081';
-
-  pictureAdded = new Subject<any>();
+  pictureAdded$ = new Subject<any>();
   picsUploaded = 0;
 
-  constructor(public db: AngularFireDatabase, private http: Http) {
+  user: firebase.User;
+  stores$ = new Subject<FirebaseObjectObservable<any>[]>();
 
-    this.pictureAdded.asObservable().subscribe((store) => {
+  constructor(public db: AngularFireDatabase, private crudService: CrudService) {
+    this.user = firebase.auth().currentUser;
+
+    this.pictureAdded$.asObservable().subscribe((store) => {
+      this.user = firebase.auth().currentUser;
       console.log('picsUp', this.picsUploaded);
       this.db.app.database().ref(`/stores/${store.key}/pictures/${this.picsUploaded}`).set(store.url);
+      this.db.app.database().ref(`/employees-stores/${this.user.uid}/${store.key}/pictures/${this.picsUploaded}`).set(store.url);
       this.picsUploaded++;
     });
   }
-/*
-  getUser() {
-  	return this.db.object(`users/${this.user.uid}`);
+
+  private getUser() {
+    return this.crudService.getUser();
   }
 
-  getProductsFrom(thisStore, params?) {
-		return this.db.list(`/products-stores/${thisStore}`);
-  }*/
+  getAllStores() {
+    return this.db.list(`/employees-stores/${this.user.uid}`);
+  }
 
   getAllCategories() {
-    return this.db.list(`/categories`);
+    return this.crudService.getAllCategories();
   }
 
   addStore(store, pictures: string[]) {
+    this.picsUploaded = 0;
 
-      const storesRef = this.db.app.database().ref(`/stores`);
-      const key = storesRef.push(store).key;
-
-      let picIndex = 0;
-
-      pictures.forEach((pic) => {
-        firebase.storage().ref(`/${key}/pics/${picIndex}.jpeg`).putString(pic, 'data_url', {
-          contentType: 'image/jpeg'
-        }).then((snapshot) => {
-          console.log('dUrl', snapshot.downloadURL);
-          this.pictureAdded.next({ key: key, url: snapshot.downloadURL });
-        });
-
-        picIndex++;
-
-       });
-  }
-/*
-  updateProduct(product) {
-
-    console.log('stooooooooooore', product.productStore);
-    let updatedProduct = {
-      name : product.name,
-      description : product.description,
-      price : product.price,
-      categories : product.selectedCategories,
-      pictures : product.images,
-      store : product.productStore
-    };
-
-    let updates = {};
-    updates[`/products/${product.productId}`] = updatedProduct;
-    updates[`/products-stores/${product.productStore}/${product.productId}`] = updatedProduct;
-
-    product.selectedCategories.forEach((category) => {
-        updates[`/products-categories/${category}/${product.productId}`] = updatedProduct;
-    });
-
-    this.db.app.database().ref().update(updates);
-
-    this.verifyChangesOnProducts(product.productId, 'Sucesso!', `O produto ${product.productId} foi atualizado com êxito!`);
-
-  }
-
-  verifyChangesOnProducts(productKey, successSummary, successMessage) {
-    this.db.app.database().ref(`/products/${productKey}`).once('value', (s) => { 
-      this.databaseChanged.next(this.notifications.success(successSummary, successMessage));
-    });
-  }*/
-
-  deleteStore(key, picsQty) {
     const storesRef = this.db.app.database().ref(`/stores`);
-    storesRef.child(`${key}`).remove();
-    this.db.app.database().ref(`/products-stores/${key}`).remove();
+    const key = storesRef.push(store).key;
+
+    this.db.object(`/stores/${key}/id`).set(key);
+    this.db.object(`/employees-stores/${this.user.uid}/${key}`).set(store);
+    this.db.object(`/employees-stores/${this.user.uid}/${key}/id`).set(key);
+
+    let picIndex = 0;
+
+    pictures.forEach((pic) => {
+      firebase.storage().ref(`/${key}/pics/${picIndex}.jpeg`).putString(pic, 'data_url', {
+        contentType: 'image/jpeg'
+      }).then((snapshot) => {
+        console.log('dUrl', snapshot.downloadURL);
+        this.pictureAdded$.next({ key: key, url: snapshot.downloadURL });
+      });
+
+      picIndex++;
+
+    });
+  }
+
+  deleteStore(key: string) {
+    this.db.object(`/stores/${key}`).subscribe((store) => {
+      if (store.pictures) {
+        store.pictures.forEach((url) => {
+          firebase.storage().refFromURL(url).delete();
+        });
+        this.db.object(`/stores/${key}`).remove();
+        this.db.object(`/products-stores/${key}`).remove();
+      }
+    });
+
     this.getAllCategories().subscribe((categories) => {
       categories.forEach((category) => {
-        this.db.list(`/products-categories/${category.key}`, {
+        this.db.list(`/products-categories/${category.$key}`, {
           query: {
             orderByChild: 'store',
             equalTo: `${key}`
           }
         }).subscribe((products) => {
           products.forEach((product) => {
-            this.db.app.database().ref(`/products-categories/${category.key}/${product.key}`).remove();
-            this.db.app.database().ref(`/products/${product.key}`).remove();
+            if (product.pictures) {
+              product.pictures.forEach((url) => {
+                firebase.storage().refFromURL(url).delete();
+              });
+              this.db.object(`/products-categories/${category.$key}/${product.$key}`).remove();
+              this.db.object(`/products/${product.$key}`).remove();
+            }
           });
         });
       });
     });
 
-    for (let i = 0; i < picsQty; i++) {
-      const fileRef = firebase.storage().ref(`/${key}/pics/${i}.jpeg`).delete();
-    }
+    this.db.list(`/employees-stores`).subscribe((employees) => {
+      console.log('MYTAG_ALL', employees);
+      employees.forEach((employee) => {
+        const employeeId = employee.$key;
+        if (employee[key]) { // IF EMPLOYEE WORKS AT `${key}` STORE
+          console.log('MYTAG_STORE_KEY', key);
+          console.log('MYTAG_STORE_DB', employee[key]);
+          console.log('MYTAG_STORE_DB_ID', employee[key].id);
+          console.log('MYTAG_EMPLOYEE_ID', employeeId);
+          this.db.object(`/employees-stores/${employeeId}/${key}`).remove();
+        }
+      });
+    });
   }
 
   optmizeImage(file) {
-    return this.http.post(`${this.optimizationAPI}/ws/0/optmize`, file);
+    return this.crudService.optmizeImage(file);
   }
 }
