@@ -29,7 +29,6 @@ export class EditProductsComponent implements OnInit, OnDestroy {
   growlMessages: Message[] = [];
   categoriesReady = false;
   picsUrls = [];
-  originalPics = [];
   newFiles = [];
 
   productsForm = new FormGroup({
@@ -51,7 +50,6 @@ export class EditProductsComponent implements OnInit, OnDestroy {
         localStorage.setItem(`${this.productId}/Pictures`, JSON.stringify(foundProduct.pictures));
         console.log(foundProduct.pictures);
         this.picsUrls = foundProduct.pictures;
-        this.originalPics = foundProduct.pictures;
         this.productStore = foundProduct.store;
         this.productsForm = fb.group({
           name: [foundProduct.name, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])],
@@ -91,6 +89,7 @@ export class EditProductsComponent implements OnInit, OnDestroy {
   }
 
   updateProduct(data) {
+    let originalPics = JSON.parse(localStorage.getItem(`${this.productId}/Pictures`));
     data.productId = this.productId;
     data.productStore = this.productStore;
     data.images = [];
@@ -101,20 +100,22 @@ export class EditProductsComponent implements OnInit, OnDestroy {
           const base64image = response._body;
           data.images.push(base64image);
           if (idx === this.newFiles.length - 1) {
-            this.productsService.updateProduct(data, this.picsUrls);
+            this.productsService.updateProduct(data, this.picsUrls, originalPics);
           }
         });
       });
     } else {
       // console.log('no_upload', this.picsUrls);
       if (this.picsUrls.length === 0) {
-      //  console.log('===0');
-        this.productsService.updateProduct(data, JSON.parse(localStorage.getItem(`${this.productId}/Pictures`)));
+        //  console.log('===0');
+        this.productsService.updateProduct(data, originalPics, originalPics);
       } else {
-      //  console.log('!==0');
-        this.productsService.updateProduct(data, this.picsUrls);
+        //  console.log('!==0');
+        this.productsService.updateProduct(data, this.picsUrls, originalPics);
       }
     }
+
+    this.router.navigate(['/shopkeeper/dashboard/admin/products']);
   }
 
   imageFinishedUploading(event: FileHolder) {

@@ -92,20 +92,20 @@ export class ProductsService {
     });
   }
 
-  updateProduct(product, originalPicsSaved: any[]) {
-    this.picsUploaded[product.productId] = originalPicsSaved.length;
-    console.log(this.picsUploaded[product.productId], originalPicsSaved);
+  updateProduct(product, sendPics: any[], originalUrls: any[]) {
+    this.picsUploaded[product.productId] = sendPics.length;
+    console.log(this.picsUploaded[product.productId], sendPics);
     let updatedProduct = {
       name: product.name,
       description: product.description,
       price: product.price,
       categories: product.selectedCategories,
       store: product.productStore,
-      pictures: originalPicsSaved
+      pictures: sendPics
     };
 
-    JSON.parse(localStorage.getItem(`${product.productId}/Pictures`)).forEach((url) => {
-      if (!originalPicsSaved.includes(url)) {
+    originalUrls.forEach((url) => {
+      if (!sendPics.includes(url)) {
         firebase.storage().refFromURL(url).delete();
       }
     });

@@ -43,8 +43,7 @@ export class AddStoresComponent implements OnDestroy {
     name: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(3), CustomValidators.maxLength(45)])),
     cnpj: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(18)])),
     color: new FormControl('#3F51B5', CustomValidators.rgba2hex()),
-    description: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(10), CustomValidators.maxLength(200)
-    ]))
+    description: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(10), CustomValidators.maxLength(200)]))
   });
 
   private addressForm = new FormGroup({
