@@ -1,103 +1,55 @@
 <p *ngIf="!(products | async)">LOADING</p>
 <div *ngIf="(products | async)">
   <form [formGroup]="productsForm" (ngSubmit)="updateProduct(productsForm.value)">
-  <!--
-  <div class="form-group">
-    <label for="product-name">Produto:</label>
-    <input required type="text" class="form-control" id="product-name" placeholder="Como seus clientes verão o produto" [formControl]="productsForm.controls['name']">
-    <aside *ngIf="productsForm.controls['name'].hasError('required') && productsForm.controls['name'].touched" class="alert alert-danger">Seus clientes não podem achar um produto sem nome!</aside>
-    <aside *ngIf="productsForm.controls['name'].hasError('minlength') && productsForm.controls['name'].touched" class="alert alert-danger">O nome do produto deve ter, pelo menos, 3 caracteres.</aside>
-    <aside *ngIf="productsForm.controls['name'].hasError('maxlength') && productsForm.controls['name'].touched" class="alert alert-danger">O nome do produto deve ter, no máximo, 40 caracteres.</aside> 	 	
-  </div> -->
     <div fxLayout="column">
-      <div fxFlex="100"> 
+      <div fxFlex="100">
         <mat-form-field fxFlex="100">
-          <input matInput placeholder="Nome do produto" [formControl]="productsForm.controls['name']" required>  
+          <input matInput placeholder="Nome do produto" [formControl]="productsForm.controls['name']" required>
           <mat-hint align="end">{{ productsForm.controls['name'].value.length }} / 40</mat-hint>
           <mat-error align="start" *ngIf="productsForm.controls['name'].hasError('maxlength')">
-            O nome é <strong>longo demais</strong>
+            O nome é
+            <strong>longo demais</strong>
           </mat-error>
           <mat-error *ngIf="productsForm.controls['name'].hasError('minlength')">
-            O nome é <strong>curto demais</strong>
+            O nome é
+            <strong>curto demais</strong>
           </mat-error>
         </mat-form-field>
       </div>
-        <!--
-  <div class="form-group">
-    <label for="product-description">Descrição:</label>
-    <textarea required class="form-control" id="product-description" placeholder="Conte mais sobre o produto!" [formControl]="productsForm.controls['description']"></textarea>
-    <aside *ngIf="productsForm.controls['description'].hasError('required') && productsForm.controls['description'].touched" class="alert alert-danger">Seus clientes querem saber mais sobre o produto!</aside>
-    <aside *ngIf="productsForm.controls['description'].hasError('minlength') && productsForm.controls['description'].touched" class="alert alert-danger">A descrição produto deve ter, pelo menos, 15 caracteres.</aside>
-    <aside *ngIf="productsForm.controls['description'].hasError('maxlength') && productsForm.controls['description'].touched" class="alert alert-danger">A descrição produto deve ter, no máximo, 200 caracteres.</aside>
-  </div> -->
-    <div fxFlex="100">
-      <mat-form-field fxFlex="100">
-        <textarea matInput placeholder="Conte mais sobre o produto!" [formControl]="productsForm.controls['description']" required></textarea>
-        <mat-hint align="end">{{ productsForm.controls['description'].value.length }} / 200</mat-hint>
-        <mat-error align="start" *ngIf="productsForm.controls['description'].hasError('maxlength')">
-          A descrição é <strong>longa demais</strong>
-        </mat-error>
-        <mat-error align="start" *ngIf="productsForm.controls['description'].hasError('minlength')">
-          A descrição é <strong>curta demais</strong>
-        </mat-error>
-      </mat-form-field>
-    </div>
-    <!--
-  <div class="form-group">
-    <label for="product-price">Preço:</label>
-    <input required type="number" step="0.01" class="form-control" id="product-price" placeholder="Não enfie a faca!" [formControl]="productsForm.controls['price']">
-  </div>
-  <aside *ngIf="whitespaceError" class="alert alert-danger">Boa tentativa, mas hoje não. Preencha os campos com caracteres válidos</aside>
--->
-    <div fxFlex="100"> 
-      <mat-form-field fxFlex="100">
-        <input matInput type="number" placeholder="Preço" [formControl]="productsForm.controls['price']" required>
-      </mat-form-field>
-    </div>
-  <!--<p-multiSelect [options]="categories" formControlName ="selectedCategories"></p-multiSelect> -->
-<div fxFlex="100">
-  <mat-form-field fxFlex="100">
-    <mat-select fxFlex="100" id="options-select"
-      label="Categorias"
-      placeholder="Categorias"
-      [formControl]="productsForm.controls['selectedCategories']" multiple>
-      <div *ngIf="categoriesReady">
-        <mat-option *ngFor="let category of categories" [value]="category.value">{{category.label}}</mat-option>
+      <div fxFlex="100">
+        <mat-form-field fxFlex="100">
+          <textarea matInput placeholder="Conte mais sobre o produto!" [formControl]="productsForm.controls['description']" required></textarea>
+          <mat-hint align="end">{{ productsForm.controls['description'].value.length }} / 200</mat-hint>
+          <mat-error align="start" *ngIf="productsForm.controls['description'].hasError('maxlength')">
+            A descrição é
+            <strong>longa demais</strong>
+          </mat-error>
+          <mat-error align="start" *ngIf="productsForm.controls['description'].hasError('minlength')">
+            A descrição é
+            <strong>curta demais</strong>
+          </mat-error>
+        </mat-form-field>
       </div>
-    </mat-select>
-  </mat-form-field></div>
-  <!--
-  <div class="container" *ngFor="let image of imagesToShow; let i = index">
-    <img [src]="image.$value" class="image">
-    <div class="overlay" [ngClass]="{'removed': image.isRemoved }" (click)="removeImage(image)">
-      <div class="text">{{ image.overlayText }}</div>
+      <div fxFlex="100">
+        <mat-form-field fxFlex="100">
+          <input matInput type="number" placeholder="Preço" [formControl]="productsForm.controls['price']" required>
+        </mat-form-field>
+      </div>
+      <div fxFlex="100">
+        <mat-form-field fxFlex="100">
+          <mat-select fxFlex="100" id="options-select" label="Categorias" placeholder="Categorias" [formControl]="productsForm.controls['selectedCategories']"
+            required multiple>
+            <div *ngIf="categoriesReady">
+              <mat-option *ngFor="let category of categories" [value]="category.value">{{category.label}}</mat-option>
+            </div>
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <image-upload [max]="5" [extensions]="['jpeg','png']" [buttonCaption]="'Escolha'" [dropBoxMessage]="'Solte suas imagens aqui!'"
+        [fileTooLargeMessage]="'Imagem muito grande!'" [uploadedFiles]="picsUrls" (uploadFinished)="imageFinishedUploading($event)"
+        (removed)="imageRemoved($event)" (uploadStateChanged)="uploadStateChange($event)"></image-upload>
+      <button mat-raised-button type="submit" [disabled]="!productsForm.valid">ATUALIZAR</button>
     </div>
-  </div> -->
-  <!--
-<div  fxLayout="row"  fxFlex="50%">
-  <mat-card *ngFor="let image of imagesToShow">
-    <mat-card-content>
-      <img mat-card-image [src]="image.$value">
-    </mat-card-content>
-    <mat-card-actions>
-      <mat-slide-toggle [checked]="image.isRemoved" color="warn" (change)="removeImage(image)">
-        <strong>{{ (image.isRemoved) ? 'EXCLUIR' : 'MANTER' }}</strong>
-      </mat-slide-toggle>
-    </mat-card-actions>
-  </mat-card>
-</div> -->
-  <image-upload [max]="5" [extensions]="['jpeg','png']" 
-                [buttonCaption]="'Escolha'"
-                [dropBoxMessage]="'Solte suas imagens aqui!'"
-                [fileTooLargeMessage]="'Imagem muito grande!'"
-                [uploadedFiles]="picsUrls" 
-    (uploadFinished)="imageFinishedUploading($event)"
-    (removed)="imageRemoved($event)" 
-    (uploadStateChanged)="uploadStateChange($event)"></image-upload>
-<!--
-  <button class="btn" type="submit" [disabled]="!productsForm.valid">Atualizar</button>	  -->
-  <button mat-raised-button type="submit" [disabled]="!productsForm.valid">ATUALIZAR</button>
-    </div> 
-  </form>	
+  </form>
 </div>
-<p-growl [value]="growlMessages"></p-growl> 
+<p-growl [value]="growlMessages"></p-growl>

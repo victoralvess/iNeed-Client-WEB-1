@@ -1,230 +1,241 @@
 <div fxLayout="column">
   <mat-accordion class="headers-align">
     <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle="true">
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Sua loja
-      </mat-panel-title>
-      <mat-panel-description>
-        Comece pelo básico
-        <mat-icon>store</mat-icon>
-      </mat-panel-description>
-    </mat-expansion-panel-header>
-    <form [formGroup]="storeForm">
-      <div fxLayout="column">
-        <div fxFlex="100"> 
-          <mat-form-field fxFlex="100">
-            <input matInput placeholder="Nome da loja" [formControl]="storeForm.controls['name']" required>  
-            <mat-hint align="end">{{ storeForm.controls['name'].value.length }} / 45</mat-hint>
-            <mat-error align="start" *ngIf="storeForm.controls['name'].hasError('maxlength')">
-              O nome é <strong>longo demais</strong>
-            </mat-error>
-            <mat-error *ngIf="storeForm.controls['name'].hasError('minlength')">
-              O nome é <strong>curto demais</strong>
-            </mat-error>
-          </mat-form-field>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Sua loja
+        </mat-panel-title>
+        <mat-panel-description>
+          Comece pelo básico
+          <mat-icon>store</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <form [formGroup]="storeForm">
+        <div fxLayout="column">
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <input matInput placeholder="Nome da loja" [formControl]="storeForm.controls['name']" required>
+              <mat-hint align="end">{{ storeForm.controls['name'].value.length }} / 45</mat-hint>
+              <mat-error align="start" *ngIf="storeForm.controls['name'].hasError('maxlength')">
+                O nome é
+                <strong>longo demais</strong>
+              </mat-error>
+              <mat-error *ngIf="storeForm.controls['name'].hasError('minlength')">
+                O nome é
+                <strong>curto demais</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <input matInput placeholder="CNPJ" [formControl]="storeForm.controls['cnpj']" [textMask]="{mask: cnpjMask, placeholderChar: '\u2000'}"
+                required>
+              <mat-error *ngIf="storeForm.controls['cnpj'].hasError('required') || storeForm.controls['cnpj'].hasError('minlength')">
+                CNPJ
+                <strong>incorreto</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div fxFlex="100">
+            <md2-colorpicker matInput fxFlex="100" [formControl]="storeForm.controls['color']" placeholder="Cor da loja" required></md2-colorpicker>
+          </div>
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <textarea matInput placeholder="{{ 'Conte-nos mais sobre ' + ((storeForm.controls['name'].value.trim().length > 3) ? storeForm.controls['name'].value : 'a sua loja') }}"
+                [formControl]="storeForm.controls['description']" required></textarea>
+              <mat-hint align="end">{{ storeForm.controls['description'].value.length }} / 200</mat-hint>
+              <mat-error align="start" *ngIf="storeForm.controls['description'].hasError('maxlength')">
+                A descrição é
+                <strong>longa demais</strong>
+              </mat-error>
+              <mat-error align="start" *ngIf="storeForm.controls['description'].hasError('minlength')">
+                A descrição é
+                <strong>curta demais</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div fxFlex="100">
+            <image-upload [max]="5" [extensions]="['jpeg','png']" [buttonCaption]="'Escolha'" [dropBoxMessage]="'Solte suas imagens aqui!'"
+              [fileTooLargeMessage]="'Imagem muito grande!'" (uploadFinished)="imageFinishedUploading($event)" (removed)="imageRemoved($event)"
+              (uploadStateChanged)="uploadStateChange($event)"></image-upload>
+          </div>
+          <mat-action-row>
+            <button mat-button color="primary" (click)="nextStep()" class="text-upper" [disabled]="!storeForm.valid">Próxima</button>
+          </mat-action-row>
         </div>
-        <div fxFlex="100">
-          <mat-form-field fxFlex="100">
-            <input matInput placeholder="CNPJ" [formControl]="storeForm.controls['cnpj']" [textMask]="{mask: cnpjMask, placeholderChar: '\u2000'}" required>  
-            <mat-error *ngIf="storeForm.controls['cnpj'].hasError('required') || storeForm.controls['cnpj'].hasError('minlength')">
-              CNPJ <strong>incorreto</strong>
-            </mat-error>
-          </mat-form-field>  
-        </div>
-<div fxFlex="100">
-        <md2-colorpicker matInput fxFlex="100" [formControl]="storeForm.controls['color']" placeholder="Cor da loja" required></md2-colorpicker> 
-</div>
-        <div fxFlex="100">
-        <mat-form-field fxFlex="100">
-          <textarea matInput placeholder="{{ 'Conte-nos mais sobre ' + ((storeForm.controls['name'].value.trim().length > 3) ? storeForm.controls['name'].value : 'a sua loja') }}" [formControl]="storeForm.controls['description']" required></textarea>
-          <mat-hint align="end">{{ storeForm.controls['description'].value.length }} / 200</mat-hint>
-          <mat-error align="start" *ngIf="storeForm.controls['description'].hasError('maxlength')">
-            A descrição é <strong>longa demais</strong>
-          </mat-error>
-          <mat-error align="start" *ngIf="storeForm.controls['description'].hasError('minlength')">
-            A descrição é <strong>curta demais</strong>
-          </mat-error>
-        </mat-form-field></div>
-        <div fxFlex="100">
-          <image-upload [max]="5" [extensions]="['jpeg','png']"
-          [buttonCaption]="'Escolha'"
-          [dropBoxMessage]="'Solte suas imagens aqui!'"
-          [fileTooLargeMessage]="'Imagem muito grande!'" 
-          (uploadFinished)="imageFinishedUploading($event)"
-          (removed)="imageRemoved($event)"
-          (uploadStateChanged)="uploadStateChange($event)"></image-upload>
-        </div>  
-        <mat-action-row>
-          <button mat-button color="primary" (click)="nextStep()" class="text-upper" [disabled]="!storeForm.valid">Próxima</button>
-        </mat-action-row>
-      </div>
-    </form>
+      </form>
     </mat-expansion-panel>
     <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle="true">
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Adicionais
-      </mat-panel-title>
-      <mat-panel-description>
-        Configurações opcionais
-        <mat-icon>settings</mat-icon>
-      </mat-panel-description>
-    </mat-expansion-panel-header>
-    <form [formGroup]="extraInfoForm">
-      <div fxLayout="column">
-        <div fxFlex="100">
-        <mat-form-field fxFlex="100">
-          <input matInput placeholder="Telefone" [formControl]="extraInfoForm.controls['phone']" [textMask]="{mask: phoneMask, placeholderChar: '\u2000'}">  
-          <mat-error align="start" *ngIf="extraInfoForm.controls['phone'].value.length > 0 &&extraInfoForm.controls['phone'].hasError('minlength')">
-            Telefone <strong>incorreto</strong>
-          </mat-error>
-        </mat-form-field>
-        </div>
-        <div fxFlex="100">
-        <mat-form-field fxFlex="100">
-          <input matInput placeholder="Celular/Whatsapp" [formControl]="extraInfoForm.controls['cellphone']" [textMask]="{mask: cellphoneMask, placeholderChar: '\u2000'}">  
-          <mat-error align="start" *ngIf="extraInfoForm.controls['cellphone'].value.length > 0 &&extraInfoForm.controls['cellphone'].hasError('minlength')">
-            Celular/Wpp <strong>incorreto</strong>
-          </mat-error>
-        </mat-form-field>
-        </div>
-        <div fxFlex="100">
-<mat-form-field fxFlex="100">
-        <mat-select fxFlex="100" id="options-select"
-            label="Formas de pagamento aceitas"
-            placeholder="Formas de pagamento aceitas"
-            [formControl]="extraInfoForm.controls['mainPaymentWays']" multiple>
-            <mat-option value="money">Dinheiro</mat-option>
-            <mat-option value="credit">Cartão de crédito</mat-option>
-            <mat-option value="debit">Cartão de débito</mat-option>
-            <mat-option value="debit">Cheque</mat-option>
-          </mat-select>
-</mat-form-field>
-          </div><div fxFlex="100">
-<mat-form-field fxFlex="100">
-          <mat-select fxFlex="100" id="options-select"
-            label="Principais categorias"
-            placeholder="Principais categorias"
-            [formControl]="extraInfoForm.controls['mainCategories']" multiple>
-            <div *ngIf="categoriesReady">
-              <mat-option *ngFor="let category of categories" [value]="category.value">{{category.label}}</mat-option>
-            </div>
-          </mat-select>
-</mat-form-field>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Adicionais
+        </mat-panel-title>
+        <mat-panel-description>
+          Configurações opcionais
+          <mat-icon>settings</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <form [formGroup]="extraInfoForm">
+        <div fxLayout="column">
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <input matInput placeholder="Telefone" [formControl]="extraInfoForm.controls['phone']" [textMask]="{mask: phoneMask, placeholderChar: '\u2000'}">
+              <mat-error align="start" *ngIf="extraInfoForm.controls['phone'].value.length > 0 &&extraInfoForm.controls['phone'].hasError('minlength')">
+                Telefone
+                <strong>incorreto</strong>
+              </mat-error>
+            </mat-form-field>
           </div>
-        <mat-action-row>
-          <button mat-button color="warn" (click)="prevStep()" class="text-upper">Voltar</button>
-          <button mat-button color="primary" (click)="nextStep()" class="text-upper" [disabled]="!extraInfoForm.valid">Próxima</button>
-        </mat-action-row>
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <input matInput placeholder="Celular/Whatsapp" [formControl]="extraInfoForm.controls['cellphone']" [textMask]="{mask: cellphoneMask, placeholderChar: '\u2000'}">
+              <mat-error align="start" *ngIf="extraInfoForm.controls['cellphone'].value.length > 0 &&extraInfoForm.controls['cellphone'].hasError('minlength')">
+                Celular/Wpp
+                <strong>incorreto</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <mat-select fxFlex="100" id="options-select" label="Formas de pagamento aceitas" placeholder="Formas de pagamento aceitas"
+                [formControl]="extraInfoForm.controls['mainPaymentWays']" multiple>
+                <mat-option value="money">Dinheiro</mat-option>
+                <mat-option value="credit">Cartão de crédito</mat-option>
+                <mat-option value="debit">Cartão de débito</mat-option>
+                <mat-option value="debit">Cheque</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <mat-select fxFlex="100" id="options-select" label="Principais categorias" placeholder="Principais categorias" [formControl]="extraInfoForm.controls['mainCategories']"
+                multiple>
+                <div *ngIf="categoriesReady">
+                  <mat-option *ngFor="let category of categories" [value]="category.value">{{category.label}}</mat-option>
+                </div>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <mat-action-row>
+            <button mat-button color="warn" (click)="prevStep()" class="text-upper">Voltar</button>
+            <button mat-button color="primary" (click)="nextStep()" class="text-upper" [disabled]="!extraInfoForm.valid">Próxima</button>
+          </mat-action-row>
         </div>
-    </form>
+      </form>
     </mat-expansion-panel>
     <mat-expansion-panel [expanded]="step === 2" (opened)="setStep(2)" hideToggle="true">
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Endereço
-      </mat-panel-title>
-      <mat-panel-description>
-        Onde fica sua loja
-        <mat-icon>map</mat-icon>
-      </mat-panel-description>
-    </mat-expansion-panel-header>
-    <form [formGroup]="addressForm">
-    <div fxLayout="column">
-        <div fxFlex="100">
-      <mat-form-field fxFlex="100">
-        <input matInput placeholder="CEP" [formControl]="addressForm.controls['zipCode']" [textMask]="{mask: zipCodeMask, placeholderChar: '\u2000', keepCharPositions: true}" (blur)="locationByZipCode()" required>  
-        <mat-error *ngIf="addressForm.controls['zipCode'].hasError('required') || addressForm.controls['zipCode'].hasError('minlength')">
-          CEP <strong>incorreto</strong>
-        </mat-error>
-      </mat-form-field>    </div>   <div fxFlex="100">
-      <mat-form-field fxFlex="100">       
-        <input matInput type="text" [formControl] = "addressForm.controls['street']" placeholder="Logradouro">
-        <mat-error *ngIf="addressForm.controls['street'].hasError('required')">
-          Insira o nome do <strong>logradouro</strong>
-        </mat-error>
-      </mat-form-field></div><div fxFlex="100">
-      <mat-form-field fxFlex="100">
-        <input matInput placeholder="Número" [formControl]="addressForm.controls['number']" (blur)="locationByZipCode()" required>
-              
-      <mat-error *ngIf="addressForm.controls['zipCode'].hasError('number') || addressForm.controls['zipCode'].hasError('number')">
-        Insira um número       
-      </mat-error>   
-      </mat-form-field></div><div fxFlex="100">
-      <mat-form-field fxFlex="100">
-        <input matInput placeholder="Bairro" [formControl]="addressForm.controls['vicinity']">
-      </mat-form-field> </div><div fxFlex="100">
-      <mat-form-field fxFlex="100">
-        <input matInput placeholder="Cidade" [formControl]="addressForm.controls['city']">
-      </mat-form-field> </div>
-      <div fxFlex="100">
-<mat-form-field fxFlex="100">
-      <mat-select id="options-select" fxFlex="100"
-        label="Estado"
-        placeholder="Estado"
-        [formControl]="addressForm.controls['state']">
-        <mat-option value="AC">Acre</mat-option>
-        <mat-option value="AL">Alagoas</mat-option>
-        <mat-option value="AP">Amapá</mat-option>
-        <mat-option value="AM">Amazonas</mat-option>
-        <mat-option value="BA">Bahia</mat-option>
-        <mat-option value="CE">Ceará</mat-option>
-        <mat-option value="DF">Distrito Federal</mat-option>
-        <mat-option value="ES">Espírito Santo</mat-option>
-        <mat-option value="GO">Goiás</mat-option>
-        <mat-option value="MA">Maranhão</mat-option>
-        <mat-option value="MT">Mato Grosso</mat-option>
-        <mat-option value="MS">Mato Grosso do Sul</mat-option>
-        <mat-option value="MG">Minas Gerais</mat-option>
-        <mat-option value="PA">Pará</mat-option>
-        <mat-option value="PB">Paraíba</mat-option>
-        <mat-option value="PR">Paraná</mat-option>
-        <mat-option value="PE">Pernambuco</mat-option>
-        <mat-option value="PI">Piauí</mat-option>
-        <mat-option value="RJ">Rio de Janeiro</mat-option>
-        <mat-option value="RN">Rio Grande do Norte</mat-option>
-        <mat-option value="RS">Rio Grande do Sul</mat-option>
-        <mat-option value="RO">Rondônia</mat-option>
-        <mat-option value="RR">Rorâima</mat-option>
-        <mat-option value="SC">Santa Catarina</mat-option>
-        <mat-option value="SP">São Paulo</mat-option>
-        <mat-option value="SE">Sergipe</mat-option>
-        <mat-option value="TO">Tocantins</mat-option>
-      </mat-select>
-</mat-form-field>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Endereço
+        </mat-panel-title>
+        <mat-panel-description>
+          Onde fica sua loja
+          <mat-icon>map</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <form [formGroup]="addressForm">
+        <div fxLayout="column">
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <input matInput placeholder="CEP" [formControl]="addressForm.controls['zipCode']" [textMask]="{mask: zipCodeMask, placeholderChar: '\u2000', keepCharPositions: true}"
+                (blur)="locationByZipCode()" required>
+              <mat-error *ngIf="addressForm.controls['zipCode'].hasError('required') || addressForm.controls['zipCode'].hasError('minlength')">
+                CEP
+                <strong>incorreto</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <input matInput type="text" [formControl]="addressForm.controls['street']" placeholder="Logradouro">
+              <mat-error *ngIf="addressForm.controls['street'].hasError('required')">
+                Insira o nome do
+                <strong>logradouro</strong>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <input matInput placeholder="Número" [formControl]="addressForm.controls['number']" (blur)="locationByZipCode()" required>
+
+              <mat-error *ngIf="addressForm.controls['zipCode'].hasError('number') || addressForm.controls['zipCode'].hasError('number')">
+                Insira um número
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <input matInput placeholder="Bairro" [formControl]="addressForm.controls['vicinity']">
+            </mat-form-field>
+          </div>
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <input matInput placeholder="Cidade" [formControl]="addressForm.controls['city']">
+            </mat-form-field>
+          </div>
+          <div fxFlex="100">
+            <mat-form-field fxFlex="100">
+              <mat-select id="options-select" fxFlex="100" label="Estado" placeholder="Estado" [formControl]="addressForm.controls['state']">
+                <mat-option value="AC">Acre</mat-option>
+                <mat-option value="AL">Alagoas</mat-option>
+                <mat-option value="AP">Amapá</mat-option>
+                <mat-option value="AM">Amazonas</mat-option>
+                <mat-option value="BA">Bahia</mat-option>
+                <mat-option value="CE">Ceará</mat-option>
+                <mat-option value="DF">Distrito Federal</mat-option>
+                <mat-option value="ES">Espírito Santo</mat-option>
+                <mat-option value="GO">Goiás</mat-option>
+                <mat-option value="MA">Maranhão</mat-option>
+                <mat-option value="MT">Mato Grosso</mat-option>
+                <mat-option value="MS">Mato Grosso do Sul</mat-option>
+                <mat-option value="MG">Minas Gerais</mat-option>
+                <mat-option value="PA">Pará</mat-option>
+                <mat-option value="PB">Paraíba</mat-option>
+                <mat-option value="PR">Paraná</mat-option>
+                <mat-option value="PE">Pernambuco</mat-option>
+                <mat-option value="PI">Piauí</mat-option>
+                <mat-option value="RJ">Rio de Janeiro</mat-option>
+                <mat-option value="RN">Rio Grande do Norte</mat-option>
+                <mat-option value="RS">Rio Grande do Sul</mat-option>
+                <mat-option value="RO">Rondônia</mat-option>
+                <mat-option value="RR">Rorâima</mat-option>
+                <mat-option value="SC">Santa Catarina</mat-option>
+                <mat-option value="SP">São Paulo</mat-option>
+                <mat-option value="SE">Sergipe</mat-option>
+                <mat-option value="TO">Tocantins</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <mat-action-row>
+            <button mat-button color="warn" (click)="prevStep()" class="text-upper">Voltar</button>
+            <button mat-button color="primary" (click)="nextStep()" class="text-upper" [disabled]="!addressForm.valid">Próxima</button>
+          </mat-action-row>
+        </div>
+      </form>
+    </mat-expansion-panel>
+    <mat-expansion-panel [expanded]="step === 3" (opened)="setStep(3)" hideToggle="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Confirmação
+        </mat-panel-title>
+        <mat-panel-description>
+          Leia os termos de uso
+          <mat-icon>assignment</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+      <div>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+          Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis
+          aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+          occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </p>
       </div>
       <mat-action-row>
         <button mat-button color="warn" (click)="prevStep()" class="text-upper">Voltar</button>
-        <button mat-button color="primary" (click)="nextStep()" class="text-upper" [disabled]="!addressForm.valid">Próxima</button>
+        <button mat-button color="primary" [disabled]="!(storeForm.valid && addressForm.valid && extraInfoForm.valid)" (click)="storeForm.valid && addressForm.valid && addStore([storeForm.value, addressForm.value, extraInfoForm.value])"
+          class="text-upper">Li e Concordo</button>
       </mat-action-row>
-      </div>
-    </form>  
-    </mat-expansion-panel>  
-    <mat-expansion-panel [expanded]="step === 3" (opened)="setStep(3)" hideToggle="true">
-    <mat-expansion-panel-header>
-      <mat-panel-title>
-        Confirmação
-      </mat-panel-title>
-      <mat-panel-description>
-        Leia os termos de uso
-        <mat-icon>assignment</mat-icon>
-      </mat-panel-description>
-    </mat-expansion-panel-header>
-    <div>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-        quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
-        consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
-        cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-      </p>
-    </div>
-    <mat-action-row>
-      <button mat-button color="warn" (click)="prevStep()" class="text-upper">Voltar</button>
-      <button mat-button color="primary" [disabled]="!(storeForm.valid && addressForm.valid && extraInfoForm.valid)" (click)="storeForm.valid && addressForm.valid && addStore([storeForm.value, addressForm.value, extraInfoForm.value])" class="text-upper">Li e Concordo</button>
-    </mat-action-row>
     </mat-expansion-panel>
   </mat-accordion>
 </div>

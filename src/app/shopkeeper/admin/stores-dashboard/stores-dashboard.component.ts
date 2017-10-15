@@ -16,7 +16,7 @@ export class StoresDashboardComponent {
   displayedColumns = ['name', 'address', 'color', 'actions'];
   dataSource: StoresDataSource;
 
-  constructor(private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private storesService: StoresService) { 
+  constructor(private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private storesService: StoresService) {
     this.dataSource = new StoresDataSource(storesService);
   }
 
@@ -46,5 +46,5 @@ export class StoresDataSource extends DataSource<any> {
     return this.storesService.getAllStores();
   }
 
-  disconnect() {}
+  disconnect() { }
 }
