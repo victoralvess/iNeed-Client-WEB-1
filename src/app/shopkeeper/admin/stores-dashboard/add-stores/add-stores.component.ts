@@ -5,10 +5,12 @@ import { CustomValidators } from '../../../../shared/validators/custom-validator
 import { Md2Colorpicker, Md2Toast } from 'md2';
 import { FileHolder } from 'angular2-image-upload';
 import { Subject } from 'rxjs/Subject';
+import { Subscription } from 'rxjs/Subscription';
 import { LocationService } from '../services/location/location.service';
 import { StoresService } from '../services/stores.service';
 import { Store } from '../models/store.model';
 import { StoreLocation } from '../models/store-location.model';
+import { Category } from '../../../models/category.model';
 
 @Component({
   selector: 'app-add-stores',
@@ -31,6 +33,10 @@ export class AddStoresComponent implements OnDestroy {
 
   private addressReady$ = new Subject<any>();
   private ready;
+
+  private categoriesReady = false;
+  private categoriesSubscription: Subscription;
+  private categories = [];
 
   private storeForm = new FormGroup({
     name: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(3), CustomValidators.maxLength(45)])),
@@ -79,6 +85,15 @@ export class AddStoresComponent implements OnDestroy {
 
         this.addressReady$.next(true);
       }
+    });
+
+    this.categoriesSubscription = storesService.getAllCategories().subscribe((categories) => {
+      let aux: Category[] = [];
+      categories.forEach((category) => {
+        aux.push({ label: category.value, value: category.$key });
+      });
+      this.categories = aux;
+      this.categoriesReady = true;
     });
   }
 

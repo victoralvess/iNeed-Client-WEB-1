@@ -98,6 +98,7 @@
             <mat-option value="money">Dinheiro</mat-option>
             <mat-option value="credit">Cartão de crédito</mat-option>
             <mat-option value="debit">Cartão de débito</mat-option>
+            <mat-option value="debit">Cheque</mat-option>
           </mat-select>
 </mat-form-field>
           </div><div fxFlex="100">
@@ -106,9 +107,9 @@
             label="Principais categorias"
             placeholder="Principais categorias"
             [formControl]="extraInfoForm.controls['mainCategories']" multiple>
-            <mat-option value="money">Dinheiro</mat-option>
-            <mat-option value="credit">Cartão de crédito</mat-option>
-            <mat-option value="debit">Cartão de débito</mat-option>
+            <div *ngIf="categoriesReady">
+              <mat-option *ngFor="let category of categories" [value]="category.value">{{category.label}}</mat-option>
+            </div>
           </mat-select>
 </mat-form-field>
           </div>
