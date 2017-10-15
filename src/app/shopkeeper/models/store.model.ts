@@ -1,9 +1,13 @@
-export class Store {
-    private _id : string;
-    private _name : string;
-    private _address : string;
-    private _checked : boolean = false;
-
+export interface Store {
+    /*private _id: string;
+    private _name: string;
+    private _address: string;
+    private _checked: boolean = false;*/
+    id: string;
+    name: string;
+    address: string;
+    checked: boolean;
+/*
     constructor(id : string, name : string, address : string) {
       this._id = id;
       this._name = name;
@@ -28,5 +32,5 @@ export class Store {
 
     set checked(isChecked) {
       this._checked = isChecked;
-    }
+    }*/
 }

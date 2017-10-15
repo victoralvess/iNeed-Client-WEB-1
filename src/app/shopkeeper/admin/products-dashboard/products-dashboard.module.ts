@@ -19,7 +19,7 @@ import { ModalModule } from 'ngx-modialog';
 
 import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
 import { NotificationsService } from '../../../shared/services/notifications/notifications.service';
-
+import { CrudService } from '../../../shared/services/crud-service/crud.service';
 import { CovalentDialogsModule } from '@covalent/core';
 import { NoConflictStyleCompatibilityMode, CompatibilityModule } from '@angular/material';
 import {
@@ -108,6 +108,6 @@ import { FlexLayoutModule } from '@angular/flex-layout';
   ],
   declarations: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
   exports: [ProductsDashboardComponent, AddProductsComponent, EditProductsComponent],
-  providers: [ProductsService, NotificationsService]
+  providers: [ProductsService, NotificationsService, CrudService]
 })
 export class ProductsDashboardModule { }

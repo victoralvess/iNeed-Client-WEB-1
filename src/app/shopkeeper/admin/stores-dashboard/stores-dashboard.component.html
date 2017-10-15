@@ -5,28 +5,30 @@
       <mat-header-cell *matHeaderCellDef> Nome </mat-header-cell>
       <mat-cell *matCellDef="let store"> {{store.name}} </mat-cell>
     </ng-container>
-    
+
     <ng-container matColumnDef="address">
       <mat-header-cell *matHeaderCellDef> Endereço </mat-header-cell>
       <mat-cell *matCellDef="let store"> {{store.location.address}} </mat-cell>
     </ng-container>
-    
+
     <ng-container matColumnDef="color">
       <mat-header-cell *matHeaderCellDef> Cor </mat-header-cell>
-      <mat-cell *matCellDef="let store" [style.color]="store.color"> <b> {{store.color}} </b> </mat-cell>
+      <mat-cell *matCellDef="let store" [style.color]="store.color">
+        <b> {{store.color}} </b>
+      </mat-cell>
     </ng-container>
 
     <ng-container matColumnDef="actions">
-        <mat-header-cell *matHeaderCellDef> Ações </mat-header-cell>
-        <mat-cell *matCellDef="let store">
-            <a class="no-decoration clickable" href="/shopkeeper/dashboard/admin/products/edit/{{store.$key}}">
-              <mat-icon>edit</mat-icon>
-            </a>
-            <a class="no-decoration clickable" (click)="deleteStore(store.$key, store.pictures.length)">
-              <mat-icon>delete</mat-icon>
-            </a>
-        </mat-cell>
-      </ng-container>
+      <mat-header-cell *matHeaderCellDef> Ações </mat-header-cell>
+      <mat-cell *matCellDef="let store">
+        <a class="no-decoration clickable" href="/shopkeeper/dashboard/admin/products/edit/{{store.$key}}">
+          <mat-icon>edit</mat-icon>
+        </a>
+        <a class="no-decoration clickable" (click)="deleteStore(store.$key)">
+          <mat-icon>delete</mat-icon>
+        </a>
+      </mat-cell>
+    </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
     <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>

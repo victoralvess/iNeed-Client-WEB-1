@@ -16,6 +16,9 @@ import { Md2Module, NoConflictStyleCompatibilityMode } from 'md2';
 import { CovalentDialogsModule, CovalentDataTableModule } from '@covalent/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { ImageUploadModule } from 'angular2-image-upload';
+import { ProductsService } from '../products-dashboard/services/products.service';
+import { NotificationsService } from '../../../shared/services/notifications/notifications.service';
+import { CrudService } from '../../../shared/services/crud-service/crud.service';
 import {
   MatAutocompleteModule,
   MatButtonModule,
@@ -104,7 +107,7 @@ CovalentDialogsModule,
   CovalentDataTableModule
   ],
   declarations: [StoresDashboardComponent, AddStoresComponent, EditStoresComponent, DeleteStoresComponent],
-  providers: [StoresService, LocationService]
+  providers: [StoresService, LocationService, ProductsService, NotificationsService, CrudService]
 })
 export class StoresDashboardModule {
 }
