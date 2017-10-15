@@ -1,194 +1,157 @@
-import { Component, OnDestroy } from '@angular/core';
-import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { ProductsService } from '../services/products.service';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { SelectItem } from 'primeng/primeng';
 
-import { CustomValidators } from '../../../../shared/validators/custom-validators';
-import { Md2Colorpicker, Md2Toast } from 'md2';
-import { FileHolder } from 'angular2-image-upload';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
-import { LocationService } from '../services/location/location.service';
-import { StoresService } from '../services/stores.service';
-import { Store } from '../models/store.model';
-import { StoreLocation } from '../models/store-location.model';
+import { Message } from 'primeng/primeng';
+import { User } from 'firebase/app';
+import { Store } from '../../../models/store.model';
 import { Category } from '../../../models/category.model';
-import { ViewContainerRef } from '@angular/core';
-import { TdDialogService } from '@covalent/core';
 
 @Component({
-  selector: 'app-add-stores',
-  templateUrl: './add-stores.component.html',
-  styleUrls: ['./add-stores.component.scss']
+  selector: 'app-add-products',
+  templateUrl: './add-products.component.html',
+  styleUrls: ['./add-products.component.css']
 })
-export class AddStoresComponent implements OnDestroy {
+export class AddProductsComponent implements OnInit {
 
-  private cnpjMask = [/\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/];
-  private zipCodeMask = [/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/];
-  private phoneMask = ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
-  private cellphoneMask = ['(', /\d/, /\d/, ')', ' ', /\d/, ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
-  private cellphoneValidator: RegExp = /\(\d\d\)\ \d\ \d\d\d\d\-\d\d\d\d/;
-  private phoneValidator: RegExp = /\(\d\d\)\ \d\d\d\d\-\d\d\d\d/;
+  stores: Store[] = [];
+  categories: SelectItem[] = [];
+  /******************PARA TRATAR ERROS******************/
+  selectAtLeastOneStore = true;
+  whitespaceError = false;
 
-  private files: File[] = [];
-  private store: Store = {};
+  productsForm: FormGroup;
+  storesGroup: FormGroup;
+  user: User;
+  selectedCategories: FormControl[];
+  files = [];
+  growlMessages: Message[] = [];
 
-  private step = 0;
+  userSubscription;
+  categoriesSubscription;
 
-  private addressReady$ = new Subject<any>();
-  private ready;
-  private categoriesReady = false;
-  private categoriesSubscription: Subscription;
-  private categories = [];
-
-  private storeForm = new FormGroup({
-    name: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(3), CustomValidators.maxLength(45)])),
-    cnpj: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(18)])),
-    color: new FormControl('#3F51B5', CustomValidators.rgba2hex()),
-    description: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(10), CustomValidators.maxLength(200)]))
-  });
-
-  private addressForm = new FormGroup({
-    street: new FormControl(''),
-    zipCode: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(9)])),
-    number: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(1)])),
-    city: new FormControl(''),
-    state: new FormControl(''),
-    vicinity: new FormControl(''),
-  });
-
-  private extraInfoForm = new FormGroup({
-    mainCategories: new FormControl([]),
-    mainPaymentWays: new FormControl([]),
-    phone: new FormControl(''),
-    cellphone: new FormControl('')
-  });
-
-  constructor(private toast: Md2Toast, private locationService: LocationService, private storesService: StoresService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService) {
-    this.addressReady$.asObservable().subscribe((isReady) => {
-      this.ready = isReady;
+  constructor(private fb: FormBuilder, private productsService: ProductsService) {
+    this.productsForm = new FormGroup({
+      name: new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])),
+      description: new FormControl('', Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])),
+      price: new FormControl('', Validators.required),
+      selectedCategories: new FormControl([], Validators.required)
     });
 
-    this.locationService.response$.asObservable().subscribe((responses) => {
-      if (responses === null) {
-        this.addressForm.controls['zipCode'].setValue('');
-        this.addressForm.controls['zipCode'].setErrors({ 'required': true });
-      } else {
-        this.addressForm.controls['street'].setValue(responses[0].endereco);
-        this.addressForm.controls['city'].setValue(responses[0].cidade);
-        this.addressForm.controls['vicinity'].setValue(responses[0].bairro);
-        this.addressForm.controls['state'].setValue(responses[0].uf);
+    this.storesGroup = new FormGroup({
+      storesList: new FormControl('')
+    });
 
-        console.log(responses[1]);
-        if (responses[1].status === 'OK') {
-          let storeLocation: StoreLocation = {};
-          storeLocation.lat = responses[1].results[0].geometry.location.lat;
-          storeLocation.lng = responses[1].results[0].geometry.location.lng;
-          storeLocation.address = responses[1].results[0].formatted_address;
-          this.store.location = storeLocation;
-          this.addressReady$.next(true);
+    this.productsForm.valueChanges
+      .map((value) => {
+        value.name = value.name.trim();
+        value.description = value.description.trim();
+        if (value.name.length < 3 || value.description.length < 20) {
+          this.whitespaceError = true;
         } else {
-          this.dialogService.openAlert({
-            message: 'Esse endereço não foi encontrado com precisão nas nossas bases de dados. Infelizmente o cadastro não poderá ser efetuado com esse endereço.',
-            disableClose: true,
-            viewContainerRef: this.viewContainerRef,
-            title: 'Erro',
-            closeButton: 'ENTENDI',
-          });
+          this.whitespaceError = false;
         }
-      }
+        return value;
+      });
+    /*
+        this.userSubscription = productsService.getUser().subscribe((user: any) => {
+          console.log('worksat', user.worksAt);
+            user.worksAt.forEach(store => {
+              this.stores.push(new Store(store.storeId, store.storeName, store.storeAddress));
+          });
+          });*/
+
+    this.userSubscription = productsService.getStoresWhereUserWorks().subscribe((stores) => {
+      stores.forEach(store => {
+        this.stores.push({ id: store.$key, name: store.name, address: store.location.address, checked: false });
+      });
     });
 
-    this.categoriesSubscription = storesService.getAllCategories().subscribe((categories) => {
+    this.categoriesSubscription = productsService.getAllCategories().subscribe((categories) => {
       let aux: Category[] = [];
       categories.forEach((category) => {
         aux.push({ label: category.value, value: category.$key });
       });
       this.categories = aux;
-      this.categoriesReady = true;
     });
+
+  }
+
+  ngOnInit() {
+
+    this.productsService.databaseChanged.asObservable().subscribe((notification) => {
+      console.log('foi');
+      this.growlMessages.push(notification);
+      setTimeout(() => {
+        this.growlMessages = [];
+      }, 7000)
+    });
+
   }
 
   ngOnDestroy() {
-    this.addressReady$.unsubscribe();
-    this.locationService.response$.unsubscribe();
+    console.log('onDestroy');
+    this.userSubscription.unsubscribe();
+    this.categoriesSubscription.unsubscribe();
   }
 
-  locationByZipCode() {
-    this.addressReady$.next(false);
-    if (!(this.addressForm.controls['zipCode'].hasError('minlength') || this.addressForm.controls['number'].hasError('minlength'))) {
-      const zipCode = this.addressForm.controls['zipCode'].value;
-      const number = this.addressForm.controls['number'].value;
-      this.locationService.locationByZipCode(zipCode, number);
-    }
-  }
+  addNewProduct(data) {
 
-  setStep(index: number) {
-    this.step = index;
-  }
-
-  nextStep() {
-    this.step++;
-  }
-
-  prevStep() {
-    this.step--;
-  }
-
-  addStore(formsValues: any[]) {
-    if (this.ready) {
-      const storeFormValues = formsValues[0];
-      const addressFormValues = formsValues[1];
-      const extraInfoFormValues = formsValues[2];
-      console.log(formsValues);
-
-      this.store.name = storeFormValues.name;
-      this.store.description = storeFormValues.description;
-      this.store.color = storeFormValues.color;
-      this.store.cnpj = storeFormValues.cnpj;
-
-      if (this.phoneValidator.test(<string>extraInfoFormValues.phone)) {
-        this.store.phone = extraInfoFormValues.phone;
-      }
-
-      if (this.cellphoneValidator.test(<string>extraInfoFormValues.cellphone)) {
-        this.store.cellphone = extraInfoFormValues.cellphone;
-      }
-
-      if ((<any[]>extraInfoFormValues.mainPaymentWays).length > 0) {
-        this.store.paymentWays = extraInfoFormValues.mainPaymentWays;
-      }
-
-      if ((<any[]>extraInfoFormValues.mainCategories).length > 0) {
-        this.store.categories = extraInfoFormValues.mainCategories;
-      }
-
-      if (this.files.length === 0) {
-        this.toast.toast('Adicione alguma imagem (.png, .jpg, .jpeg) antes de continuar!');
-        return;
-      } else {
-        let pictures: string[] = [];
-        this.files.forEach((file, idx, arr) => {
-          this.storesService.optmizeImage(file).subscribe((res) => {
-            const response: any = res;
-            const base64image = response._body;
-            pictures.push(base64image);
-            if (idx === this.files.length - 1) {
-              console.log(this.store);
-              this.storesService.addStore(this.store, pictures);
-            }
-          });
-        });
-      }
+    if (data.name.trim().length < 3 || data.description.trim().length < 20) {
+      this.whitespaceError = true;
+      return;
     } else {
+      this.whitespaceError = false;
+    }
+
+    for (let store of this.stores) {
+      this.selectAtLeastOneStore = store.checked;
+      if (store.checked) {
+        break;
+      }
+    }
+
+    if (!this.selectAtLeastOneStore) {
+      return;
+    }
+    data.images = [];
+    if (this.files.length == 0) {
+      this.growlMessages = [{ severity: 'error', summary: 'Erro', detail: 'Adicione alguma imagem (.png, .jpg, .jpeg) antes de continuar!' }];
       setTimeout(() => {
-        this.addStore(formsValues);
-      }, 1000);
+        this.growlMessages = [];
+      }, 7000);
+      return;
+    } else {
+      this.files.forEach((file, idx, arr) => {
+        this.productsService.optmizeImage(file).subscribe((res) => {
+          const response: any = res;
+          const base64image = response._body;
+          data.images.push(base64image);
+          if (idx === this.files.length - 1) {
+            this.addProduct(data);
+          }
+        });
+      });
     }
   }
 
-  imageFinishedUploading(event: FileHolder) {
+  addProduct(data) {
+    console.log(this.stores);
+    data.stores = this.stores
+      .filter(store => store.checked)
+      .map(store => store.id);
+
+    this.productsService.addProduct(data);
+  }
+
+  imageFinishedUploading(event) {
     console.log(event, event.file.type);
     if ((event.file.type !== 'image/jpeg' && event.file.type !== 'image/png') || (event.file.size > 1100000)) {
-      this.toast.toast('Remova as imagens com mais de 1MB. Elas não serão adicionadas!');
+      this.growlMessages = [{ severity: 'error', summary: 'Erro', detail: 'Remova as imagens com mais de 1MB. Elas não serão adicionadas!' }];
+      setTimeout(() => {
+        this.growlMessages = [];
+      }, 7000);
       return;
     }
 
@@ -197,7 +160,7 @@ export class AddStoresComponent implements OnDestroy {
   }
 
 
-  imageRemoved(event: FileHolder) {
+  imageRemoved(event) {
     this.files.splice(this.files.indexOf(event.file), 1);
     console.log(this.files);
   }
