@@ -1,5 +1,9 @@
 // Karma configuration file, see link for more information
+<<<<<<< HEAD
+// https://karma-runner.github.io/0.13/config/configuration-file.html
+=======
 // https://karma-runner.github.io/1.0/config/configuration-file.html
+>>>>>>> stores-module
 
 module.exports = function (config) {
   config.set({
