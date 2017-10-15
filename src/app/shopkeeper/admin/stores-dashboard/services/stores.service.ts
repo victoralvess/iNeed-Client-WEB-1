@@ -64,7 +64,7 @@ export class StoresService {
     });
   }
 
-  deleteStore(key: string, picsQty) {
+  deleteStore(key: string) {
     this.db.object(`/stores/${key}`).subscribe((store) => {
       if (store.pictures) {
         store.pictures.forEach((url) => {
@@ -97,9 +97,16 @@ export class StoresService {
     });
 
     this.db.list(`/employees-stores`).subscribe((employees) => {
-      employees.forEach((store) => {
-        const employee = store.$key;
-        this.db.list(`/employees-stores/${employee}/${key}`).remove();
+      console.log('MYTAG_ALL', employees);
+      employees.forEach((employee) => {
+        const employeeId = employee.$key;
+        if (employee[key]) { // IF EMPLOYEE WORKS AT `${key}` STORE
+          console.log('MYTAG_STORE_KEY', key);
+          console.log('MYTAG_STORE_DB', employee[key]);
+          console.log('MYTAG_STORE_DB_ID', employee[key].id);
+          console.log('MYTAG_EMPLOYEE_ID', employeeId);
+          this.db.object(`/employees-stores/${employeeId}/${key}`).remove();
+        }
       });
     });
   }

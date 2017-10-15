@@ -11,6 +11,8 @@ import { StoresService } from '../services/stores.service';
 import { Store } from '../models/store.model';
 import { StoreLocation } from '../models/store-location.model';
 import { Category } from '../../../models/category.model';
+import { ViewContainerRef } from '@angular/core';
+import { TdDialogService } from '@covalent/core';
 
 @Component({
   selector: 'app-add-stores',
@@ -33,7 +35,6 @@ export class AddStoresComponent implements OnDestroy {
 
   private addressReady$ = new Subject<any>();
   private ready;
-
   private categoriesReady = false;
   private categoriesSubscription: Subscription;
   private categories = [];
@@ -62,7 +63,7 @@ export class AddStoresComponent implements OnDestroy {
     cellphone: new FormControl('')
   });
 
-  constructor(private toast: Md2Toast, private locationService: LocationService, private storesService: StoresService) {
+  constructor(private toast: Md2Toast, private locationService: LocationService, private storesService: StoresService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService) {
     this.addressReady$.asObservable().subscribe((isReady) => {
       this.ready = isReady;
     });
@@ -77,13 +78,23 @@ export class AddStoresComponent implements OnDestroy {
         this.addressForm.controls['vicinity'].setValue(responses[0].bairro);
         this.addressForm.controls['state'].setValue(responses[0].uf);
 
-        let storeLocation: StoreLocation = {};
-        storeLocation.lat = responses[1].results[0].geometry.location.lat;
-        storeLocation.lng = responses[1].results[0].geometry.location.lng;
-        storeLocation.address = responses[1].results[0].formatted_address;
-        this.store.location = storeLocation;
-
-        this.addressReady$.next(true);
+        console.log(responses[1]);
+        if (responses[1].status === 'OK') {
+          let storeLocation: StoreLocation = {};
+          storeLocation.lat = responses[1].results[0].geometry.location.lat;
+          storeLocation.lng = responses[1].results[0].geometry.location.lng;
+          storeLocation.address = responses[1].results[0].formatted_address;
+          this.store.location = storeLocation;
+          this.addressReady$.next(true);
+        } else {
+          this.dialogService.openAlert({
+            message: 'Esse endereço não foi encontrado com precisão nas nossas bases de dados. Infelizmente o cadastro não poderá ser efetuado com esse endereço.',
+            disableClose: true,
+            viewContainerRef: this.viewContainerRef,
+            title: 'Erro',
+            closeButton: 'ENTENDI',
+          });
+        }
       }
     });
 
@@ -104,7 +115,7 @@ export class AddStoresComponent implements OnDestroy {
 
   locationByZipCode() {
     this.addressReady$.next(false);
-    if (!(this.addressForm.controls['zipCode'].hasError('minlength') || this.addressForm.controls['number'].hasError('minlength'))){
+    if (!(this.addressForm.controls['zipCode'].hasError('minlength') || this.addressForm.controls['number'].hasError('minlength'))) {
       const zipCode = this.addressForm.controls['zipCode'].value;
       const number = this.addressForm.controls['number'].value;
       this.locationService.locationByZipCode(zipCode, number);

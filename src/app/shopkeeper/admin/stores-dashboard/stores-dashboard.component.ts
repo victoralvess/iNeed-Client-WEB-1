@@ -20,7 +20,7 @@ export class StoresDashboardComponent {
     this.dataSource = new StoresDataSource(storesService);
   }
 
-  deleteStore(key, picsQty) {
+  deleteStore(key) {
     this.dialogService.openConfirm({
       message: `Você realmente deseja excluir esta loja?`,
       disableClose: true,
@@ -30,7 +30,7 @@ export class StoresDashboardComponent {
       acceptButton: 'Excluir',
     }).afterClosed().subscribe((accept: boolean) => {
       if (accept) {
-        this.storesService.deleteStore(key, picsQty);
+        this.storesService.deleteStore(key);
       }
     });
   }
