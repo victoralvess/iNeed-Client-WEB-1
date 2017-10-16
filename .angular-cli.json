@@ -1,11 +1,7 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "project": {
-<<<<<<< HEAD
-    "name": "i-need-web-project"
-=======
     "name": "ineed-stores-module"
->>>>>>> stores-module
   },
   "apps": [
     {
@@ -27,19 +23,10 @@
         "../node_modules/primeng/resources/themes/bootstrap/theme.css",
         "../node_modules/primeng/resources/primeng.min.css",
         "../node_modules/font-awesome/css/font-awesome.min.css",
-<<<<<<< HEAD
-        "styles.css"
-      ],
-      "scripts": [
-        "../node_modules/jquery/dist/jquery.js",
-        "../node_modules/bootstrap/dist/js/bootstrap.js"
-      ],
-=======
         "../node_modules/@covalent/core/common/platform.scss",
         "styles.scss"
       ],
       "scripts": [],
->>>>>>> stores-module
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
@@ -54,15 +41,6 @@
   },
   "lint": [
     {
-<<<<<<< HEAD
-      "project": "src/tsconfig.app.json"
-    },
-    {
-      "project": "src/tsconfig.spec.json"
-    },
-    {
-      "project": "e2e/tsconfig.e2e.json"
-=======
       "project": "src/tsconfig.app.json",
       "exclude": "**/node_modules/**"
     },
@@ -73,7 +51,6 @@
     {
       "project": "e2e/tsconfig.e2e.json",
       "exclude": "**/node_modules/**"
->>>>>>> stores-module
     }
   ],
   "test": {
@@ -82,11 +59,7 @@
     }
   },
   "defaults": {
-<<<<<<< HEAD
-    "styleExt": "css",
-=======
     "styleExt": "scss",
->>>>>>> stores-module
     "component": {}
   }
 }
