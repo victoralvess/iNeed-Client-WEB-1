@@ -68,6 +68,36 @@
     <mat-expansion-panel [expanded]="step === 1" (opened)="setStep(1)" hideToggle="true">
       <mat-expansion-panel-header>
         <mat-panel-title>
+          Horários de funcionamento
+        </mat-panel-title>
+        <mat-panel-description>
+          <p></p>
+          <mat-icon>access_time</mat-icon>
+        </mat-panel-description>
+      </mat-expansion-panel-header>
+     <!-- <form [formGroup]="openingClosingForm"> -->
+        <div fxLayout="column">
+          <div fxFlex="100">
+            <!-- <mat-form-field fxFlex="100">
+              <mat-select #daysSelect fxFlex="100" id="options-select" label="Dias" placeholder="Dias" (change)="openTimePickerDialog(daysSelect.selected, $event.value)" [formControl]="openingClosingForm.controls['days']"
+                multiple>
+                <mat-option [value]="day" *ngFor="let day of daysOfTheWeek">{{ day }}</mat-option>
+              </mat-select>
+            </mat-form-field> -->
+            <mat-checkbox fxFlex="20" [value]="day.day" *ngFor="let day of daysOfTheWeek" [checked]="day.checked" (change)="openTimePickerDialog(day.day, $event.checked)">
+              {{ day.day }}
+            </mat-checkbox>
+          </div>
+          <mat-action-row>
+            <button mat-button color="warn" (click)="prevStep()" class="text-upper">Voltar</button>
+            <button mat-button color="primary" (click)="nextStep()" class="text-upper" [disabled]="!openingClosingForm.valid">Próxima</button>
+          </mat-action-row>
+        </div>
+     <!-- </form> -->
+    </mat-expansion-panel>
+    <mat-expansion-panel [expanded]="step === 2" (opened)="setStep(2)" hideToggle="true">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
           Adicionais
         </mat-panel-title>
         <mat-panel-description>
@@ -102,7 +132,7 @@
                 <mat-option value="money">Dinheiro</mat-option>
                 <mat-option value="credit">Cartão de crédito</mat-option>
                 <mat-option value="debit">Cartão de débito</mat-option>
-                <mat-option value="debit">Cheque</mat-option>
+                <mat-option value="check">Cheque</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
@@ -123,7 +153,7 @@
         </div>
       </form>
     </mat-expansion-panel>
-    <mat-expansion-panel [expanded]="step === 2" (opened)="setStep(2)" hideToggle="true">
+    <mat-expansion-panel [expanded]="step === 3" (opened)="setStep(3)" hideToggle="true">
       <mat-expansion-panel-header>
         <mat-panel-title>
           Endereço
@@ -213,7 +243,7 @@
         </div>
       </form>
     </mat-expansion-panel>
-    <mat-expansion-panel [expanded]="step === 3" (opened)="setStep(3)" hideToggle="true">
+    <mat-expansion-panel [expanded]="step === 4" (opened)="setStep(4)" hideToggle="true">
       <mat-expansion-panel-header>
         <mat-panel-title>
           Confirmação
@@ -233,7 +263,8 @@
       </div>
       <mat-action-row>
         <button mat-button color="warn" (click)="prevStep()" class="text-upper">Voltar</button>
-        <button mat-button color="primary" [disabled]="!(storeForm.valid && addressForm.valid && extraInfoForm.valid)" (click)="storeForm.valid && addressForm.valid && addStore([storeForm.value, addressForm.value, extraInfoForm.value])"
+        <button mat-button color="primary" [disabled]="!(storeForm.valid && addressForm.valid && extraInfoForm.valid)"
+          (click)="storeForm.valid && addressForm.valid && addStore([storeForm.value, addressForm.value, extraInfoForm.value])"
           class="text-upper">Li e Concordo</button>
       </mat-action-row>
     </mat-expansion-panel>

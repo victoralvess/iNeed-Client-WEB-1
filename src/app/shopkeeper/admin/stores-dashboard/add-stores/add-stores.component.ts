@@ -13,6 +13,9 @@ import { StoreLocation } from '../models/store-location.model';
 import { Category } from '../../../models/category.model';
 import { ViewContainerRef } from '@angular/core';
 import { TdDialogService } from '@covalent/core';
+import { MatDialog } from '@angular/material';
+import { TimePickerDialogComponent } from '../time-picker-dialog/time-picker-dialog.component';
+import { MatOption } from '@angular/material';
 
 @Component({
   selector: 'app-add-stores',
@@ -38,12 +41,26 @@ export class AddStoresComponent implements OnDestroy {
   private categoriesReady = false;
   private categoriesSubscription: Subscription;
   private categories = [];
+  private daysOfTheWeek = [
+    { day: 'Segunda', checked: false, order: 0 },
+    { day: 'Terça', checked: false, order: 1 },
+    { day: 'Quarta', checked: false, order: 2 },
+    { day: 'Quinta', checked: false, order: 3 },
+    { day: 'Sexta', checked: false, order: 4 },
+    { day: 'Sábado', checked: false, order: 5 },
+    { day: 'Domingo', checked: false, order: 6 }
+  ];
+  private openingClosingArr = [];
 
   private storeForm = new FormGroup({
     name: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(3), CustomValidators.maxLength(45)])),
     cnpj: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(18)])),
     color: new FormControl('#3F51B5', CustomValidators.rgba2hex()),
     description: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(10), CustomValidators.maxLength(200)]))
+  });
+
+  private openingClosingForm = new FormGroup({
+    days: new FormControl([])
   });
 
   private addressForm = new FormGroup({
@@ -62,7 +79,7 @@ export class AddStoresComponent implements OnDestroy {
     cellphone: new FormControl('')
   });
 
-  constructor(private toast: Md2Toast, private locationService: LocationService, private storesService: StoresService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService) {
+  constructor(private dialog: MatDialog, private toast: Md2Toast, private locationService: LocationService, private storesService: StoresService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService) {
     this.addressReady$.asObservable().subscribe((isReady) => {
       this.ready = isReady;
     });
@@ -91,7 +108,7 @@ export class AddStoresComponent implements OnDestroy {
             disableClose: true,
             viewContainerRef: this.viewContainerRef,
             title: 'Erro',
-            closeButton: 'ENTENDI',
+            closeButton: 'ENTENDI'
           });
         }
       }
@@ -106,6 +123,57 @@ export class AddStoresComponent implements OnDestroy {
       this.categoriesReady = true;
     });
   }
+
+  openTimePickerDialog(/*days: MatOption[],*/ day, checked) {
+    console.log('MYTAG_', this.daysOfTheWeek);
+    this.daysOfTheWeek[this.daysOfTheWeek.map((e) => e.day).indexOf(day)].checked = checked;
+    console.log('MYTAG_', this.daysOfTheWeek);
+    const index = this.openingClosingArr.map((e) => e.day).indexOf(day);
+    if (checked) {
+      console.log(day);
+      let dialogRef;
+      if (!(index > -1)) {
+        console.log('nao é maior que -1');
+        dialogRef = this.dialog.open(TimePickerDialogComponent, {
+          data: { day: day }
+        });
+      } else {
+        console.log('here');
+        dialogRef = this.dialog.open(TimePickerDialogComponent, {
+          data: { day: day, opening: this.openingClosingArr[index].opening, closing: this.openingClosingArr[index].closing }
+        });
+      }
+
+      dialogRef.afterClosed().subscribe((response: any) => {
+        if (response) {
+          console.log('time', response);
+          this.openingClosingArr.push(response);
+          // this.orderTimesArray();
+          console.log('opcl', this.openingClosingArr);
+        } else {
+          this.removeTimesUnchecked(index);
+        }
+      });
+    } else {
+      this.removeTimesUnchecked(index);
+    }
+  }
+
+  removeTimesUnchecked(index) {
+    this.openingClosingArr.splice(index, 1);
+    if (this.openingClosingArr.length === 0) {
+      this.openingClosingArr = [];
+    } else {
+      // this.orderTimesArray();
+    }
+    console.log('opcl', this.openingClosingArr);
+  }
+
+  /* orderTimesArray() {
+    this.openingClosingArr.sort((a, b) => {
+      return (this.daysOfTheWeek.map((e) => e.day).indexOf(a.day) - this.daysOfTheWeek.map((e) => e.day).indexOf(b.day));
+    });
+  } */
 
   ngOnDestroy() {
     this.addressReady$.unsubscribe();
@@ -135,6 +203,15 @@ export class AddStoresComponent implements OnDestroy {
 
   addStore(formsValues: any[]) {
     if (this.ready) {
+      if (this.openingClosingArr.length === 0) {
+        this.toast.show('ADICIONE OS HORÁRIOS DE FUNCIONAMENTO');
+        return;
+      } else {
+        this.store.businessTimes = [];
+        this.openingClosingArr.forEach((oc) => {
+          this.store.businessTimes.push({ day: oc.day, open: oc.openingParsed, close: oc.closingParsed });
+        });
+      }
       const storeFormValues = formsValues[0];
       const addressFormValues = formsValues[1];
       const extraInfoFormValues = formsValues[2];

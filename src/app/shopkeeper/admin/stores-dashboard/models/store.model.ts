@@ -1,4 +1,5 @@
 import { StoreLocation } from './store-location.model';
+import { BusinessTime } from './business-time.interface';
 
 export interface Store {
     name?: string;
@@ -10,4 +11,5 @@ export interface Store {
     paymentWays?: string[];
     categories?: string[];
     location?: StoreLocation;
+    businessTimes?: BusinessTime[];
 }
