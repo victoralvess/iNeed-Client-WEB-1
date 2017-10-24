@@ -5,6 +5,7 @@ import { TdDialogService } from '@covalent/core';
 import { DataSource } from '@angular/cdk/collections';
 import { Observable } from 'rxjs/Observable';
 import { StoresService } from './services/stores.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-stores-dashboard',
@@ -16,7 +17,7 @@ export class StoresDashboardComponent {
   displayedColumns = ['name', 'address', 'color', 'actions'];
   dataSource: StoresDataSource;
 
-  constructor(private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private storesService: StoresService) {
+  constructor(private router: Router, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private storesService: StoresService) {
     this.dataSource = new StoresDataSource(storesService);
   }
 
@@ -34,6 +35,11 @@ export class StoresDashboardComponent {
       }
     });
   }
+
+  updateStore(key) {
+    this.router.navigate([`/shopkeeper/dashboard/admin/stores/edit/${key}`]);
+  }
+
 }
 
 export class StoresDataSource extends DataSource<any> {

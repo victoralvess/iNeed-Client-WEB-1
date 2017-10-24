@@ -7,6 +7,7 @@ import { Message } from 'primeng/primeng';
 import { User } from 'firebase/app';
 import { Store } from '../../../models/store.model';
 import { Category } from '../../../models/category.model';
+import { CustomValidators } from '../../../../shared/validators/custom-validators';
 
 @Component({
   selector: 'app-add-products',
@@ -17,12 +18,8 @@ export class AddProductsComponent implements OnInit {
 
   stores: Store[] = [];
   categories: SelectItem[] = [];
-  /******************PARA TRATAR ERROS******************/
-  selectAtLeastOneStore = true;
-  whitespaceError = false;
 
   productsForm: FormGroup;
-  storesGroup: FormGroup;
   user: User;
   selectedCategories: FormControl[];
   files = [];
@@ -33,34 +30,12 @@ export class AddProductsComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private productsService: ProductsService) {
     this.productsForm = new FormGroup({
-      name: new FormControl('', Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])),
-      description: new FormControl('', Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])),
+      name: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(3), CustomValidators.maxLength(40)])),
+      description: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(20), CustomValidators.maxLength(200)])),
       price: new FormControl('', Validators.required),
-      selectedCategories: new FormControl([], Validators.required)
+      selectedCategories: new FormControl([], Validators.required),
+      stores: new FormControl([], Validators.required),
     });
-
-    this.storesGroup = new FormGroup({
-      storesList: new FormControl('')
-    });
-
-    this.productsForm.valueChanges
-      .map((value) => {
-        value.name = value.name.trim();
-        value.description = value.description.trim();
-        if (value.name.length < 3 || value.description.length < 20) {
-          this.whitespaceError = true;
-        } else {
-          this.whitespaceError = false;
-        }
-        return value;
-      });
-    /*
-        this.userSubscription = productsService.getUser().subscribe((user: any) => {
-          console.log('worksat', user.worksAt);
-            user.worksAt.forEach(store => {
-              this.stores.push(new Store(store.storeId, store.storeName, store.storeAddress));
-          });
-          });*/
 
     this.userSubscription = productsService.getStoresWhereUserWorks().subscribe((stores) => {
       stores.forEach(store => {
@@ -97,24 +72,8 @@ export class AddProductsComponent implements OnInit {
   }
 
   addNewProduct(data) {
+    console.log(data);
 
-    if (data.name.trim().length < 3 || data.description.trim().length < 20) {
-      this.whitespaceError = true;
-      return;
-    } else {
-      this.whitespaceError = false;
-    }
-
-    for (let store of this.stores) {
-      this.selectAtLeastOneStore = store.checked;
-      if (store.checked) {
-        break;
-      }
-    }
-
-    if (!this.selectAtLeastOneStore) {
-      return;
-    }
     data.images = [];
     if (this.files.length == 0) {
       this.growlMessages = [{ severity: 'error', summary: 'Erro', detail: 'Adicione alguma imagem (.png, .jpg, .jpeg) antes de continuar!' }];
@@ -138,9 +97,6 @@ export class AddProductsComponent implements OnInit {
 
   addProduct(data) {
     console.log(this.stores);
-    data.stores = this.stores
-      .filter(store => store.checked)
-      .map(store => store.id);
 
     this.productsService.addProduct(data);
   }

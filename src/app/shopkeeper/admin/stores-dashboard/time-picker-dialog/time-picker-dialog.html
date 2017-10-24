@@ -1,0 +1,19 @@
+<td-dialog>
+    <td-dialog-title *ngIf="day">
+        {{ day }}
+    </td-dialog-title>
+    <td-dialog-content class="md-subhead tc-grey-700">
+        <div fxLayout="column" fxFlex="100" fxFlexAlign="center">
+            <div fxFlexAlign="center">
+                <md2-datepicker type="time" required placeholder="Abertura" [(ngModel)]="time.opening"></md2-datepicker>
+            </div>
+            <div fxFlexAlign="center">
+                <md2-datepicker type="time" required placeholder="Fechamento" [(ngModel)]="time.closing"></md2-datepicker>
+            </div>
+        </div>
+    </td-dialog-content>
+    <td-dialog-actions>
+        <button mat-button #closeBtn (keydown.arrowright)="acceptBtn.focus()" (click)="cancel()">{{cancelButton}}</button>
+        <button mat-button color="accent" #acceptBtn (keydown.arrowleft)="closeBtn.focus()" (click)="accept()">{{acceptButton}}</button>
+    </td-dialog-actions>
+</td-dialog>
