@@ -41,10 +41,18 @@ export class ChatComponent implements OnInit {
                 private renderer: Renderer,
                 private router: Router) {
         this.user = firebase.auth().currentUser;
+<<<<<<< HEAD
+
+        this.messagesObservable = db.list('/messages', {
+            query: {
+                orderByChild: 'sentAt',
+                limitToLast: 25
+=======
         this.messagesObservable = db.list('/messages', {
             query: {
                 orderByChild: 'sentAt',
                 limitToLast: 2
+>>>>>>> stores-module
             }
         });
     }

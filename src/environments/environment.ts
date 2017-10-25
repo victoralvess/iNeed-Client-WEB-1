@@ -6,6 +6,14 @@
 export const environment = {
   production: false,
   firebase: {
+<<<<<<< HEAD
+    apiKey: "AIzaSyDEeq0uXlCaOOIorAbxMJEe_6Uobr6O_1M",
+    authDomain: "default-project-d4f76.firebaseapp.com",
+    databaseURL: "https://default-project-d4f76.firebaseio.com",
+    projectId: "default-project-d4f76",
+    storageBucket: "default-project-d4f76.appspot.com",
+    messagingSenderId: "553175398310"
+=======
     apiKey: 'AIzaSyDEeq0uXlCaOOIorAbxMJEe_6Uobr6O_1M',
     authDomain: 'default-project-d4f76.firebaseapp.com',
     databaseURL: 'https://default-project-d4f76.firebaseio.com',
@@ -32,5 +40,6 @@ export const environment = {
       key: 'Um63CZFPUQQYIOazveLh6HziEKwt9kvS',
       app_secret: '5NPddVdikevehe7GjwHK56WPLaJqRwhnLxemxD9qPZ6JBuAL'
     }
+>>>>>>> stores-module
   }
 };

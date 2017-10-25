@@ -12,7 +12,10 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { AuthService } from './shared/services/services-auth/auth.service';
 import { VerifyAuth } from './shared/services/verify-auth/verify-auth';
+<<<<<<< HEAD
+=======
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+>>>>>>> stores-module
 
 @NgModule({ 
   declarations: [
@@ -26,8 +29,12 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
     HttpModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
+<<<<<<< HEAD
+    AngularFireAuthModule
+=======
     AngularFireAuthModule,
     NoopAnimationsModule
+>>>>>>> stores-module
   ],
   providers: [AuthService,VerifyAuth],
   bootstrap: [AppComponent]

@@ -4,7 +4,11 @@ import { Observable } from 'rxjs/Observable';
 
 import { AuthService } from '../../../shared/services/services-auth/auth.service';
 import { AngularFireDatabase } from 'angularfire2/database';
+<<<<<<< HEAD
+import { environment } from 'environments/environment';
+=======
 import { environment } from '../../../../environments/environment';
+>>>>>>> stores-module
 
 import 'rxjs/add/operator/map';
 
@@ -29,7 +33,11 @@ export class MustBeAdminGuard implements CanActivate {
           return false;
         }
         console.log('can');
+<<<<<<< HEAD
+        return true; 
+=======
         return true;
+>>>>>>> stores-module
       });
     } else {
       this.router.navigate(['/subscribe']);
