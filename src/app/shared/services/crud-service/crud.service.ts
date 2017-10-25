@@ -35,4 +35,8 @@ export class CrudService {
             return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
         });
     }
+
+    getStoresWhereUserWorks() {
+        return this.db.list(`/employees-stores/${this.user.uid}`);
+    }
 }

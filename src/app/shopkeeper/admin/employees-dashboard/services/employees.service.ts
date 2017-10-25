@@ -4,84 +4,38 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { AuthService } from '../../../../shared/services/services-auth/auth.service';
 
 import * as firebase from 'firebase/app';
+import { CrudService } from '../../../../shared/services/crud-service/crud.service';
 
 @Injectable()
 export class EmployeesService {
 
-	user : firebase.User;
+  user: firebase.User;
 
-  constructor(public db : AngularFireDatabase, private auth : AuthService) {
-  	this.user = firebase.auth().currentUser;  	
+  constructor(public db: AngularFireDatabase, private auth: AuthService, private crudService: CrudService) {
+    this.user = firebase.auth().currentUser;
   }
 
   getUser() {
-  	return this.db.object(`users/${this.user.uid}`);
+    return this.db.object(`users/${this.user.uid}`);
   }
- 
+
   getAllCategories() {
-    return this.db.list(`/categories`); 
+    return this.db.list(`/categories`);
   }
 
   getEmployeesFrom(thisStore, params?) {
-		return this.db.list(`/employees-stores/${thisStore}`); 
+    return this.db.list(`/employees-stores/${thisStore}`);
   }
 
-  addProduct(product) {
-    product.stores.forEach((store) => {
-
-      let newProduct = {
-        name : product.name,
-        description : product.description,
-        price : product.price,
-        store : store,
-        categories : product.selectedCategories,
-        pictures : product.images
-      };
-
-      let productsRef = this.db.app.database().ref(`/products`);
-      let newFirebaseProduct = productsRef.push(newProduct);      
-      
-      let key = newFirebaseProduct.key;   
-      
-      let linkProductToStoreRef = this.db.app.database().ref(`/products-stores/${store}/${key}`);
-      linkProductToStoreRef.set(newProduct);
-      
-      product.selectedCategories.forEach((category) => {
-        this.db.app.database().ref(`/products-categories/${category}/${key}`).set(newProduct);
-      });                 
-      
-    });  	
+  addEmployee(employee) {
+    console.log(employee);
   }
 
-  updateEmployee(employee) {
-    
-    console.log('stooooooooooore', employee.productStore);
-    let updatedProduct = {
-      name : employee.name,
-      description : employee.description,
-      price : employee.price,
-      categories : employee.selectedCategories,
-      pictures : employee.images,
-      store : employee.productStore
-    };  
-
-    let updates = {};
-    updates[`/products/${employee.productId}`] = updatedProduct;
-    updates[`/products-stores/${employee.productStore}/${employee.productId}`] = updatedProduct;
-    
-    employee.selectedCategories.forEach((category) => {
-        updates[`/products-categories/${category}/${employee.productId}`] = updatedProduct;
-    }); 
-
-    this.db.app.database().ref().update(updates);
+  getStoresWhereUserWorks() {
+    return this.crudService.getStoresWhereUserWorks();
   }
 
-  deleteEmployee(key, categories, store) { 
-    let productsRef = this.db.app.database().ref(`/products`);
-    productsRef.child(`${key}`).remove();
-    this.db.app.database().ref(`/products-stores/${store}/${key}`).remove();
-    categories.forEach((category) => {
-      this.db.app.database().ref(`/products-categories/${category}/${key}`).remove();
-    }); 
+  optmizeImage(file) {
+    return this.crudService.optmizeImage(file);
   }
 }
