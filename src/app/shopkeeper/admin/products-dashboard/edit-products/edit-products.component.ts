@@ -89,33 +89,32 @@ export class EditProductsComponent implements OnInit, OnDestroy {
   }
 
   updateProduct(data) {
-    let originalPics = JSON.parse(localStorage.getItem(`${this.productId}/Pictures`));
-    data.productId = this.productId;
-    data.productStore = this.productStore;
-    data.images = [];
-    if (this.newFiles.length > 0) {
-      this.newFiles.forEach((file, idx, arr) => {
-        this.productsService.optmizeImage(file).subscribe((res) => {
-          const response: any = res;
-          const base64image = response._body;
-          data.images.push(base64image);
-          if (idx === this.newFiles.length - 1) {
-            this.productsService.updateProduct(data, this.picsUrls, originalPics);
-          }
+    const originalPics = JSON.parse(localStorage.getItem(`${this.productId}/Pictures`));
+    if (originalPics) {
+      data.productId = this.productId;
+      data.productStore = this.productStore;
+      data.images = [];
+      if (this.newFiles.length > 0) {
+        this.newFiles.forEach((file, idx, arr) => {
+          this.productsService.optmizeImage(file).subscribe((res) => {
+            const response: any = res;
+            const base64image = response._body;
+            data.images.push(base64image);
+            if (idx === this.newFiles.length - 1) {
+              this.productsService.updateProduct(data, this.picsUrls, originalPics);
+            }
+          });
         });
-      });
-    } else {
-      // console.log('no_upload', this.picsUrls);
-      if (this.picsUrls.length === 0) {
-        //  console.log('===0');
-        this.productsService.updateProduct(data, originalPics, originalPics);
       } else {
-        //  console.log('!==0');
-        this.productsService.updateProduct(data, this.picsUrls, originalPics);
+        if (this.picsUrls.length === 0) {
+          this.productsService.updateProduct(data, originalPics, originalPics);
+        } else {
+          this.productsService.updateProduct(data, this.picsUrls, originalPics);
+        }
       }
-    }
 
-    this.router.navigate(['/shopkeeper/dashboard/admin/products']);
+      this.router.navigate(['/shopkeeper/dashboard/admin/products']);
+    }
   }
 
   imageFinishedUploading(event: FileHolder) {
