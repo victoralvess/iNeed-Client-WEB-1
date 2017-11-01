@@ -8,7 +8,9 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "precache": "sw-precache",
+    "precache-build": "sw-precache --verbose --config=sw-precache-config.js"
   },
   "private": true,
   "dependencies": {
@@ -26,8 +28,11 @@
     "@angular/router": "^4.4.4",
     "@covalent/core": "^1.0.0-beta.8-1",
     "angular2-image-upload": "^1.0.0-rc.0",
+    "angular2-jwt": "^0.2.3",
     "angular2-text-mask": "^8.0.4",
     "angularfire2": "4.0.0-rc.1",
+    "auth0-js": "^8.10.1",
+    "auth0-lock": "^10.23.1",
     "bootstrap": "^3.3.7",
     "core-js": "^2.5.1",
     "firebase": "4.1.5",
@@ -42,6 +47,7 @@
     "primeng": "^4.2.2",
     "primeui": "^4.1.15",
     "rxjs": "^5.4.3",
+    "sendbird": "^3.0.42",
     "zone.js": "^0.8.18"
   },
   "devDependencies": {
@@ -52,6 +58,11 @@
     "@types/jasminewd2": "~2.0.3",
     "@types/node": "~8.0.34",
     "codelyzer": "~3.2.1",
+    "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-csso": "^3.0.0",
+    "gulp-gzip": "^1.4.0",
+    "gulp-uglify": "^3.0.0",
     "jasmine-core": "~2.8.0",
     "jasmine-spec-reporter": "~4.2.1",
     "karma": "~1.7.1",
@@ -61,6 +72,7 @@
     "karma-jasmine": "~1.1.0",
     "karma-jasmine-html-reporter": "^0.2.2",
     "protractor": "~5.1.2",
+    "sw-precache": "^5.2.0",
     "ts-node": "~3.3.0",
     "tslint": "~5.7.0",
     "typescript": "~2.5.3"

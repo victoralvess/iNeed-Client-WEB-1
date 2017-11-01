@@ -51,6 +51,15 @@ export class AddStoresComponent implements OnDestroy {
     { day: 'Domingo', checked: false }
   ];
   /*private*/ openingClosingArr = [];
+  paymentMethods = [
+    { label: 'Dinheiro', value: 'money' },
+    { label: 'Boleto', value: 'payment-slip' },
+    { label: 'PayPal', value: 'paypal' },
+    { label: 'Cartão de Débito', value: 'debit' },
+    { label: 'Cartão de Crédito', value: 'credit' },
+    { label: 'Cheque', value: 'check' },
+    { label: 'Bitcoin', value: 'bitcoin' }
+  ];
 
   /*private*/ storeForm = new FormGroup({
     name: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(3), CustomValidators.maxLength(45)])),

@@ -16,6 +16,11 @@
     </div>
     <div fxFlex="100">
       <mat-form-field fxFlex="100">
+        <input matInput type="email" placeholder="Email" email [formControl]="employeeForm.controls['email']" required>        
+      </mat-form-field>
+    </div>
+    <div fxFlex="100">
+      <mat-form-field fxFlex="100">
         <input matInput placeholder="Nome de acesso" [formControl]="employeeForm.controls['login']" required>
         <mat-hint align="start">Login do seu funcionário</mat-hint>
         <mat-hint align="end">{{ employeeForm.controls['login'].value.length }} / 20</mat-hint>
@@ -46,9 +51,9 @@
         <mat-hint align="start">As permissões se acumulam</mat-hint>
       </mat-form-field>
     </div>
-    <image-upload [max]="1" [extensions]="['jpeg','png']" [buttonCaption]="'Escolha'" [dropBoxMessage]="'Solte a foto de perfil aqui!'"
+    <!--<image-upload [max]="1" [extensions]="['jpeg','png']" [buttonCaption]="'Escolha'" [dropBoxMessage]="'Solte a foto de perfil aqui!'"
       [fileTooLargeMessage]="'Imagem muito grande!'" (uploadFinished)="imageFinishedUploading($event)" (removed)="imageRemoved($event)"
-      (uploadStateChanged)="uploadStateChange($event)"></image-upload>
+      (uploadStateChanged)="uploadStateChange($event)"></image-upload>-->
     <button mat-raised-button type="submit" [disabled]="!employeeForm.valid">ADICIONAR</button>
   </div>
 </form>

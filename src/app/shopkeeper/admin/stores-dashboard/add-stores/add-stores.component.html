@@ -129,10 +129,7 @@
             <mat-form-field fxFlex="100">
               <mat-select fxFlex="100" id="options-select" label="Formas de pagamento aceitas" placeholder="Formas de pagamento aceitas"
                 [formControl]="extraInfoForm.controls['mainPaymentWays']" multiple>
-                <mat-option value="money">Dinheiro</mat-option>
-                <mat-option value="credit">Cartão de crédito</mat-option>
-                <mat-option value="debit">Cartão de débito</mat-option>
-                <mat-option value="check">Cheque</mat-option>
+                <mat-option *ngFor="let payment of paymentMethods" [value]="payment.value">{{payment.label}}</mat-option>
               </mat-select>
             </mat-form-field>
           </div>

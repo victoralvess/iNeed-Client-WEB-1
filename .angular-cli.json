@@ -9,7 +9,8 @@
       "outDir": "dist",
       "assets": [
         "assets",
-        "favicon.ico"
+        "favicon.ico",
+"manifest.json"
       ],
       "index": "index.html",
       "main": "main.ts",
@@ -26,7 +27,10 @@
         "../node_modules/@covalent/core/common/platform.scss",
         "styles.scss"
       ],
-      "scripts": [],
+      "scripts": [
+        "../node_modules/auth0-js/build/auth0.js",
+        "../node_modules/sendbird/SendBird.min.js"
+      ],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
