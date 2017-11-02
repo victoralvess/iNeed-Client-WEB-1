@@ -37,21 +37,13 @@ export class EmployeesService {
   }
 
   addEmployee(employee) {
-    console.log(employee);
-    this.auth0Service.employeeLogin();/*
     const signedUp = this.auth0Service.signUp({
       email: employee.email, password: 'DEFAULT', user_metadata: {
         name: employee.name,
-        login: employee.login,
-        permissionLevel: `${employee.permissionLevel}`// ,
-        // stores: employee.stores // ONLY-STRINGS
+        permissionLevel: `${employee.permissionLevel}`,
+        worksAt: employee.stores
       }
     }, this.signUp$);
-    /*name
-    email
-    login
-    permissionLevel
-    stores*/
   }
 
   getStoresWhereUserWorks() {

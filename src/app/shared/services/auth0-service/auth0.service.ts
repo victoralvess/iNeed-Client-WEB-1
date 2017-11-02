@@ -6,6 +6,7 @@ import { Subject } from 'rxjs/Subject';
 import * as firebase from 'firebase/app';
 import { environment } from '../../../../environments/environment';
 import { JwtHelper } from 'angular2-jwt';
+import { AngularFireAuth } from 'angularfire2/auth';
 
 @Injectable()
 export class Auth0Service {
@@ -21,7 +22,7 @@ export class Auth0Service {
     public signedUp = new Subject<boolean>();
     jwtHelper = new JwtHelper();
 
-    constructor(public router: Router) { }
+    constructor(public router: Router, private afAuth: AngularFireAuth) { }
 
     public signUp(user: User, observer: Subject<boolean>) {
         this.auth0.signup({
@@ -45,28 +46,6 @@ export class Auth0Service {
     public handleAuthentication(): void {
         this.auth0.parseHash((parseError, authResult) => {
             if (authResult && authResult.accessToken && authResult.idToken) {
-                firebase.initializeApp(environment.firebase);
-                if (authResult.mytoken) {
-                    firebase.auth().signInWithCustomToken(authResult.mytoken).then((success) => {
-                        console.log(success);
-                    });
-                }
-                /*const decoded = this.jwtHelper.decodeToken(authResult.idToken);
-                let firebaseToken: any = {};
-                firebaseToken.uid = (<string>authResult.idTokenPayload.sub).split('|')[1];
-                firebaseToken.aud = 'https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit';
-                firebaseToken.iss = 'firebase-adminsdk-lwsop@default-project-d4f76.iam.gserviceaccount.com';
-                firebaseToken.sub = 'firebase-adminsdk-lwsop@default-project-d4f76.iam.gserviceaccount.com';
-                firebaseToken.iat = decoded.iat;
-                firebaseToken.exp = decoded.exp;
-                firebaseToken.claims = {
-                    admin: true
-                };
-                const parts = authResult.idToken.split('.');
-                console.log(`${parts[0]}.${btoa(JSON.stringify(firebaseToken))}.${parts[2]}`);
-                firebase.auth().signInWithCustomToken(`${parts[0]}.${btoa(JSON.stringify(decoded))}.${parts[2]}`).then((success) => {
-                    console.log(success);
-                }); */
                 window.location.hash = '';
                 console.log(authResult);
                 new auth0.Management({
@@ -74,7 +53,7 @@ export class Auth0Service {
                     token: authResult.idToken
                 }).getUser(authResult.idTokenPayload.sub, (managementError, res) => {
                     console.log(res.app_metadata.authToken);
-firebase.auth().signInWithCustomToken(res.app_metadata.authToken).then((success) => {
+                    this.afAuth.auth.signInWithCustomToken(res.app_metadata.authToken).then((success) => {
                         console.log(success);
                     });
                 });

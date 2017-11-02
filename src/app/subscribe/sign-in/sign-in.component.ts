@@ -3,6 +3,7 @@ import { Observable } from 'rxjs/Observable';
 
 import { Shopkeeper } from '../../shared/models/shopkeeper.model';
 import { AuthService } from '../../shared/services/services-auth/auth.service';
+import { Auth0Service } from '../../shared/services/auth0-service/auth0.service';
 import * as firebase from 'firebase/app';
 
 @Component({
@@ -18,7 +19,7 @@ export class SignInComponent implements OnInit {
     btnLoadingEmail: boolean = false;
     shopkeeperLoggedStatus: boolean = true;
 
-    constructor(public authService: AuthService) {
+    constructor(public authService: AuthService, private auth0Service: Auth0Service) {
         this.shopkeeper = new Shopkeeper();
 
         this.shopkeeperFirebase = this.authService.user;
@@ -31,7 +32,7 @@ export class SignInComponent implements OnInit {
         console.log(this.shopkeeper);
         this.btnLoadingGoogle = true;
         this.authService.signInWithGoogle();
-        this.authService.shopkeeperLogged.subscribe( result => {
+        this.authService.shopkeeperLogged.subscribe(result => {
             console.log(result);
             this.shopkeeperLoggedStatus = result;
             this.btnLoadingGoogle = result;
@@ -42,10 +43,14 @@ export class SignInComponent implements OnInit {
         console.log(this.shopkeeper);
         this.btnLoadingEmail = true;
         this.authService.signInWithEmail(this.shopkeeper);
-        this.authService.shopkeeperLogged.subscribe( result => {
+        this.authService.shopkeeperLogged.subscribe(result => {
             console.log(result);
             this.shopkeeperLoggedStatus = result;
             this.btnLoadingEmail = result;
         });
+    }
+
+    onClickSignInShopkeeper() {
+        this.auth0Service.employeeLogin();
     }
 }
