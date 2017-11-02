@@ -10,6 +10,7 @@ import { Message } from '../../shared/models/message.model';
 import * as SendBird from 'sendbird/SendBird.min.js';
 import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
+import { CrudService } from '../../shared/services/crud-service/crud.service';
 
 @Component({
   selector: 'app-chat',
@@ -17,7 +18,7 @@ import { Observable } from 'rxjs/Observable';
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
-
+  userSubscription;
   /*
     CHAT SDK
   */
@@ -26,14 +27,16 @@ export class ChatComponent implements OnInit {
     appId: '0AE653E2-CB57-4945-A496-00C12C0BC0B8'
   });
 
-  storeId = '-KxYMBGkiuW0me9Stnjd';
-  consumerId = 'joaozinho_app';
+  storeId = '';
+  consumerId = '';
   messages: any[] = [];
   channelUrl: string;
   channelMessages$ = new Subject<string>();
   channelList$ = new Subject<any[]>();
   channelListHack$ = new Subject<any>();
   channelList: any[] = [];
+  stores;
+  chat$ = new Subject<any>();
   /*
     END CHAT SDK
   */
@@ -43,7 +46,7 @@ export class ChatComponent implements OnInit {
   textAreaInput: string;
 
   lastMessageKey: string;
-  // messagesAreLoading: boolean = true;
+  messagesAreLoading: boolean = true;
 
   @ViewChild('scrollable') private erScrollable: ElementRef;
   @ViewChild('messagesList') private erMessages: ElementRef;
@@ -61,7 +64,8 @@ export class ChatComponent implements OnInit {
     private http: Http,
     private elementRef: ElementRef,
     private renderer: Renderer,
-    private router: Router) {
+    private router: Router,
+    private crudService: CrudService) {
     this.user = firebase.auth().currentUser;
     this.channelMessages$.asObservable().subscribe((channelUrl) => {
       this.channelUrl = channelUrl;
@@ -81,51 +85,16 @@ export class ChatComponent implements OnInit {
       }
     });
     */
-    const worksAt = [{ id: '-KxYMBGkiuW0me9Stnjd', name: 'Estrutura Completa' }];
-    this.sb.connect('-KxYMBGkiuW0me9Stnjd', (user, connectionError) => {
-      if (user) {
-        console.log(user);
-        let hackMessages = this.channelMessages$;
-        let hackList = this.channelListHack$;
-        let channelHandler = new this.sb.ChannelHandler();
-        channelHandler.onMessageReceived = function (channel, message) {
-          if (this.channelUrl === channel.url) {
-            hackMessages.next(channel.url);
-          }
-          hackList.next('hack');
-        };
-        channelHandler.onChannelDeleted = function (channelUrl, channelType) { 
-          hackList.next('hack');
-        }; 
-        this.sb.addChannelHandler(`${this.storeId}_handler`, channelHandler);
-        // tslint:disable-next-line:max-line-length
-        /* this.sb.updateCurrentUserInfo(worksAt[0].name, 'https://s.gravatar.com/avatar/a3f6a72374f74dd7457fd19f4495b866?s=480&r=pg', (response, errr) => {
-           console.log(response, errr);
-         });*/
-        let channelListQuery = this.sb.GroupChannel.createMyGroupChannelListQuery();
-        channelListQuery.includeEmpty = true;
-        channelListQuery.userIdsFilter = [this.storeId, this.consumerId];
-        channelListQuery.queryType = 'AND';
-        channelListQuery.channelNameContainsFilter = `${this.storeId}_${this.consumerId}`;
-        if (channelListQuery.hasNext) {
-          channelListQuery.next(function (channelList, filterError) {
-            if (filterError) {
-              console.error(filterError);
-              return;
-            }
-            hackMessages.next(channelList[0].url);
-            console.log(channelList);
-
-          });
-        }
-
-        this.updateChannels();
-      }
+    this.userSubscription = crudService.getStoresWhereUserWorks().subscribe((stores) => {
+      this.stores = stores;
+      this.storeId = this.stores[0].$key;
+      this.connectionHandler(this.storeId, '');
     });
+
   }
 
   updateChannels() {
-    let hackList = this.channelList$;
+    const hackList = this.channelList$;
     let allChannelListQuery = this.sb.GroupChannel.createMyGroupChannelListQuery();
     allChannelListQuery.includeEmpty = true;
     allChannelListQuery.userIdsFilter = [this.storeId];
@@ -147,7 +116,6 @@ export class ChatComponent implements OnInit {
     this.sb.GroupChannel.getChannel(channelUrl, (channel, channelError) => {
       if (channel) {
         let messageListQuery = channel.createPreviousMessageListQuery();
-        channel.createPreviousMessageListQuery();
 
         messageListQuery.load(30, true, (messageList, messagesError) => {
           if (messageList) {
@@ -161,16 +129,20 @@ export class ChatComponent implements OnInit {
 
               return aVal - bVal;
             });
-            setTimeout(() => {
-              this.scroll();
-            });
+
+            this.scroll();
+
             setTimeout(() => {
               this.scroll();
             }, 1500);
+
             console.log(messageList);
           }
         });
-      }
+      } else {
+	this.messages = [];
+this.scroll();
+}
     });
   }
 
@@ -243,5 +215,61 @@ export class ChatComponent implements OnInit {
       'scrollTop',
       this.erScrollable.nativeElement.scrollHeight
     );
+
+    this.messagesAreLoading = false;
+  }
+
+  changeConsumerChannel(consumerId) {
+    this.messagesAreLoading = true;
+    this.connectionHandler(this.storeId, consumerId);
+  }
+
+  changeStoreChannel(storeId) {
+    this.messagesAreLoading = true;
+    this.connectionHandler(storeId, this.consumerId);
+  }
+
+  connectionHandler(storeId, consumerId) {
+    this.sb.connect(storeId, (user, connectionError) => {
+      if (user) {
+        console.log(user);
+        const hackMessages = this.channelMessages$;
+        const hackList = this.channelListHack$;
+        let channelHandler = new this.sb.ChannelHandler();
+        channelHandler.onMessageReceived = function (channel, message) {
+          if (this.channelUrl === channel.url) {
+            hackMessages.next(channel.url);
+          }
+          hackList.next('');
+        };
+        channelHandler.onChannelDeleted = function (channelUrl, channelType) {
+          hackList.next('');
+        };
+        this.sb.addChannelHandler(`${storeId}_handler`, channelHandler);
+        // tslint:disable-next-line:max-line-length
+        /* this.sb.updateCurrentUserInfo(worksAt[0].name, 'https://s.gravatar.com/avatar/a3f6a72374f74dd7457fd19f4495b866?s=480&r=pg', (response, errr) => {
+           console.log(response, errr);
+         });*/
+        let channelListQuery = this.sb.GroupChannel.createMyGroupChannelListQuery();
+        channelListQuery.includeEmpty = true;
+        channelListQuery.userIdsFilter = [storeId, consumerId];
+        channelListQuery.queryType = 'AND';
+        channelListQuery.channelNameContainsFilter = `${storeId}_${consumerId}`;
+        if (channelListQuery.hasNext) {
+          channelListQuery.next(function (channelList, filterError) {
+            if (filterError) {
+              console.error(filterError);
+              return;
+            }
+if(channelList && channelList.length > 0) {
+            hackMessages.next(channelList[0].url);}else {hackMessages.next('');}
+            console.log(channelList);
+
+          });
+        } 
+
+        this.updateChannels();
+      }
+    });
   }
 }
