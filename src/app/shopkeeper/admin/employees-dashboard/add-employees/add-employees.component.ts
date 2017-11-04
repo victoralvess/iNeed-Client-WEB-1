@@ -7,6 +7,7 @@ import { EmployeesService } from '../services/employees.service';
 import { Http, RequestOptionsArgs, Headers, RequestMethod } from '@angular/http';
 import { Subscription } from 'rxjs/Subscription';
 import { EmailValidator } from '@angular/forms';
+import { Permission } from '../models/permission.interface';
 
 @Component({
   selector: 'app-add-employees',
@@ -58,9 +59,4 @@ export class AddEmployeesComponent implements OnInit, OnDestroy {
     data.stores = <string>((<any[]>data.stores).join('|'));
     this.employeesService.addEmployee(data);
   }
-}
-
-export interface Permission {
-  value: number;
-  function: string;
 }

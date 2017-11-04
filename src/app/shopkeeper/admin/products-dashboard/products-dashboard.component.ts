@@ -35,16 +35,16 @@ export class ProductsDashboardComponent {
   constructor(private productsService: ProductsService, private afAuth: AngularFireAuth, private dialogService: TdDialogService,
     private viewContainerRef: ViewContainerRef) {
 
-      this.products$.asObservable().subscribe((storeId) => {
-        this.products = this.productsService.getProductsFrom(storeId);
-        this.productsSubscription = this.products.subscribe();
-});
+    this.products$.asObservable().subscribe((storeId) => {
+      this.products = this.productsService.getProductsFrom(storeId);
+      this.productsSubscription = this.products.subscribe();
+    });
 
-  /*  this.userSubscription = productsService.getUser().subscribe((user: any) => {
-      this.stores = user.worksAt;
-      this.lastSelected = this.stores[0].storeId;
-      this.products$.next(this.lastSelected);
-    });*/
+    /*  this.userSubscription = productsService.getUser().subscribe((user: any) => {
+        this.stores = user.worksAt;
+        this.lastSelected = this.stores[0].storeId;
+        this.products$.next(this.lastSelected);
+      });*/
 
     this.userSubscription = productsService.getStoresWhereUserWorks().subscribe((stores) => {
       this.stores = stores;

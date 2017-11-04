@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { EmployeesService } from './services/employees.service';
 import { Router } from '@angular/router';
@@ -8,116 +8,114 @@ import { PaginationInstance } from 'ngx-pagination';
 
 import { Modal } from 'ngx-modialog/plugins/bootstrap/bundle/ngx-modialog-bootstrap';
 
-import { Subject } from 'rxjs/Subject'; 
+import { Subject } from 'rxjs/Subject';
+import { Permission } from './models/permission.interface';
+import { ViewContainerRef } from '@angular/core';
+import { TdDialogService } from '@covalent/core';
+import { DataSource } from '@angular/cdk/collections';
+import { Observable } from 'rxjs/Observable';
 
 @Component({
   selector: 'app-employees-dashboard',
   templateUrl: './employees-dashboard.component.html',
   styleUrls: ['./employees-dashboard.component.css']
 })
-export class EmployeesDashboardComponent implements OnInit {
-/*
-	stores : any[];
-	employees;
-	user : firebase.User;
-  query : any;
-  currentPage = 1;
+export class EmployeesDashboardComponent implements OnInit, OnDestroy {
+
+  permissions: Permission[] = [
+    {
+      value: 1,
+      function: 'Pode visualizar e responder feedbacks'
+    },
+    {
+      value: 2,
+      function: 'Pode cadastrar lojas e produtos'
+    },
+    {
+      value: 3,
+      function: 'Pode cadastrar novos funcionários'
+    }
+  ];
+
+  displayedColumns = ['name', 'email', 'permission', 'actions'];
+  dataSource: EmployeesDataSource;
+  stores = [];
   userSubscription;
-  employeesSubscription;
   lastSelected;
-  employeesSubject;
+  employees$ = new Subject<any>();
+  employees;
+  employeesSubscription;
 
-  public paginationComponentConfig: PaginationInstance = {
-    id: 'employees-pagination',
-    itemsPerPage: 10,
-    currentPage: 1
-  };
-
-  constructor(private router : Router, private employeesService : EmployeesService, private modal : Modal) { 
-		this.employeesSubject = new Subject<string>();
-		this.employeesSubject.asObservable().subscribe((storeId) => {
-  		this.getEmployees(storeId);
-  	});
-
-    this.userSubscription = employeesService.getUser().subscribe((user) => {
-      this.stores = user.worksAt;
-      this.lastSelected = this.stores[0].storeId;      
-      this.employeesSubject.next(this.lastSelected); 
+  constructor(private router: Router, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private employeesService: EmployeesService) {
+    this.employees$.asObservable().subscribe((storeId) => {
+      this.dataSource = new EmployeesDataSource(employeesService, storeId);
     });
-     console.log(this.bindPermissionLevel('1'));
-  } 	
-*/
+
+    this.userSubscription = employeesService.getStoresWhereUserWorks().subscribe((stores) => {
+      this.stores = stores;
+      this.lastSelected = this.stores[0].$key;
+      this.employees$.next(this.lastSelected);
+    });
+   // this.dataSource = new EmployeesDataSource(employeesService);
+
+  }
+
   ngOnInit() { }
-/*
-  ngOnDestroy() {
-    console.log('onDestroy');
-    this.employees.subscribe().unsubscribe();
-    this.userSubscription.unsubscribe();
-    this.employeesSubscription.unsubscribe();
-    
-  }  
+
+ngOnDestroy() {
+	this.userSubscription.unsubscribe();
+}
+
+  deleteEmployee(key) {
+    this.dialogService.openConfirm({
+      message: `Você realmente deseja excluir este funcionário?`,
+      disableClose: true,
+      viewContainerRef: this.viewContainerRef,
+      title: '',
+      cancelButton: 'Cancelar',
+      acceptButton: 'Excluir',
+    }).afterClosed().subscribe((accept: boolean) => {
+      if (accept) {
+        this.employeesService.deleteEmployee(key);
+      }
+    });
+  }
+
+  deleteEmployeeFromStore(key) {
+    this.dialogService.openConfirm({
+      message: `Você realmente deseja retirar o acesso deste funcionário desta loja?`,
+      disableClose: true,
+      viewContainerRef: this.viewContainerRef,
+      title: '',
+      cancelButton: 'Cancelar',
+      acceptButton: 'Confirmar',
+    }).afterClosed().subscribe((accept: boolean) => {
+      if (accept) {
+        this.employeesService.deleteEmployee(key, this.lastSelected);
+      }
+    });
+  }
+
+  updateEmployee(key) {
+    this.router.navigate([`/shopkeeper/dashboard/admin/employees/edit/${key}`]);
+  }
 
   onChange(value) {
-    this.lastSelected = value;   
-    this.employeesSubject.next(this.lastSelected);
+    this.lastSelected = value;
+    this.employees$.next(this.lastSelected);
   }
 
-  getEmployees(storeId) {    
-    this.employees = this.employeesService.getEmployeesFrom(storeId);
-    this.updateEmployeesSubscription();
+}
+
+export class EmployeesDataSource extends DataSource<any> {
+
+  constructor(private employeesService: EmployeesService, private storeId) {
+    super();
   }
 
-  updateEmployeesSubscription() {    
-    this.employeesSubscription = this.employees.subscribe();
+  connect(): Observable<any[]> {
+    return this.employeesService.getEmployeesFrom(this.storeId);
   }
 
-  addNewEmployee() {
-    this.router.navigate(['/shopkeeper/dashboard/admin/employees/add']);
-  }
-
-  deleteEmployee(key, categories, store) {
-  	console.log('delete', key);
-  	console.log('delete', categories);
-  	console.log('delete', store);
-    const deleteModal = this.modal.confirm()
-                      .size('lg')
-                      .showClose(false)
-                      .keyboard(27)
-                      .title('Excluir dados')
-                      .body(`
-                          <div class="alert alert-danger">
-                            <b><span class="material-icons">warning</span> O funcionário será desassociado somente de ${this.stores[this.lastSelected].storeName} - ${this.stores[this.lastSelected].storeAddress} (permanentemente).</b>
-                          </div>
-                          <p>Você realmente deseja desassociá-lo desta loja?</p>
-                          `)
-                      .cancelBtn('CANCELAR')
-                      .okBtn('EXCLUIR')
-                      .okBtnClass('btn btn-danger')
-                      .open();
-
-    deleteModal.then((dialogRef) => {
-      dialogRef.result.then((result) => {
-        if(result) {
-          this.employeesService.deleteEmployee(key, categories, store);
-        }
-      }).catch((err) => {
-        
-      });
-    });
-    
-  }
-
-  bindPermissionLevel(level: string) {
-  	let pLevel : number = Number.parseInt(level);
-  	switch (pLevel) {
-  		case 1:
-  			return 'Visualizar Produtos / Ler e Responder Feedbacks';
-
-  		case 2:
-  			return 'Visualizar e Gravar Produtos / Ler e Responder Feedbacks';
-
-  		case 3:
-  			return 'Visualizar e Gravar Novos Usuários e Produtos / Ler e Responder Feedbacks';
-  	}
-  }*/
+  disconnect() { }
 }

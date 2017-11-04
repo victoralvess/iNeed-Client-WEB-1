@@ -33,21 +33,58 @@ export class EmployeesService {
   }
 
   getEmployeesFrom(thisStore, params?) {
-    return this.db.list(`/employees-stores/${thisStore}`);
+    return this.db.list(`/stores-employees/${thisStore}`);
   }
 
   addEmployee(employee) {
     const signedUp = this.auth0Service.signUp({
       email: employee.email, password: 'DEFAULT', user_metadata: {
         name: employee.name,
-        permissionLevel: `${employee.permissionLevel}`,
+        permissionLevel: employee.permissionLevel,
         worksAt: employee.stores
       }
     }, this.signUp$);
   }
 
+  updateEmployee(employee) {
+    this.db.app.database().ref(`/users/${employee.employeeId}`).update({
+      permissionLevel: employee.permissionLevel
+    });
+    this.db.app.database().ref(`employees-stores/${employee.employeeId}`).remove();
+
+    (<any[]>employee.previousStoresIds).forEach((prev) => {
+      if (employee.stores.indexOf(prev) < 0) {
+        this.db.object(`/stores-employees/${prev}/${employee.employeeId}`).remove();
+      }
+    });
+    
+    employee.stores.forEach((storeId) => {
+      this.db.app.database().ref(`stores/${storeId}`).once('value', (snapshot) => {
+        const obj = snapshot.val();
+        this.db.app.database().ref(`employees-stores/${employee.employeeId}/${obj.id}`).set(obj);
+      });
+
+      this.db.app.database().ref(`/users/${employee.employeeId}`).once('value', (snapshot) => {
+        this.db.object(`/stores-employees/${storeId}/${employee.employeeId}`).set(snapshot.val());
+      });
+    });
+  }
+
+  deleteEmployee(id, storeId?) {
+    if (storeId) {
+      this.db.app.database().ref(`employees-stores/${id}/${storeId}`).remove();
+    } else {
+      this.db.app.database().ref(`users/${id}`).remove();
+      this.db.app.database().ref(`employees-stores/${id}`).remove();
+    }
+  }
+
   getStoresWhereUserWorks() {
     return this.crudService.getStoresWhereUserWorks();
+  }
+
+  getStoresWhereEmployeeWorks(employeeId) {
+    return this.db.list(`employees-stores/${employeeId}`);
   }
 
   optmizeImage(file) {

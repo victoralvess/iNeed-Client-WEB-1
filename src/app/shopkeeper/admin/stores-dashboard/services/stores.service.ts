@@ -46,6 +46,10 @@ export class StoresService {
     const key = storesRef.push(store).key;
 
     this.db.object(`/stores/${key}/id`).set(key);
+    this.db.database.ref(`users/${this.user.uid}`).once('value', (snapshot) => {
+      this.db.object(`/stores-employees/${key}/${this.user.uid}`).set(snapshot.val());
+    });
+
     this.db.object(`/employees-stores/${this.user.uid}/${key}`).set(store);
     this.db.object(`/employees-stores/${this.user.uid}/${key}/id`).set(key);
 
@@ -71,6 +75,7 @@ export class StoresService {
           firebase.storage().refFromURL(url).delete();
         });
         this.db.object(`/stores/${key}`).remove();
+        this.db.object(`/stores-employees/${key}`).remove();
         this.db.object(`/products-stores/${key}`).remove();
       }
     });
