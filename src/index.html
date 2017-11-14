@@ -11,28 +11,32 @@
   <meta name="theme-color" content="#ff5578">
   <title>iNeed</title>
   <link rel="icon" type="image/x-icon" href="favicon.ico">
-  <link rel="stylesheet" type="text/css" href="./assets/css/spinner.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <noscript>
     NÃO PODEMOS FAZER NADA SEM JAVASCRIPT. POR FAVOR ATIVE-O NO SEU NAVEGADOR.
   </noscript>
 </head>
-
 <body>
   <app-root>
-    <div>
-      <div class="loader tri"></div>
-      <div class="loader tri2"></div>
-      <div class="loader tri3"></div>
-      <div class="loader tri4"></div>
-      <div class="loader circ"></div>
-      <div class="loader circ2"></div>
-    </div>
-  </app-root>
+<img class="default-loader" src="assets/three-loading.svg" alt="loading" style="
+position: absolute;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  left: 50%;
+  right: 0;
+  margin: auto;
+  text-align: center;
+  width: 100px;
+  height: 100px;
+  margin: 20px;
+  display: inline-block;">
+  </app-root> 
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/service-worker.js').then(function (registration) {
-        // Registration was successful
+        // Registration was successful 
         console.log('ServiceWorker registration successful with scope: ', registration.scope);
       }).catch(function (err) {
         // registration failed :(

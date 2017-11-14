@@ -7,6 +7,8 @@ import * as firebase from 'firebase/app';
 import { CrudService } from '../../../../shared/services/crud-service/crud.service';
 import { Auth0Service } from '../../../../shared/services/auth0-service/auth0.service';
 import { Subject } from 'rxjs/Subject';
+import * as auth0 from 'auth0-js';
+import { Http, Headers, RequestOptions } from '@angular/http';
 
 @Injectable()
 export class EmployeesService {
@@ -14,7 +16,7 @@ export class EmployeesService {
   user: firebase.User;
   signUp$ = new Subject<boolean>();
 
-  constructor(public db: AngularFireDatabase, private auth: AuthService, private crudService: CrudService, private auth0Service: Auth0Service) {
+  constructor(private http: Http, public db: AngularFireDatabase, private auth: AuthService, private crudService: CrudService, private auth0Service: Auth0Service) {
     this.user = firebase.auth().currentUser;
     this.signUp$.asObservable().subscribe((signedUp) => {
       if (signedUp) {
@@ -57,7 +59,7 @@ export class EmployeesService {
         this.db.object(`/stores-employees/${prev}/${employee.employeeId}`).remove();
       }
     });
-    
+
     employee.stores.forEach((storeId) => {
       this.db.app.database().ref(`stores/${storeId}`).once('value', (snapshot) => {
         const obj = snapshot.val();
@@ -74,8 +76,34 @@ export class EmployeesService {
     if (storeId) {
       this.db.app.database().ref(`employees-stores/${id}/${storeId}`).remove();
     } else {
-      this.db.app.database().ref(`users/${id}`).remove();
-      this.db.app.database().ref(`employees-stores/${id}`).remove();
+      //.remove()
+      this.db.list(`employees-stores/${id}`).subscribe((storesList) => {
+        // console.log(storesList.keys);
+        storesList.forEach((store) => {
+          this.db.object(`/stores-employees/${store.id}/${id}`).remove();
+        });
+
+        this.db.list(`employees-stores/${id}`).remove();
+      });
+      this.db.app.database().ref(`users/${id}`).once('value', (snapshot) => {
+        this.http.post('https://default-tenant.auth0.com/oauth/token', {
+          grant_type: 'client_credentials',
+          client_id: 'bK8ww4-EDzJUgz-lcdg5JTRz8hCPtTQi',
+          client_secret: '2fJ6PbF2QRZo5gF0_rQKECSrX_XGj5zUTjVHWIIENqQzcDMD_rtuztCF22lg1XES',
+          audience: 'https://default-tenant.auth0.com/api/v2/'
+        })
+          .map((res) => res.json())
+          .subscribe((res) => {
+            let management = new auth0.Management({
+              domain: 'default-tenant.auth0.com',
+              token: res.access_token
+            });
+            let headers = new Headers();
+            headers.append('Authorization', 'Bearer  ' + res.access_token);
+            this.http.delete('https://default-tenant.auth0.com/api/v2/users/' + snapshot.val().auth0Id, { headers: headers }).subscribe(function (res) { console.log(res) });
+          });
+        this.db.app.database().ref(`users/${id}`).remove();
+      });
     }
   }
 

@@ -56,15 +56,15 @@ export class EmployeesDashboardComponent implements OnInit, OnDestroy {
       this.lastSelected = this.stores[0].$key;
       this.employees$.next(this.lastSelected);
     });
-   // this.dataSource = new EmployeesDataSource(employeesService);
+    // this.dataSource = new EmployeesDataSource(employeesService);
 
   }
 
   ngOnInit() { }
 
-ngOnDestroy() {
-	this.userSubscription.unsubscribe();
-}
+  ngOnDestroy() {
+    this.userSubscription.unsubscribe();
+  }
 
   deleteEmployee(key) {
     this.dialogService.openConfirm({

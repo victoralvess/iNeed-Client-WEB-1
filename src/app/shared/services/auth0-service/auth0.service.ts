@@ -14,7 +14,7 @@ export class Auth0Service {
     auth0 = new auth0.WebAuth({
         domain: 'default-tenant.auth0.com',
         clientID: 'bK8ww4-EDzJUgz-lcdg5JTRz8hCPtTQi',
-        redirectUri: 'http://localhost:4200/callback',
+        redirectUri: 'https://default-project-d4f76.firebaseapp.com/callback', // 'http://localhost:4200/callback',
         responseType: 'token id_token',
         scope: 'openid profile'
     });
