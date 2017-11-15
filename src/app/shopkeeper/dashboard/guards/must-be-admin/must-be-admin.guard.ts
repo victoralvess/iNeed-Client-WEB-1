@@ -4,7 +4,11 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { AuthService } from '../../../../shared/services/services-auth/auth.service';
 import { AngularFireDatabase } from 'angularfire2/database';
+<<<<<<< HEAD
+import { environment } from 'environments/environment';
+=======
 import { environment } from '../../../../../environments/environment';
+>>>>>>> stores-module
 
 @Injectable()
 export class MustBeAdminGuard implements CanActivate {
