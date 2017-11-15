@@ -19,7 +19,6 @@ export class ProductsService {
   user: firebase.User;
   databaseChanged = new Subject<Message>();
   pictureAdded = new Subject<any>();
-  // pictureUpdated = new Subject<any>();
   picsUploaded = {};
   picIndex = {};
 
@@ -56,17 +55,21 @@ export class ProductsService {
 
   addProduct(product) {
     product.stores.forEach((store) => {
-      const newProduct = {
+      let newProduct: any = {
         name: product.name,
         description: product.description,
         price: product.price,
         store: store,
         categories: product.selectedCategories,
+        upVotesCount: 0,
+        downVotesCount: 0
       };
 
       const productsRef = this.db.app.database().ref(`/products`);
-      const key = productsRef.push(newProduct).key;
+      const key = productsRef.push().key;
+      newProduct.id = key;
 
+      this.db.app.database().ref(`/products/${key}`).set(newProduct);
       this.picsUploaded[key] = 0;
 
       this.db.app.database().ref(`/products-stores/${store}/${key}`).set(newProduct);
@@ -101,7 +104,11 @@ export class ProductsService {
       price: product.price,
       categories: product.selectedCategories,
       store: product.productStore,
-      pictures: sendPics
+      pictures: sendPics,
+      upVotes: product.upVotes,
+      downVotes: product.downVotes,
+      upVotesCount: product.upVotesCount,
+      downVotesCount: product.downVotesCount,
     };
 
     originalUrls.forEach((url) => {

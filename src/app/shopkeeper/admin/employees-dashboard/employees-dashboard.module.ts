@@ -57,6 +57,7 @@ import {
 } from '@angular/material';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { CrudService } from '../../../shared/services/crud-service/crud.service';
+import { Auth0Service } from '../../../shared/services/auth0-service/auth0.service';
 @NgModule({
   imports: [
     FlexLayoutModule,
@@ -120,6 +121,6 @@ import { CrudService } from '../../../shared/services/crud-service/crud.service'
   ],
   declarations: [EmployeesDashboardComponent, AddEmployeesComponent, EditEmployeesComponent],
   exports: [EmployeesDashboardComponent, AddEmployeesComponent, EditEmployeesComponent],
-  providers: [EmployeesService, CrudService]
+  providers: [EmployeesService, CrudService, Auth0Service]
 })
 export class EmployeesDashboardModule { }

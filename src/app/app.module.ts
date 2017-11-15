@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { environment } from '../environments/environment';
-import { FormsModule} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
 import { AngularFireModule } from 'angularfire2';
@@ -12,15 +12,15 @@ import { AppComponent } from './app.component';
 import { HomeComponent } from './home/home.component';
 import { AuthService } from './shared/services/services-auth/auth.service';
 import { VerifyAuth } from './shared/services/verify-auth/verify-auth';
-<<<<<<< HEAD
-=======
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
->>>>>>> stores-module
+import { CallbackComponent } from './callback/callback.component';
+import { Auth0Service } from './shared/services/auth0-service/auth0.service';
 
-@NgModule({ 
+@NgModule({
   declarations: [
     AppComponent,
-    HomeComponent
+    HomeComponent,
+    CallbackComponent
   ],
   imports: [
     BrowserModule,
@@ -29,14 +29,10 @@ import { NoopAnimationsModule } from '@angular/platform-browser/animations';
     HttpModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
-<<<<<<< HEAD
-    AngularFireAuthModule
-=======
     AngularFireAuthModule,
     NoopAnimationsModule
->>>>>>> stores-module
   ],
-  providers: [AuthService,VerifyAuth],
+  providers: [AuthService, VerifyAuth, Auth0Service],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

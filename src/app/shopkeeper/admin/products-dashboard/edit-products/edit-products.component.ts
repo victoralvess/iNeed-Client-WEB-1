@@ -35,7 +35,11 @@ export class EditProductsComponent implements OnInit, OnDestroy {
     name: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(3), CustomValidators.maxLength(40)])),
     description: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(20), CustomValidators.maxLength(200)])),
     price: new FormControl('', Validators.required),
-    selectedCategories: new FormControl([], Validators.required)
+    selectedCategories: new FormControl([], Validators.required),
+    upVotes: new FormControl([]),
+    downVotes: new FormControl([]),
+    upVotesCount: new FormControl(0),
+    downVotesCount: new FormControl(0)
   });
 
   constructor(private fb: FormBuilder, private productsService: ProductsService, private activatedRoute: ActivatedRoute, private router: Router) {
@@ -51,11 +55,21 @@ export class EditProductsComponent implements OnInit, OnDestroy {
         console.log(foundProduct.pictures);
         this.picsUrls = foundProduct.pictures;
         this.productStore = foundProduct.store;
+        if (!foundProduct.downVotes) {
+          foundProduct.downVotes = [];
+        }
+        if (!foundProduct.upVotes) {
+          foundProduct.upVotes = [];
+        }
         this.productsForm = fb.group({
           name: [foundProduct.name, Validators.compose([Validators.required, Validators.minLength(3), Validators.maxLength(40)])],
           description: [foundProduct.description, Validators.compose([Validators.required, Validators.minLength(20), Validators.maxLength(200)])],
           price: [foundProduct.price, Validators.required],
-          selectedCategories: [foundProduct.categories, Validators.required]
+          selectedCategories: [foundProduct.categories, Validators.required],
+          upVotes: [foundProduct.upVotes],
+          downVotes: [foundProduct.downVotes],
+          upVotesCount: [foundProduct.upVotesCount],
+          downVotesCount: [foundProduct.downVotesCount],
         });
       });
     });
