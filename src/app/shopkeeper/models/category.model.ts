@@ -1,4 +1,4 @@
-export class Category {
+export interface Category {/*
   private _label : string;
   private _value : string;
 
@@ -13,5 +13,8 @@ export class Category {
 
   get value() : string {
     return this._value;
-  }
+  }*/
+
+  label: string;
+  value: string;
 }

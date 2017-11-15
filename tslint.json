@@ -31,8 +31,19 @@
     "member-access": false,
     "member-ordering": [
       true,
+<<<<<<< HEAD
       "static-before-instance",
       "variables-before-functions"
+=======
+      {
+        "order": [
+          "static-field",
+          "instance-field",
+          "static-method",
+          "instance-method"
+        ]
+      }
+>>>>>>> stores-module
     ],
     "no-arg": true,
     "no-bitwise": true,
@@ -80,6 +91,10 @@
     ],
     "radix": true,
     "semicolon": [
+<<<<<<< HEAD
+=======
+      true,
+>>>>>>> stores-module
       "always"
     ],
     "triple-equals": [
@@ -128,8 +143,11 @@
     "use-pipe-transform-interface": true,
     "component-class-suffix": true,
     "directive-class-suffix": true,
+<<<<<<< HEAD
     "no-access-missing-member": true,
     "templates-use-public": true,
+=======
+>>>>>>> stores-module
     "invoke-injectable": true
   }
 }

@@ -1,0 +1,42 @@
+.no-decoration:focus, .no-decoration:hover {
+	text-decoration: none;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.tbl {
+    display: flex;
+    flex-direction: column;
+    min-width: 280px;
+}
+
+.header {
+    min-height: 64px;
+    display: flex;
+    align-items: baseline;
+    padding: 8px 24px 0;
+    font-size: 20px;
+    justify-content: space-between;
+}
+
+.mat-form-field {
+    font-size: 14px;
+    flex-grow: 1;
+    margin-left: 32px;
+}
+
+.mat-table {
+    overflow: auto;
+    align-items: center;justify-content: space-between;
+    max-height: 500px;
+}
+
+.mat-cell {
+    margin-right: 15px;
+}
+
+.mat-fab-margin-top {
+    margin-top: 24px;
+}

@@ -8,6 +8,7 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { Http } from '@angular/http';
 import { environment } from '../../../../environments/environment';
 import 'rxjs/add/operator/retry';
+import 'rxjs/add/operator/map';
 
 @Injectable()
 export class VerifyAuth {
@@ -55,7 +56,7 @@ export class VerifyAuth {
             .map((foundUser) => {
                 console.log(user);
                 console.log(foundUser);
-                if (foundUser.$exists()) {
+                if (foundUser.$exists) {
                     if (foundUser.emailVerified) {
                         if (foundUser.profileVerified) {
                             console.log('registro completo');
@@ -111,7 +112,7 @@ export class VerifyAuth {
                                         .child(`${user.uid}`)
                                         .update({
                                             verificationSent: true
-                                        })
+                                        });
                                 });
                         });
                 }

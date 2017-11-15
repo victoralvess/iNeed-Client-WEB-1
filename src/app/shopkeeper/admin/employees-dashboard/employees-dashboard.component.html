@@ -1,67 +1,51 @@
-<p *ngIf="!(employees | async)">LOADING</p>
-<div *ngIf="(employees | async)">
-	<div class="row">
-		<div class="input-group">
-			<input class="form-control" type="text" name="search-employees" placeholder="Pesquisar funcionários" [(ngModel)]="query">
-			<span class="input-group-btn">
-	    	<button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
-	  	</span>    	
-	  </div>
-	  <select class="form-control" (change)="onChange($event.target.value)">
-	  	<option *ngFor="let store of stores" [value]="store.storeId" [selected]="(store.storeId == lastSelected)">{{ store.storeName + " - " + store.storeAddress }}</option>
-	  </select>
+<div fxLayout="column">
+	<div fxFlex="100">
+		<mat-form-field fxFlex="100">
+			<mat-select fxFlex="100" id="options-select" label="Loja" placeholder="Loja" [(ngModel)]="lastSelected" (change)="onChange($event.value)">
+				<mat-option *ngFor="let store of stores" [value]="store.$key">{{ store.name + " - " + store.location.address }}</mat-option>
+			</mat-select>
+		</mat-form-field>
 	</div>
+	<div fxFlex="100" class="tbl mat-elevation-z8">
+		<mat-table #table [dataSource]="dataSource">
 
-	<div class="row">  
-	  <div class="table-responsive" style="max-height: 560px;overflow-y: auto">
-	  	<table class="table table-striped">
-	  		<thead>
-	  			<tr>
-			    	<th>Funcionário</th>
-			    	<th><span class="material-icons">email</span></th>
-			    	<th>Nível de Permissão</th>
-			    	<th>Ações</th>
-			    </tr>
-		    </thead>	    
-		    <tbody>	    	
-		    	<tr *ngFor="let employee of employees | async | search : query | paginate: paginationComponentConfig">
-		    		<td>{{ employee.name }}</td>
-		    		<td>{{ employee.email }}</td>
-		    		<td>{{ bindPermissionLevel(employee.permissionLevel) }}</td>
-		    		<td>
-		    			<a class="no-decoration" href="/shopkeeper/dashboard/admin/employee/edit/{{employee.$key}}">
-		    				<span class="material-icons">edit</span>
-		    			</a>
-		    			<a (click)="deleteEmployee(employee.$key, employee.categories, employee.store)">
-		    				<span class="material-icons">delete</span>
-		    			</a>
-		    		</td>
-		    	</tr>	 	  	
-		    </tbody>
-	  	</table>	  		
-	  </div>
-	  <pagination-template #pagination="paginationApi"
-											     [id]="paginationComponentConfig.id"
-											     (pageChange)="paginationComponentConfig.currentPage = $event">
-	    <div class="pagination">
-	        <div class="pagination-previous" [class.disabled]="pagination.isFirstPage()">
-	            <a *ngIf="!pagination.isFirstPage()" (click)="pagination.previous()"><span class="material-icons">navigate_before</span></a>
-	        </div>
+			<ng-container matColumnDef="name">
+				<mat-header-cell *matHeaderCellDef> Nome </mat-header-cell>
+				<mat-cell *matCellDef="let employee"> {{employee.name}} </mat-cell>
+			</ng-container>
 
-	        <div *ngFor="let page of pagination.pages" [class.current]="pagination.getCurrent() === page.value">
-	            <a (click)="pagination.setCurrent(page.value)" *ngIf="pagination.getCurrent() !== page.value">
-	                <span>{{ page.label }}</span>
-	            </a>
-	            <div *ngIf="pagination.getCurrent() === page.value">
-	                <span>{{ page.label }}</span>
-	            </div>
-	        </div>
+			<ng-container matColumnDef="email">
+				<mat-header-cell *matHeaderCellDef> Email </mat-header-cell>
+				<mat-cell *matCellDef="let employee"> {{employee.email}} </mat-cell>
+			</ng-container>
 
-	        <div class="pagination-next" [class.disabled]="pagination.isLastPage()">
-	            <a *ngIf="!pagination.isLastPage()" (click)="pagination.next()"><span class="material-icons">navigate_next</span></a>
-	        </div>
-	    </div>
-		</pagination-template>	  
+			<ng-container matColumnDef="permission">
+				<mat-header-cell *matHeaderCellDef> Permissão </mat-header-cell>
+				<mat-cell *matCellDef="let employee"> {{employee.permissionLevel}} </mat-cell>
+			</ng-container>
+
+			<ng-container matColumnDef="actions">
+				<mat-header-cell *matHeaderCellDef> Ações </mat-header-cell>
+				<mat-cell *matCellDef="let employee">
+					<button mat-icon-button color="accent" (click)="updateEmployee(employee.$key)">
+						<mat-icon>edit</mat-icon>
+					</button>
+					<button mat-icon-button color="accent" (click)="deleteEmployeeFromStore(employee.$key)">
+						<mat-icon>delete</mat-icon>
+					</button>
+					<button mat-icon-button color="warn" (click)="deleteEmployee(employee.$key)">
+						<mat-icon>delete</mat-icon>
+					</button>
+				</mat-cell>
+			</ng-container>
+
+			<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+			<mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+		</mat-table>
 	</div>
 </div>
-<button class="fab" (click)="addNewEmployee()"><span class="material-icons">add</span></button>
+<div fxLayout="row" fxLayoutAlign="end end">
+	<a class="mat-fab-margin-top" href="/shopkeeper/dashboard/admin/employees/add" mat-fab>
+		<mat-icon class="md-24">add</mat-icon>
+	</a>
+</div>

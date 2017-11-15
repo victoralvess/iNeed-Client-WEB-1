@@ -4,7 +4,11 @@ import { Observable } from 'rxjs/Observable';
 
 import { AuthService } from '../../../shared/services/services-auth/auth.service';
 import { AngularFireDatabase } from 'angularfire2/database';
+<<<<<<< HEAD
 import { environment } from 'environments/environment';
+=======
+import { environment } from '../../../../environments/environment';
+>>>>>>> stores-module
 
 import 'rxjs/add/operator/map';
 
@@ -17,19 +21,28 @@ export class MustBeAdminGuard implements CanActivate {
     next: ActivatedRouteSnapshot,
     state: RouterStateSnapshot): Observable<boolean> | Promise<boolean> | boolean {
     const user = JSON.parse(localStorage.getItem(`firebase:authUser:${environment.firebase.apiKey}:[DEFAULT]`));
-
+console.log(next.data);
     let canActivate;
     if (user != null) {
       return this.db.object(`users/${user.uid}`)
       .map((currentUser) => {
-        canActivate = (currentUser.permissionLevel == 2 || currentUser.permissionLevel == 3);
+if (next.data["sudo"]) {
+        canActivate = (currentUser.permissionLevel == 3);
+ } else {
+canActivate = (currentUser.permissionLevel >= 2);
+}
+
         if (!canActivate) {
           this.router.navigate(['/shopkeeper/dashboard/home']);
           console.log('can\'t');
           return false;
         }
         console.log('can');
+<<<<<<< HEAD
         return true; 
+=======
+        return true;
+>>>>>>> stores-module
       });
     } else {
       this.router.navigate(['/subscribe']);

@@ -4,88 +4,118 @@ import { AngularFireDatabase } from 'angularfire2/database';
 import { AuthService } from '../../../../shared/services/services-auth/auth.service';
 
 import * as firebase from 'firebase/app';
+import { CrudService } from '../../../../shared/services/crud-service/crud.service';
+import { Auth0Service } from '../../../../shared/services/auth0-service/auth0.service';
+import { Subject } from 'rxjs/Subject';
+import * as auth0 from 'auth0-js';
+import { Http, Headers, RequestOptions } from '@angular/http';
 
 @Injectable()
 export class EmployeesService {
 
-	user : firebase.User;
+  user: firebase.User;
+  signUp$ = new Subject<boolean>();
 
-  constructor(public db : AngularFireDatabase, private auth : AuthService) {
-  	this.user = firebase.auth().currentUser;  	
+  constructor(private http: Http, public db: AngularFireDatabase, private auth: AuthService, private crudService: CrudService, private auth0Service: Auth0Service) {
+    this.user = firebase.auth().currentUser;
+    this.signUp$.asObservable().subscribe((signedUp) => {
+      if (signedUp) {
+        // SHOW NOTIFICATION
+        // LOGIN TESTE this.auth0Service.employeeLogin();
+      }
+    });
   }
 
   getUser() {
-  	return this.db.object(`users/${this.user.uid}`);
+    return this.db.object(`users/${this.user.uid}`);
   }
- 
+
   getAllCategories() {
-    return this.db.list(`/categories`); 
+    return this.db.list(`/categories`);
   }
 
   getEmployeesFrom(thisStore, params?) {
-		return this.db.list(`/employees-stores/${thisStore}`, {
-      query : params || {
-        orderByChild: 'name'
-      } 
-		}); 
+    return this.db.list(`/stores-employees/${thisStore}`);
   }
 
-  addProduct(product) {
-    product.stores.forEach((store) => {
-
-      let newProduct = {
-        name : product.name,
-        description : product.description,
-        price : product.price,
-        store : store,
-        categories : product.selectedCategories,
-        pictures : product.images
-      };
-
-      let productsRef = this.db.database.ref(`/products`);
-      let newFirebaseProduct = productsRef.push(newProduct);      
-      
-      let key = newFirebaseProduct.key;   
-      
-      let linkProductToStoreRef = this.db.database.ref(`/products-stores/${store}/${key}`);
-      linkProductToStoreRef.set(newProduct);
-      
-      product.selectedCategories.forEach((category) => {
-        this.db.database.ref(`/products-categories/${category}/${key}`).set(newProduct);
-      });                 
-      
-    });  	
+  addEmployee(employee) {
+    const signedUp = this.auth0Service.signUp({
+      email: employee.email, password: 'DEFAULT', user_metadata: {
+        name: employee.name,
+        permissionLevel: employee.permissionLevel,
+        worksAt: employee.stores
+      }
+    }, this.signUp$);
   }
 
   updateEmployee(employee) {
-    
-    console.log('stooooooooooore', employee.productStore);
-    let updatedProduct = {
-      name : employee.name,
-      description : employee.description,
-      price : employee.price,
-      categories : employee.selectedCategories,
-      pictures : employee.images,
-      store : employee.productStore
-    };  
+    this.db.app.database().ref(`/users/${employee.employeeId}`).update({
+      permissionLevel: employee.permissionLevel
+    });
+    this.db.app.database().ref(`employees-stores/${employee.employeeId}`).remove();
 
-    let updates = {};
-    updates[`/products/${employee.productId}`] = updatedProduct;
-    updates[`/products-stores/${employee.productStore}/${employee.productId}`] = updatedProduct;
-    
-    employee.selectedCategories.forEach((category) => {
-        updates[`/products-categories/${category}/${employee.productId}`] = updatedProduct;
-    }); 
+    (<any[]>employee.previousStoresIds).forEach((prev) => {
+      if (employee.stores.indexOf(prev) < 0) {
+        this.db.object(`/stores-employees/${prev}/${employee.employeeId}`).remove();
+      }
+    });
 
-    this.db.database.ref().update(updates);
+    employee.stores.forEach((storeId) => {
+      this.db.app.database().ref(`stores/${storeId}`).once('value', (snapshot) => {
+        const obj = snapshot.val();
+        this.db.app.database().ref(`employees-stores/${employee.employeeId}/${obj.id}`).set(obj);
+      });
+
+      this.db.app.database().ref(`/users/${employee.employeeId}`).once('value', (snapshot) => {
+        this.db.object(`/stores-employees/${storeId}/${employee.employeeId}`).set(snapshot.val());
+      });
+    });
   }
 
-  deleteEmployee(key, categories, store) { 
-    let productsRef = this.db.database.ref(`/products`);
-    productsRef.child(`${key}`).remove();
-    this.db.database.ref(`/products-stores/${store}/${key}`).remove();
-    categories.forEach((category) => {
-      this.db.database.ref(`/products-categories/${category}/${key}`).remove();
-    }); 
+  deleteEmployee(id, storeId?) {
+    if (storeId) {
+      this.db.app.database().ref(`employees-stores/${id}/${storeId}`).remove();
+    } else {
+      //.remove()
+      this.db.list(`employees-stores/${id}`).subscribe((storesList) => {
+        // console.log(storesList.keys);
+        storesList.forEach((store) => {
+          this.db.object(`/stores-employees/${store.id}/${id}`).remove();
+        });
+
+        this.db.list(`employees-stores/${id}`).remove();
+      });
+      this.db.app.database().ref(`users/${id}`).once('value', (snapshot) => {
+        this.http.post('https://default-tenant.auth0.com/oauth/token', {
+          grant_type: 'client_credentials',
+          client_id: 'bK8ww4-EDzJUgz-lcdg5JTRz8hCPtTQi',
+          client_secret: '2fJ6PbF2QRZo5gF0_rQKECSrX_XGj5zUTjVHWIIENqQzcDMD_rtuztCF22lg1XES',
+          audience: 'https://default-tenant.auth0.com/api/v2/'
+        })
+          .map((res) => res.json())
+          .subscribe((res) => {
+            let management = new auth0.Management({
+              domain: 'default-tenant.auth0.com',
+              token: res.access_token
+            });
+            let headers = new Headers();
+            headers.append('Authorization', 'Bearer  ' + res.access_token);
+            this.http.delete('https://default-tenant.auth0.com/api/v2/users/' + snapshot.val().auth0Id, { headers: headers }).subscribe(function (res) { console.log(res) });
+          });
+        this.db.app.database().ref(`users/${id}`).remove();
+      });
+    }
+  }
+
+  getStoresWhereUserWorks() {
+    return this.crudService.getStoresWhereUserWorks();
+  }
+
+  getStoresWhereEmployeeWorks(employeeId) {
+    return this.db.list(`employees-stores/${employeeId}`);
+  }
+
+  optmizeImage(file) {
+    return this.crudService.optmizeImage(file);
   }
 }
