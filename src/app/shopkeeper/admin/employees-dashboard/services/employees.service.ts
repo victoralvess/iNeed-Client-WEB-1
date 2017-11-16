@@ -21,7 +21,6 @@ export class EmployeesService {
     this.signUp$.asObservable().subscribe((signedUp) => {
       if (signedUp) {
         // SHOW NOTIFICATION
-        // LOGIN TESTE this.auth0Service.employeeLogin();
       }
     });
   }
@@ -76,13 +75,10 @@ export class EmployeesService {
     if (storeId) {
       this.db.app.database().ref(`employees-stores/${id}/${storeId}`).remove();
     } else {
-      //.remove()
       this.db.list(`employees-stores/${id}`).subscribe((storesList) => {
-        // console.log(storesList.keys);
         storesList.forEach((store) => {
           this.db.object(`/stores-employees/${store.id}/${id}`).remove();
         });
-
         this.db.list(`employees-stores/${id}`).remove();
       });
       this.db.app.database().ref(`users/${id}`).once('value', (snapshot) => {
