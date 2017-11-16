@@ -1,73 +1,53 @@
-<p *ngIf="!(products | async)">LOADING</p>
-<div *ngIf="(products | async)">
-	<div class="row">
-		<div class="input-group">
-			<input class="form-control" type="text" name="search-products" placeholder="Pesquisar produtos" [(ngModel)]="query">
-			<span class="input-group-btn">
-	    	<button class="btn btn-default" type="button"><span class="glyphicon glyphicon-search"></span></button>
-	  	</span>
-	  </div>
-	  <select class="form-control" (change)="onChange($event.target.value)">
-	  	<option *ngFor="let store of stores" [value]="store.$key" [selected]="(store.$key == lastSelected)">{{ store.name + " - " + store.location.address }}</option>
-	  </select>
+<div fxLayout="column">
+	<div fxFlex="100">
+		<mat-form-field fxFlex="100">
+			<mat-select fxFlex="100" id="options-select" label="Loja" placeholder="Loja" [(ngModel)]="lastSelected" (change)="onChange($event.value)">
+				<mat-option *ngFor="let store of stores" [value]="store.$key">{{ store.name + " - " + store.location.address }}</mat-option>
+			</mat-select>
+		</mat-form-field>
 	</div>
+	<div fxFlex="100" class="tbl mat-elevation-z8">
+		<mat-table #table [dataSource]="dataSource">
 
-	<div class="row">
-	  <div class="table-responsive" style="max-height: 560px;overflow-y: auto">
-	  	<table class="table table-striped">
-	  		<thead>
-	  			<tr>
-			    	<th>Produto</th>
-			    	<th><span class="material-icons">attach_money</span></th>
-			    	<th><span class="material-icons">thumb_up</span></th>
-			    	<th><span class="material-icons">thumb_down</span></th>
-			    	<th>Ações</th>
-			    </tr>
-		    </thead>
-		    <tbody>
-		    	<tr *ngFor="let product of products | async | search : query | paginate: paginationComponentConfig">
-		    		<td>{{ product.name }}</td>
-		    		<td>{{ product.price | currency:'BRL':true:'2.2-2' }}</td>
-		    		<td>{{ product.upVotesCount || "0" }}</td>
-		    		<td>{{ product.downVotesCount || "0" }}</td>
-		    		<td>
-		    			<a class="no-decoration clickable" href="/shopkeeper/dashboard/admin/products/edit/{{product.$key}}">
-		    				<span class="material-icons">edit</span>
-		    			</a>
-		    			<a class="no-decoration clickable" (click)="deleteProduct(product.$key, product.categories, product.store, product.pictures.length)">
-		    				<span class="material-icons">delete</span>
-		    			</a>
-		    		</td>
-		    	</tr>
-		    </tbody>
-	  	</table>
-	  </div>
-	  <pagination-template class="clickable" #pagination="paginationApi"
-											     [id]="paginationComponentConfig.id"
-											     (pageChange)="paginationComponentConfig.currentPage = $event">
-	    <div class="pagination">
-	        <div class="pagination-previous" [class.disabled]="pagination.isFirstPage()">
-	            <div *ngIf="!pagination.isFirstPage()" (click)="pagination.previous()"><span class="material-icons">navigate_before</span></div>
-	        </div>
+			<ng-container matColumnDef="name">
+				<mat-header-cell *matHeaderCellDef> Nome </mat-header-cell>
+				<mat-cell *matCellDef="let product"> {{product.name}} </mat-cell>
+			</ng-container>
 
-	        <div *ngFor="let page of pagination.pages" [class.current]="pagination.getCurrent() === page.value">
-	            <div (click)="pagination.setCurrent(page.value)" *ngIf="pagination.getCurrent() !== page.value">
-	                <span>{{ page.label }}</span>
-	            </div>
-	            <div *ngIf="pagination.getCurrent() === page.value">
-	                <span>{{ page.label }}</span>
-	            </div>
-	        </div>
+			<ng-container matColumnDef="price">
+				<mat-header-cell *matHeaderCellDef> Preço </mat-header-cell>
+				<mat-cell *matCellDef="let product"> {{product.price}} </mat-cell>
+			</ng-container>
 
-	        <div class="pagination-next" [class.disabled]="pagination.isLastPage()">
-	            <div *ngIf="!pagination.isLastPage()" (click)="pagination.next()"><span class="material-icons">navigate_next</span></div>
-	        </div>
-	    </div>
-		</pagination-template>
+			<ng-container matColumnDef="upVotes">
+				<mat-header-cell *matHeaderCellDef> Votos positivos </mat-header-cell>
+				<mat-cell *matCellDef="let product"> {{product.upVotesCount}} </mat-cell>
+			</ng-container>
+
+			<ng-container matColumnDef="downVotes">
+				<mat-header-cell *matHeaderCellDef> Votos negativos </mat-header-cell>
+				<mat-cell *matCellDef="let product"> {{product.downVotesCount}} </mat-cell>
+			</ng-container>
+
+			<ng-container matColumnDef="actions">
+				<mat-header-cell *matHeaderCellDef> Ações </mat-header-cell>
+				<mat-cell *matCellDef="let product">
+					<button mat-icon-button color="accent" (click)="updateProduct(product.$key)">
+						<mat-icon>edit</mat-icon>
+					</button>
+					<button mat-icon-button color="accent" (click)="deleteProduct(product.$key, product.categories, product.store, product.pictures.length)">
+						<mat-icon>delete</mat-icon>
+					</button>
+				</mat-cell>
+			</ng-container>
+
+			<mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+			<mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+		</mat-table>
 	</div>
 </div>
 <div fxLayout="row" fxLayoutAlign="end end">
-<a href="/shopkeeper/dashboard/admin/products/add" mat-fab>
-	<mat-icon class="md-24">add</mat-icon>
-</a>
+	<a class="mat-fab-margin-top" href="/shopkeeper/dashboard/admin/products/add" mat-fab>
+		<mat-icon class="md-24">add</mat-icon>
+	</a>
 </div>
