@@ -2,25 +2,18 @@
   "compileOnSave": false,
   "compilerOptions": {
     "outDir": "./dist/out-tsc",
-<<<<<<< HEAD
     "baseUrl": "src",
-=======
->>>>>>> stores-module
     "sourceMap": true,
     "declaration": false,
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "target": "es5",
+    "target": "es2017",
     "typeRoots": [
       "node_modules/@types"
     ],
     "lib": [
-<<<<<<< HEAD
-      "es2016",
-=======
       "es2017",
->>>>>>> stores-module
       "dom"
     ]
   }

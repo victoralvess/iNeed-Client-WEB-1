@@ -2,15 +2,9 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../out-tsc/spec",
-<<<<<<< HEAD
-    "module": "commonjs",
-    "target": "es5",
-    "baseUrl": "",
-=======
     "baseUrl": "./",
     "module": "commonjs",
     "target": "es5",
->>>>>>> stores-module
     "types": [
       "jasmine",
       "node"

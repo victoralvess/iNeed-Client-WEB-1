@@ -2,10 +2,7 @@
   "extends": "../tsconfig.json",
   "compilerOptions": {
     "outDir": "../out-tsc/e2e",
-<<<<<<< HEAD
-=======
     "baseUrl": "./",
->>>>>>> stores-module
     "module": "commonjs",
     "target": "es5",
     "types": [
