@@ -4,16 +4,12 @@ import { Observable } from 'rxjs/Observable';
 import 'rxjs/add/operator/map';
 import { AuthService } from '../../../../shared/services/services-auth/auth.service';
 import { AngularFireDatabase } from 'angularfire2/database';
-<<<<<<< HEAD
-import { environment } from 'environments/environment';
-=======
 import { environment } from '../../../../../environments/environment';
->>>>>>> stores-module
 
 @Injectable()
 export class MustBeAdminGuard implements CanActivate {
 
-	constructor(private router: Router, private authService: AuthService, private db: AngularFireDatabase ) {}
+  constructor(private router: Router, private authService: AuthService, private db: AngularFireDatabase) { }
 
   canActivate(
     next: ActivatedRouteSnapshot,
@@ -23,18 +19,17 @@ export class MustBeAdminGuard implements CanActivate {
     let canActivate;
     if (user != null) {
       return this.db.object(`users/${user.uid}`)
-      .map((currentUser) => {
-        canActivate = (currentUser.permissionLevel == 2 || currentUser.permissionLevel == 3);
-        if (!canActivate) {
-          this.router.navigate(['/shopkeeper/dashboard/home']);
-          return false;
-        }
-        return true; 
-      });
+        .map((currentUser) => {
+          canActivate = (currentUser.permissionLevel == 2 || currentUser.permissionLevel == 3);
+          if (!canActivate) {
+            this.router.navigate(['/shopkeeper/dashboard/home']);
+            return false;
+          }
+          return true;
+        });
     } else {
       this.router.navigate(['/subscribe']);
       return false;
     }
   }
 }
-  
