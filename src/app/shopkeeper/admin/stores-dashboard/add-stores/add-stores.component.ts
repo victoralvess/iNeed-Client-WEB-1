@@ -24,24 +24,24 @@ import { MatOption } from '@angular/material';
 })
 export class AddStoresComponent implements OnDestroy {
 
-  /*private*/ cnpjMask = [/\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/];
-  /*private*/ zipCodeMask = [/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/];
-  /*private*/ phoneMask = ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
-  /*private*/ cellphoneMask = ['(', /\d/, /\d/, ')', ' ', /\d/, ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
-  /*private*/ cellphoneValidator: RegExp = /\(\d\d\)\ \d\ \d\d\d\d\-\d\d\d\d/;
-  /*private*/ phoneValidator: RegExp = /\(\d\d\)\ \d\d\d\d\-\d\d\d\d/;
+  cnpjMask = [/\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/];
+  zipCodeMask = [/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/];
+  phoneMask = ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+  cellphoneMask = ['(', /\d/, /\d/, ')', ' ', /\d/, ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+  cellphoneValidator: RegExp = /\(\d\d\)\ \d\ \d\d\d\d\-\d\d\d\d/;
+  phoneValidator: RegExp = /\(\d\d\)\ \d\d\d\d\-\d\d\d\d/;
 
-  /*private*/ files: File[] = [];
-  /*private*/ store: Store = {};
+  files: File[] = [];
+  store: Store = {};
 
-  /*private*/ step = 0;
-
-  /*private*/ addressReady$ = new Subject<any>();
-  /*private*/ ready;
-  /*private*/ categoriesReady = false;
-  /*private*/ categoriesSubscription: Subscription;
-  /*private*/ categories = [];
-  /*private*/ daysOfTheWeek = [
+  step = 0;
+  locationServiceSubscription: Subscription;
+  addressReady$ = new Subject<any>();
+  ready;
+  categoriesReady = false;
+  categoriesSubscription: Subscription;
+  categories = [];
+  daysOfTheWeek = [
     { day: 'Segunda', checked: false },
     { day: 'Terça', checked: false },
     { day: 'Quarta', checked: false },
@@ -50,7 +50,7 @@ export class AddStoresComponent implements OnDestroy {
     { day: 'Sábado', checked: false },
     { day: 'Domingo', checked: false }
   ];
-  /*private*/ openingClosingArr = [];
+  openingClosingArr = [];
   paymentMethods = [
     { label: 'Dinheiro', value: 'money' },
     { label: 'Boleto', value: 'payment-slip' },
@@ -61,18 +61,18 @@ export class AddStoresComponent implements OnDestroy {
     { label: 'Bitcoin', value: 'bitcoin' }
   ];
 
-  /*private*/ storeForm = new FormGroup({
+  storeForm = new FormGroup({
     name: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(3), CustomValidators.maxLength(45)])),
     cnpj: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(18)])),
     color: new FormControl('#3F51B5', CustomValidators.rgba2hex()),
     description: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(10), CustomValidators.maxLength(200)]))
   });
 
-  /*private*/ openingClosingForm = new FormGroup({
+  openingClosingForm = new FormGroup({
     days: new FormControl([])
   });
 
-  /*private*/ addressForm = new FormGroup({
+  addressForm = new FormGroup({
     street: new FormControl(''),
     zipCode: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(9)])),
     number: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(1)])),
@@ -81,7 +81,7 @@ export class AddStoresComponent implements OnDestroy {
     vicinity: new FormControl(''),
   });
 
-  /*private*/ extraInfoForm = new FormGroup({
+  extraInfoForm = new FormGroup({
     mainCategories: new FormControl([]),
     mainPaymentWays: new FormControl([]),
     phone: new FormControl(''),
@@ -93,7 +93,7 @@ export class AddStoresComponent implements OnDestroy {
       this.ready = isReady;
     });
 
-    this.locationService.response$.asObservable().subscribe((responses) => {
+    this.locationServiceSubscription = this.locationService.response$.asObservable().subscribe((responses) => {
       if (responses === null) {
         this.addressForm.controls['zipCode'].setValue('');
         this.addressForm.controls['zipCode'].setErrors({ 'required': true });
@@ -178,7 +178,7 @@ export class AddStoresComponent implements OnDestroy {
 
   ngOnDestroy() {
     this.addressReady$.unsubscribe();
-    this.locationService.response$.unsubscribe();
+    this.locationServiceSubscription.unsubscribe();
   }
 
   locationByZipCode() {
@@ -222,6 +222,14 @@ export class AddStoresComponent implements OnDestroy {
       this.store.description = storeFormValues.description;
       this.store.color = storeFormValues.color;
       this.store.cnpj = storeFormValues.cnpj;
+
+      this.store.location.parts = {};
+      this.store.location.parts['street'] = addressFormValues.street;
+      this.store.location.parts['zipCode'] = (addressFormValues.zipCode);
+      this.store.location.parts['number'] = addressFormValues.number;
+      this.store.location.parts['city'] = addressFormValues.city;
+      this.store.location.parts['state'] = addressFormValues.state;
+      this.store.location.parts['vicinity'] = addressFormValues.vicinity;
 
       if (this.phoneValidator.test(<string>extraInfoFormValues.phone)) {
         this.store.phone = extraInfoFormValues.phone;

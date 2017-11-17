@@ -1,4 +1,21 @@
 import { Component, OnInit } from '@angular/core';
+import { StoresService } from '../services/stores.service';
+import { ActivatedRoute, Router, Params } from '@angular/router';
+import { CustomValidators } from '../../../../shared/validators/custom-validators';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { Store } from '../models/store.model';
+import { Subject } from 'rxjs/Subject';
+import { Subscription } from 'rxjs/Subscription';
+import { StoreLocation } from '../models/store-location.model';
+import { Category } from '../../../models/category.model';
+import { Md2Colorpicker, Md2Toast } from 'md2';
+import { FileHolder } from 'angular2-image-upload';
+import { LocationService } from '../services/location/location.service';
+import { ViewContainerRef } from '@angular/core';
+import { TdDialogService } from '@covalent/core';
+import { MatDialog } from '@angular/material';
+import { TimePickerDialogComponent } from '../time-picker-dialog/time-picker-dialog.component';
+import { MatOption } from '@angular/material';
 
 @Component({
   selector: 'app-edit-stores',
@@ -7,9 +24,243 @@ import { Component, OnInit } from '@angular/core';
 })
 export class EditStoresComponent implements OnInit {
 
-  constructor() { }
+  activatedRouteSubscription;
+  storeId;
+  fireStore;
+  storeSubscription;
+  picsUrls = [];
+  newFiles = [];
+  cnpjMask = [/\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/];
+  zipCodeMask = [/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/];
+  phoneMask = ['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+  cellphoneMask = ['(', /\d/, /\d/, ')', ' ', /\d/, ' ', /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/];
+  cellphoneValidator: RegExp = /\(\d\d\)\ \d\ \d\d\d\d\-\d\d\d\d/;
+  phoneValidator: RegExp = /\(\d\d\)\ \d\d\d\d\-\d\d\d\d/;
+
+  files: File[] = [];
+  store: Store = {};
+
+  step = 0;
+  locationServiceSubscription: Subscription;
+
+  addressReady$ = new Subject<any>();
+  ready;
+  categoriesReady = false;
+  categoriesSubscription: Subscription;
+  categories = [];
+  daysOfTheWeek = [
+    { day: 'Segunda', checked: false },
+    { day: 'Terça', checked: false },
+    { day: 'Quarta', checked: false },
+    { day: 'Quinta', checked: false },
+    { day: 'Sexta', checked: false },
+    { day: 'Sábado', checked: false },
+    { day: 'Domingo', checked: false }
+  ];
+  openingClosingArr = [];
+  paymentMethods = [
+    { label: 'Dinheiro', value: 'money' },
+    { label: 'Boleto', value: 'payment-slip' },
+    { label: 'PayPal', value: 'paypal' },
+    { label: 'Cartão de Débito', value: 'debit' },
+    { label: 'Cartão de Crédito', value: 'credit' },
+    { label: 'Cheque', value: 'check' },
+    { label: 'Bitcoin', value: 'bitcoin' }
+  ];
+  storeForm = new FormGroup({
+    name: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(3), CustomValidators.maxLength(45)])),
+    cnpj: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(18)])),
+    color: new FormControl('#3F51B5', CustomValidators.rgba2hex()),
+    description: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(10), CustomValidators.maxLength(200)]))
+  });
+
+  openingClosingForm = new FormGroup({
+    days: new FormControl([])
+  });
+
+  addressForm = new FormGroup({
+    street: new FormControl(''),
+    zipCode: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(9)])),
+    number: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(1)])),
+    city: new FormControl(''),
+    state: new FormControl(''),
+    vicinity: new FormControl(''),
+  });
+
+  extraInfoForm = new FormGroup({
+    mainCategories: new FormControl([]),
+    mainPaymentWays: new FormControl([]),
+    phone: new FormControl(''),
+    cellphone: new FormControl('')
+  });
+
+  constructor(private dialog: MatDialog, private toast: Md2Toast, private locationService: LocationService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private storesService: StoresService, private activatedRoute: ActivatedRoute, private router: Router) {
+    this.addressReady$.asObservable().subscribe((isReady) => {
+      this.ready = isReady;
+    });
+
+    this.locationServiceSubscription = this.locationService.response$.asObservable().subscribe((responses) => {
+      if (responses === null) {
+        this.addressForm.controls['zipCode'].setValue('');
+        this.addressForm.controls['zipCode'].setErrors({ 'required': true });
+      } else {
+        this.addressForm.controls['street'].setValue(responses[0].endereco);
+        this.addressForm.controls['city'].setValue(responses[0].cidade);
+        this.addressForm.controls['vicinity'].setValue(responses[0].bairro);
+        this.addressForm.controls['state'].setValue(responses[0].uf);
+
+        console.log(responses[1]);
+        if (responses[1].status === 'OK') {
+          let storeLocation: StoreLocation = {};
+          storeLocation.lat = responses[1].results[0].geometry.location.lat;
+          storeLocation.lng = responses[1].results[0].geometry.location.lng;
+          storeLocation.address = responses[1].results[0].formatted_address;
+          this.store.location = storeLocation;
+          this.addressReady$.next(true);
+        } else {
+          this.dialogService.openAlert({
+            message: 'Esse endereço não foi encontrado com precisão nas nossas bases de dados. Infelizmente o cadastro não poderá ser efetuado com esse endereço.',
+            disableClose: true,
+            viewContainerRef: this.viewContainerRef,
+            title: 'Erro',
+            closeButton: 'ENTENDI'
+          });
+        }
+      }
+    });
+
+    this.categoriesSubscription = storesService.getAllCategories().subscribe((categories) => {
+      let aux: Category[] = [];
+      categories.forEach((category) => {
+        aux.push({ label: category.value, value: category.$key });
+      });
+      this.categories = aux;
+      this.categoriesReady = true;
+    });
+
+    this.activatedRouteSubscription = this.activatedRoute.params.subscribe((params: Params) => {
+
+      this.storeId = params['storeId'];
+
+      this.fireStore = this.storesService.db.object(`stores/${this.storeId}`);
+      this.storeSubscription = this.fireStore.subscribe((foundStore) => {
+        console.log('found', foundStore);
+        this.picsUrls = [];
+        localStorage.setItem(`${this.storeId}/Pictures`, JSON.stringify(foundStore.pictures));
+        console.log(foundStore.pictures);
+        this.picsUrls = foundStore.pictures;
+
+        /* SETTING DATA IN FIELDS */
+        this.storeForm.patchValue({ 'name': foundStore.name });
+        this.storeForm.patchValue({ 'description': foundStore.description });
+        this.storeForm.patchValue({ 'color': foundStore.color });
+        this.storeForm.patchValue({ 'cnpj': foundStore.cnpj });
+
+        // this.openingClosingForm.patchValue({ 'days': foundStore.businessTimes });
+        this.openingClosingArr = (<any[]>foundStore.businessTimes);
+        (<any[]>foundStore.businessTimes).forEach((day) => {
+          const index = this.daysOfTheWeek.findIndex((i => i.day === day.day));
+          if (index > -1) {
+            this.daysOfTheWeek[index].checked = true;
+          }
+        });
+
+        this.addressForm.patchValue({ 'street': foundStore.location.parts['street'] });
+        this.addressForm.patchValue({ 'zipCode': foundStore.location.parts['zipCode'] });
+        this.addressForm.patchValue({ 'number': foundStore.location.parts['number'] });
+        this.addressForm.patchValue({ 'city': foundStore.location.parts['city'] });
+        this.addressForm.patchValue({ 'state': foundStore.location.parts['state'] });
+        this.addressForm.patchValue({ 'vicinity': foundStore.location.parts['vicinity'] });
+
+        this.extraInfoForm.patchValue({ 'mainCategories': foundStore.categories || [] });
+        this.extraInfoForm.patchValue({ 'mainPaymentWays': foundStore.paymentWays || [] });
+        this.extraInfoForm.patchValue({ 'phone': foundStore.phone || '' });
+        this.extraInfoForm.patchValue({ 'cellphone': foundStore.cellphone || '' });
+      });
+    });
+  }
 
   ngOnInit() {
   }
+
+  ngOnDestroy() {
+    this.locationServiceSubscription.unsubscribe();
+  }
+
+  imageFinishedUploading(event: FileHolder) {
+    if ((event.file.type !== 'image/jpeg' && event.file.type !== 'image/png') || (event.file.size > 1100000)) {
+      return;
+    }
+
+    this.newFiles.push(event.file);
+  }
+
+  imageRemoved(event: FileHolder) {
+    if (!event.src.startsWith('http')) {
+      this.newFiles.splice(this.newFiles.indexOf(event.file), 1);
+    } else {
+      this.picsUrls.splice(this.picsUrls.indexOf(event.src), 1);
+    }
+  }
+
+  uploadStateChange(state: boolean) {
+    console.log(JSON.stringify(state));
+  }
+
+  setStep(index: number) {
+    this.step = index;
+  }
+
+  nextStep() {
+    this.step++;
+  }
+
+  prevStep() {
+    this.step--;
+  }
+
+  openTimePickerDialog(day, checked) {
+    console.log('MYTAG_', this.daysOfTheWeek);
+    this.daysOfTheWeek[this.daysOfTheWeek.map((e) => e.day).indexOf(day)].checked = checked;
+    console.log('MYTAG_', this.daysOfTheWeek);
+    const index = this.openingClosingArr.map((e) => e.day).indexOf(day);
+    if (checked) {
+      console.log(day);
+      let dialogRef;
+      if (!(index > -1)) {
+        console.log('nao é maior que -1');
+        dialogRef = this.dialog.open(TimePickerDialogComponent, {
+          data: { day: day }
+        });
+      } else {
+        console.log('here');
+        dialogRef = this.dialog.open(TimePickerDialogComponent, {
+          data: { day: day, opening: this.openingClosingArr[index].opening, closing: this.openingClosingArr[index].closing }
+        });
+      }
+
+      dialogRef.afterClosed().subscribe((response: any) => {
+        if (response) {
+          console.log('time', response);
+          this.openingClosingArr.push(response);
+          console.log('opcl', this.openingClosingArr);
+        } else {
+          this.removeTimesUnchecked(index);
+        }
+      });
+    } else {
+      this.removeTimesUnchecked(index);
+    }
+  }
+
+  removeTimesUnchecked(index) {
+    this.openingClosingArr.splice(index, 1);
+    if (this.openingClosingArr.length === 0) {
+      this.openingClosingArr = [];
+    } else {
+    }
+    console.log('opcl', this.openingClosingArr);
+  }
+
 
 }
