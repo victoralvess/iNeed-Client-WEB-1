@@ -261,7 +261,7 @@
       <mat-action-row>
         <button mat-button color="warn" (click)="prevStep()" class="text-upper">Voltar</button>
         <button mat-button color="primary" [disabled]="!(storeForm.valid && addressForm.valid && extraInfoForm.valid)"
-          (click)="storeForm.valid && addressForm.valid && addStore([storeForm.value, addressForm.value, extraInfoForm.value])"
+          (click)="storeForm.valid && addressForm.valid && updateStore([storeForm.value, addressForm.value, extraInfoForm.value])"
           class="text-upper">Li e Concordo</button>
       </mat-action-row>
     </mat-expansion-panel>

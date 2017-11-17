@@ -44,7 +44,7 @@ export class EditStoresComponent implements OnInit {
   locationServiceSubscription: Subscription;
 
   addressReady$ = new Subject<any>();
-  ready;
+  ready = false;
   categoriesReady = false;
   categoriesSubscription: Subscription;
   categories = [];
@@ -125,6 +125,7 @@ export class EditStoresComponent implements OnInit {
             title: 'Erro',
             closeButton: 'ENTENDI'
           });
+          this.addressReady$.next(false);
         }
       }
     });
@@ -149,7 +150,7 @@ export class EditStoresComponent implements OnInit {
         localStorage.setItem(`${this.storeId}/Pictures`, JSON.stringify(foundStore.pictures));
         console.log(foundStore.pictures);
         this.picsUrls = foundStore.pictures;
-
+        this.store.location = foundStore.location;
         /* SETTING DATA IN FIELDS */
         this.storeForm.patchValue({ 'name': foundStore.name });
         this.storeForm.patchValue({ 'description': foundStore.description });
@@ -176,6 +177,8 @@ export class EditStoresComponent implements OnInit {
         this.extraInfoForm.patchValue({ 'mainPaymentWays': foundStore.paymentWays || [] });
         this.extraInfoForm.patchValue({ 'phone': foundStore.phone || '' });
         this.extraInfoForm.patchValue({ 'cellphone': foundStore.cellphone || '' });
+
+        this.addressReady$.next(true);
       });
     });
   }
@@ -262,5 +265,89 @@ export class EditStoresComponent implements OnInit {
     console.log('opcl', this.openingClosingArr);
   }
 
+  updateStore(formsValues: any[]) {
+    const originalPics = JSON.parse(localStorage.getItem(`${this.storeId}/Pictures`));
+    if (this.ready) {
+      if (this.openingClosingArr.length === 0) {
+        this.toast.show('ADICIONE OS HORÁRIOS DE FUNCIONAMENTO');
+        return;
+      } else {
+        this.store.businessTimes = [];
+        this.openingClosingArr.forEach((oc) => {
+          this.store.businessTimes.push({ day: oc.day, open: oc.openingParsed || oc.open, close: oc.closingParsed || oc.close });
+        });
+      }
+      const storeFormValues = formsValues[0];
+      const addressFormValues = formsValues[1];
+      const extraInfoFormValues = formsValues[2];
+      console.log(formsValues);
 
+      this.store.id = this.storeId;
+
+      this.store.name = storeFormValues.name;
+      this.store.description = storeFormValues.description;
+      this.store.color = storeFormValues.color;
+      this.store.cnpj = storeFormValues.cnpj;
+
+      // this.store.location.parts = {};
+      this.store.location.parts['street'] = addressFormValues.street;
+      this.store.location.parts['zipCode'] = (addressFormValues.zipCode);
+      this.store.location.parts['number'] = addressFormValues.number;
+      this.store.location.parts['city'] = addressFormValues.city;
+      this.store.location.parts['state'] = addressFormValues.state;
+      this.store.location.parts['vicinity'] = addressFormValues.vicinity;
+      
+      if (this.phoneValidator.test(<string>extraInfoFormValues.phone)) {
+        this.store.phone = extraInfoFormValues.phone;
+      }
+
+      if (this.cellphoneValidator.test(<string>extraInfoFormValues.cellphone)) {
+        this.store.cellphone = extraInfoFormValues.cellphone;
+      }
+
+      if ((<any[]>extraInfoFormValues.mainPaymentWays).length > 0) {
+        this.store.paymentWays = extraInfoFormValues.mainPaymentWays;
+      }
+
+      if ((<any[]>extraInfoFormValues.mainCategories).length > 0) {
+        this.store.categories = extraInfoFormValues.mainCategories;
+      }
+
+      if (originalPics) {
+        if (this.newFiles.length > 0) {
+          let pictures: string[] = [];
+          this.newFiles.forEach((file, idx, arr) => {
+            this.storesService.optmizeImage(file).subscribe((res) => {
+              const response: any = res;
+              const base64image = response._body;
+              pictures.push(base64image);
+              if (idx === this.newFiles.length - 1) {
+                console.log(this.store);
+                this.storesService.updateStore(this.store, this.picsUrls, originalPics, pictures);
+              }
+            });
+          });
+        } else {
+          if (this.picsUrls.length === 0) {
+            this.storesService.updateStore(this.store, originalPics, originalPics);
+          } else {
+            this.storesService.updateStore(this.store, this.picsUrls, originalPics);
+          }
+        }
+      }
+    } else {
+      setTimeout(() => {
+        this.updateStore(formsValues);
+      }, 1000);
+    }
+  }
+
+  locationByZipCode() {
+    this.addressReady$.next(false);
+    if (!(this.addressForm.controls['zipCode'].hasError('minlength') || this.addressForm.controls['number'].hasError('minlength'))) {
+      const zipCode = this.addressForm.controls['zipCode'].value;
+      const number = this.addressForm.controls['number'].value;
+      this.locationService.locationByZipCode(zipCode, number);
+    }
+  }
 }

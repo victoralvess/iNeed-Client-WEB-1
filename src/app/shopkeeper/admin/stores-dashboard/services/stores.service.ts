@@ -68,6 +68,48 @@ export class StoresService {
     });
   }
 
+  updateStore(store, sendPics: any[], originalUrls: any[], addedPics?: any[]) {
+    this.picsUploaded = sendPics.length;
+    store.pictures = [];
+    originalUrls.forEach((url) => {
+      if (!sendPics.includes(url)) {
+        firebase.storage().refFromURL(url).delete();
+      } else {
+        store.pictures.push(url);
+      }
+    });
+
+    this.db.app.database().ref(`/stores/${store.id}`).set(store);
+    this.db.list(`/employees-stores`).subscribe((employees) => {
+      console.log('MYTAG_ALL', employees);
+      employees.forEach((employee) => {
+        const employeeId = employee.$key;
+        if (employee[store.id]) { // IF EMPLOYEE WORKS AT `${key}` STORE
+          console.log('MYTAG_STORE_KEY', store.id);
+          console.log('MYTAG_STORE_DB', employee[store.id]);
+          console.log('MYTAG_STORE_DB_ID', employee[store.id].id);
+          console.log('MYTAG_EMPLOYEE_ID', employeeId);
+          this.db.object(`/employees-stores/${employeeId}/${store.id}`).set(store);
+        }
+      });
+    });
+
+    if (addedPics && addedPics.length > 0) {
+      addedPics.forEach((image) => {
+        firebase.storage().ref(`/${store.id}/pics/${this.crudService.unique()}.jpeg`).putString(image, 'data_url', {
+          contentType: 'image/jpeg'
+        }).then((snapshot) => {
+          console.log('dUrl', snapshot.downloadURL);
+          this.pictureAdded$.next({
+            key: store.id,
+            url: snapshot.downloadURL
+          });
+        });
+      });
+    }
+    // this.verifyChangesOnProducts(product.productId, 'Sucesso!', 'O produto foi atualizado com êxito!');
+  }
+
   deleteStore(key: string) {
     this.db.object(`/stores/${key}`).subscribe((store) => {
       if (store.pictures) {
@@ -75,10 +117,11 @@ export class StoresService {
           firebase.storage().refFromURL(url).delete();
         });
         this.db.object(`/stores/${key}`).remove();
-        this.db.object(`/stores-employees/${key}`).remove();
-        this.db.object(`/products-stores/${key}`).remove();
       }
     });
+
+    this.db.object(`/stores-employees/${key}`).remove();
+    this.db.object(`/products-stores/${key}`).remove();
 
     this.getAllCategories().subscribe((categories) => {
       categories.forEach((category) => {
