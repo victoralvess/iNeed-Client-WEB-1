@@ -15,13 +15,38 @@ export class ShopkeeperComponent implements OnInit, AfterViewInit {
   user: any;
   chosenInitialized: boolean = false;
 
+  // HOME PROD LOJ FUN CHAT
+
+  routes: Object[] = [{
+    icon: 'home',
+    route: '/shopkeeper/dashboard/home',
+    title: 'Home',
+  }, {
+    icon: 'shopping_basket',
+    route: '/shopkeeper/dashboard/admin/products',
+    title: 'Produtos',
+  }, {
+    icon: 'store',
+    route: '/shopkeeper/dashboard/admin/stores',
+    title: 'Lojas',
+  }, {
+    icon: 'people',
+    route: '/shopkeeper/dashboard/admin/employees',
+    title: 'Funcionários',
+  }, {
+    icon: 'chat',
+    route: '/shopkeeper/chat',
+    title: 'Chat',
+  }
+  ];
+
   constructor(private afAuth: AngularFireAuth, private service: AuthService, private router: Router) {
     this.user = afAuth.auth.currentUser;
 
     this.afAuth.auth.onAuthStateChanged((user) => {
-      if(!user) {
+      if (!user) {
         console.log('mata tuto chessus');
-        this.router.navigate(['/subscribe/signin']);       
+        this.router.navigate(['/subscribe/signin']);
       }
     });
   }
@@ -30,8 +55,8 @@ export class ShopkeeperComponent implements OnInit, AfterViewInit {
   ngAfterViewInit() {
 
     if (!this.chosenInitialized) {
-      $(document).ready(function(){
-        $('[data-toggle="offcanvas"]').click(function(){
+      $(document).ready(function () {
+        $('[data-toggle="offcanvas"]').click(function () {
           $('#navigation').toggleClass('hidden-xs');
         });
       });
@@ -45,4 +70,5 @@ export class ShopkeeperComponent implements OnInit, AfterViewInit {
     this.service.logout();
     this.router.navigate(['/home']);
   }
+
 }

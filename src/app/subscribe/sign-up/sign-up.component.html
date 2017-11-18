@@ -1,4 +1,4 @@
-<div class="panel panel-default">
+<!--<div class="panel panel-default">
     <div class="panel-body">
         <div class="row" style="padding: 16px">
             <button type="button" class="btn btn-primary btn-block" (click)="onClickSignInGoogle()">
@@ -65,5 +65,57 @@
             </p>
         </div>
     </div>
-</div>
-
+</div>-->
+<mat-card>
+    <mat-card-title layout="row" fxLayoutAlign="center center">
+        <span class="md-title">Autenticação</span>
+    </mat-card-title>
+    <mat-card-subtitle fxLayoutAlign="center center">Conecte-se ao iNeed</mat-card-subtitle>
+    <mat-divider></mat-divider>
+    <mat-card-content>
+        <form [formGroup]="signUpForm">
+            <div fxLayout="column">
+                <div fxFlex="100">
+                    <mat-form-field fxFlex="100">
+                        <input matInput placeholder="Nome" [formControl]="signUpForm.controls['name']" required>
+                        <mat-hint align="end">{{ signUpForm.controls['name'].value.length }} / 40</mat-hint>
+                        <mat-error align="start" *ngIf="signUpForm.controls['name'].hasError('maxlength')">
+                            O nome está
+                            <strong>longo demais</strong>
+                        </mat-error>
+                        <mat-error *ngIf="signUpForm.controls['name'].hasError('minlength')">
+                            O nome está
+                            <strong>curto demais</strong>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100">
+                    <mat-form-field fxFlex="100">
+                        <input matInput placeholder="Email" [formControl]="signUpForm.controls['email']" required>
+                        <mat-error *ngIf="signUpForm.controls['email'].hasError('required')">
+                            <strong>Informe</strong> seu email
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100">
+                    <mat-form-field fxFlex="100">
+                        <input matInput type="password" placeholder="Senha" [formControl]="signUpForm.controls['password']" required>
+                        <mat-error *ngIf="signUpForm.controls['password'].hasError('required')">
+                            Você
+                            <strong>precisa</strong> de uma senha
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </form>
+    </mat-card-content>
+    <mat-divider></mat-divider>
+    <mat-card-actions>
+        <div fxLayout="row">
+            <button fxFlex="50" mat-raised-button color="accent" [disabled]="!signUpForm.valid" (click)="signUpWithEmail(signUpForm.value)">CADASTRAR</button>
+            <button fxFlex="50" color="#fff" mat-raised-button (click)="signUpWithGoogle()">
+                <mat-icon svgIcon="google"></mat-icon>
+            </button>
+        </div>
+    </mat-card-actions>
+</mat-card>

@@ -15,7 +15,11 @@ import { VerifyAuth } from './shared/services/verify-auth/verify-auth';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { CallbackComponent } from './callback/callback.component';
 import { Auth0Service } from './shared/services/auth0-service/auth0.service';
-
+import { MatToolbarModule } from '@angular/material';
+import { MatButtonModule } from '@angular/material';
+import { NoConflictStyleCompatibilityMode, CompatibilityModule } from '@angular/material';
+import { MatMenuModule } from '@angular/material';
+import { MatIconModule } from '@angular/material';
 @NgModule({
   declarations: [
     AppComponent,
@@ -30,7 +34,13 @@ import { Auth0Service } from './shared/services/auth0-service/auth0.service';
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
     AngularFireAuthModule,
-    NoopAnimationsModule
+    NoopAnimationsModule,
+    MatToolbarModule,
+    MatButtonModule,
+    NoConflictStyleCompatibilityMode,
+    CompatibilityModule,
+    MatMenuModule,
+    MatIconModule
   ],
   providers: [AuthService, VerifyAuth, Auth0Service],
   bootstrap: [AppComponent]
