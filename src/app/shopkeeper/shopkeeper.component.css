@@ -46,6 +46,8 @@ padding-top: 16px;
   flex: 1 1 auto;
 }
 
+.mat-drawer-content {
+    background-color: white;}
 .n-circle-logo {
 max-width: 60px !important;
 width: 60px;
@@ -329,7 +331,6 @@ header {
   left: 0;
   padding: 16px;
   background-color: #ffffff;
-  border-top: 0.1em solid rgba(0, 0, 0, 0.16);
 }
 
 .social:hover {
