@@ -23,7 +23,7 @@ export class MustBeAdminGuard implements CanActivate {
       return this.db.object(`users/${user.uid}`)
         .map((currentUser) => {
           if (next.data["sudo"]) {
-            canActivate = (currentUser.permissionLevel == 3);
+            canActivate = (currentUser.permissionLevel >= 3);
           } else {
             canActivate = (currentUser.permissionLevel >= 2);
           }

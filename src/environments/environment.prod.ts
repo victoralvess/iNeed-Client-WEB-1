@@ -20,6 +20,7 @@ export const environment = {
         url: 'https://maps.googleapis.com/maps/api/geocode/json?',
         key: 'AIzaSyDBMaCLamHn33qRqgqKDs0KFxelcY1yFS0'
         // key: 'AIzaSyB8228EjbA5c_KZddHe9TgsOn1vP4ZkwMY'
+        // key: 'AIzaSyB8228EjbA5c_KZddHe9TgsOn1vP4ZkwMY'
       }
     },
     webmania: {

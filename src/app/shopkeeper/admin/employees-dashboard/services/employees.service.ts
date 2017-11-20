@@ -39,9 +39,9 @@ export class EmployeesService {
 
   addEmployee(employee) {
     const signedUp = this.auth0Service.signUp({
-      email: employee.email, password: 'DEFAULT', user_metadata: {
+      email: employee.email, password: `${this.crudService.unique()}`, user_metadata: {
         name: employee.name,
-        permissionLevel: employee.permissionLevel,
+        permissionLevel: `${employee.permissionLevel}`,
         worksAt: employee.stores
       }
     }, this.signUp$);

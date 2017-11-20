@@ -12,11 +12,15 @@
       </mat-card>
     </div>
     <ul>
-      <li *ngFor="let channel of channelList; let i = index" (click)="changeConsumerChannel(channel.inviter.userId)">
-        <img class="consumer-img" [alt]="channel.inviter.nickname + ' picture'" [src]="channel.inviter.profileUrl" />
+      <li *ngFor="let channel of channelList; let i = index">
+        <img class="consumer-img" [alt]="channel.inviter.nickname + ' picture'" [src]="channel.inviter.profileUrl" (click)="changeConsumerChannel(channel.inviter.userId)"
+        />
         <p class="consumer-name">{{ channel.inviter.nickname }}</p>
-      <button *ngIf="(i === channelList.length - 1)" fxFlex="100" fxHide [fxHide.lt-sm]="false" mat-button>Chat</button>
+
       </li>
+      <a style="margin-left: 5px; margin-top: 6px;" fxHide [fxHide.lt-sm]="false" mat-fab (click)="openChannelChangeDialog()">
+        <mat-icon style="color: white">store</mat-icon>
+      </a>
     </ul>
   </div>
   <div #messagesList class="messages">

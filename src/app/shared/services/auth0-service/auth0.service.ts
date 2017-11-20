@@ -58,9 +58,8 @@ export class Auth0Service {
                     });
                 });
                 this.setSession(authResult);
-                this.router.navigate(['/home']);
-            } else if (parseError) {
-                this.router.navigate(['/home']);
+                this.router.navigate(['/shopkeeper/dashboard/home']);
+            } else if (parseError) {                
                 console.log(parseError);
             }
         });

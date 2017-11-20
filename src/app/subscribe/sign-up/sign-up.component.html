@@ -68,11 +68,20 @@
 </div>-->
 <mat-card>
     <mat-card-title layout="row" fxLayoutAlign="center center">
-        <span class="md-title">Autenticação</span>
+        <span class="md-title">Cadastro</span>
     </mat-card-title>
     <mat-card-subtitle fxLayoutAlign="center center">Conecte-se ao iNeed</mat-card-subtitle>
     <mat-divider></mat-divider>
     <mat-card-content>
+        <div fxLayout="column">
+            <button fxFlex="100" color="#fff" mat-raised-button (click)="signUpWithGoogle()">
+                <mat-icon svgIcon="google"></mat-icon>
+<span style="padding-left: 10px">LOGIN COM O GOOGLE</span>
+            </button>
+            <br />
+            <span fxLayoutAlign="center center">OU</span>
+        </div>
+        <mat-divider></mat-divider>
         <form [formGroup]="signUpForm">
             <div fxLayout="column">
                 <div fxFlex="100">
@@ -109,13 +118,9 @@
             </div>
         </form>
     </mat-card-content>
-    <mat-divider></mat-divider>
     <mat-card-actions>
-        <div fxLayout="row">
-            <button fxFlex="50" mat-raised-button color="accent" [disabled]="!signUpForm.valid" (click)="signUpWithEmail(signUpForm.value)">CADASTRAR</button>
-            <button fxFlex="50" color="#fff" mat-raised-button (click)="signUpWithGoogle()">
-                <mat-icon svgIcon="google"></mat-icon>
-            </button>
+        <div fxLayout="column">
+            <button fxFlex="100" mat-raised-button color="accent" [disabled]="!signUpForm.valid" (click)="signUpWithEmail(signUpForm.value)">CADASTRAR</button>
         </div>
     </mat-card-actions>
 </mat-card>

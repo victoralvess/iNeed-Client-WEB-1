@@ -5,10 +5,9 @@ module.exports = {
     'dist/**.css',
     'dist/assets/images/*',
     'dist/assets/icons/*',
-'dist/assets/*',
-'dist/assets/**',
-'dist/**'
-
+    'dist/assets/*',
+    'dist/assets/**',
+    'dist/**'
   ],
   root: 'dist',
   stripPrefix: 'dist/',

@@ -24,7 +24,13 @@ export class MustBeLoggedInGuard implements CanActivate {
                     canActivate = currentUser.emailVerified && currentUser.profileVerified;
                     if (!canActivate) {
                         console.log('can t');
+if(!currentUser.emailVerified) {
+ this.router.navigate(['/subscribe/verification/email']);
+} else if(!currentUser.profileVerified) {
+ this.router.navigate(['/subscribe/verification/admin']);
+} else {
                         this.router.navigate(['/subscribe']);
+}
                         return false;
                     }
                     console.log(canActivate);

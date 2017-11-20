@@ -54,3 +54,7 @@
 .clickable {
 	cursor: pointer;
 }
+
+.mat-fab-margin-top {
+    margin-top: 24px;
+}

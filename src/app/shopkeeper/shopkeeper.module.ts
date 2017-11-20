@@ -8,12 +8,14 @@ import { MatToolbarModule } from '@angular/material';
 import { MatIconModule, MatButtonModule, MatMenuModule, MatListModule } from '@angular/material';
 import {MatSidenavModule} from '@angular/material';
 import { CovalentMenuModule, CovalentLayoutModule } from '@covalent/core';
+import { FlexLayoutModule } from '@angular/flex-layout';
+
 @NgModule({
   imports: [
     CommonModule,
     ShopkeeperRoutingModule,
     MatToolbarModule,
-    MatIconModule, MatButtonModule, MatMenuModule, MatListModule, MatSidenavModule,
+    MatIconModule, MatButtonModule, MatMenuModule, MatListModule, MatSidenavModule, FlexLayoutModule,
     CovalentMenuModule, CovalentLayoutModule
   ],
   declarations: [ShopkeeperComponent, MainDashboardComponent],

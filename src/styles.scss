@@ -5,12 +5,16 @@
 
 @include mat-core();
 
-$primary: mat-palette($mat-orange, 800);
-$accent:  mat-palette($mat-light-blue, 600, A100, A400);
+$primary: mat-palette($mat-purple, 700);
+$accent:  mat-palette($mat-orange, 600, A100, A400);
 
 $warn:    mat-palette($mat-red, 600);
 
 $theme: mat-light-theme($primary, $accent, $warn);
+
+.mat-raised-button.mat-accent, .mat-fab.mat-accent, .mat-mini-fab.mat-accent {
+    color: white !important;
+}
 
 @include angular-material-theme($theme);
 @include covalent-theme($theme);

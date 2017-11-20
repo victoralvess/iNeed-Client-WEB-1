@@ -4,6 +4,9 @@ import { Router } from '@angular/router';
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthService } from '../shared/services/services-auth/auth.service';
 import * as $ from 'jquery';
+import { User } from 'firebase/app';
+import {Subscription} from "rxjs/Subscription";
+import {MediaChange, ObservableMedia} from "@angular/flex-layout";
 
 @Component({
   selector: 'app-shopkeeper',
@@ -12,12 +15,12 @@ import * as $ from 'jquery';
 })
 export class ShopkeeperComponent implements OnInit, AfterViewInit {
 
-  user: any;
+  user: User;
   chosenInitialized: boolean = false;
 
   // HOME PROD LOJ FUN CHAT
 
-  routes: Object[] = [{
+  routes: any[] = [{
     icon: 'home',
     route: '/shopkeeper/dashboard/home',
     title: 'Home',
@@ -40,7 +43,11 @@ export class ShopkeeperComponent implements OnInit, AfterViewInit {
   }
   ];
 
-  constructor(private afAuth: AngularFireAuth, private service: AuthService, private router: Router) {
+watcher: Subscription;
+activeMediaQuery = '';
+isDesktop = false;
+mode = 'over';
+  constructor(private afAuth: AngularFireAuth, private service: AuthService, private router: Router, media: ObservableMedia) {
     this.user = afAuth.auth.currentUser;
 
     this.afAuth.auth.onAuthStateChanged((user) => {
@@ -48,6 +55,17 @@ export class ShopkeeperComponent implements OnInit, AfterViewInit {
         console.log('mata tuto chessus');
         this.router.navigate(['/subscribe/signin']);
       }
+    });
+
+this.watcher = media.subscribe((change: MediaChange) => {
+      this.activeMediaQuery = change ? `'${change.mqAlias}' = (${change.mediaQuery})` : "";
+if(change.mqAlias === "xs" || change.mqAlias === "sm") {
+this.isDesktop = false;
+this.mode = 'over';
+} else {
+this.isDesktop = true;
+this.mode = 'side';
+}
     });
   }
 
@@ -65,6 +83,11 @@ export class ShopkeeperComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
   }
+
+ngOnDestroy() {
+    this.watcher.unsubscribe();
+  }
+
 
   onClickLogout() {
     this.service.logout();

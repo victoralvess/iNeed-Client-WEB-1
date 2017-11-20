@@ -1,14 +1,17 @@
 <td-dialog>
-    <td-dialog-title *ngIf="day">
-        {{ day }}
+    <td-dialog-title>
+        Escolha
     </td-dialog-title>
     <td-dialog-content class="md-subhead tc-grey-700">
-        <div fxLayout="column" fxFlex="100">
+        <div>
             <div>
-                <md2-datepicker type="time" required placeholder="Abertura" [(ngModel)]="time.opening"></md2-datepicker>
-            </div>
-            <div>
-                <md2-datepicker type="time" required placeholder="Fechamento" [(ngModel)]="time.closing"></md2-datepicker>
+                <mat-form-field>
+                    <mat-select placeholder="Opções" [(ngModel)]="selected" name="options" style="width: 100%;">
+                        <mat-option *ngFor="let option of options" [value]="option.value">
+                            {{ option.label }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
         </div>
     </td-dialog-content>

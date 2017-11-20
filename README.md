@@ -1,4 +1,4 @@
-# INeedWebProject
+# iNeed - Web
 
 Sistema de gerenciamento de produtos e serviços da plataforma iNeed.
 

@@ -1,4 +1,4 @@
-<div class="panel panel-default">
+<!--<div class="panel panel-default">
     <div class="panel-body">
         <div class="row" style="padding: 16px">
             <button type="button" class="btn btn-primary btn-block" (click)="onClickSignInGoogle()">
@@ -70,4 +70,57 @@
             <p align="center"><a routerLink="/subscribe/forgot">Esqueceu sua senha?</a></p>
         </div>
     </div>
-</div>
+</div>-->
+<mat-card>
+    <mat-card-title layout="row" fxLayoutAlign="center center">
+        <span class="md-title">Autenticação</span>
+    </mat-card-title>
+    <mat-card-subtitle fxLayoutAlign="center center">Conecte-se ao iNeed</mat-card-subtitle>
+    <mat-divider></mat-divider>
+    <mat-card-content>
+        <div fxLayout="column">
+            <button fxFlex="100" color="#fff" mat-raised-button (click)="signInWithGoogle()">
+                <mat-icon svgIcon="google"></mat-icon>
+<span style="padding-left: 10px">SOU GERENTE</span>
+            </button>
+            <br />
+            <button fxFlex="100" color="#fff" mat-raised-button (click)="signInAsShopkeeper()">
+                <mat-icon svgIcon="auth0"></mat-icon>
+                <span style="padding-left: 10px">SOU FUNCIONÁRIO</span>
+            </button>
+            <br />
+            <span fxLayoutAlign="center center">OU</span>
+        </div>
+        <mat-divider></mat-divider>
+        <form [formGroup]="signInForm">
+            <div fxLayout="column">
+                <div fxFlex="100">
+                    <mat-form-field fxFlex="100">
+                        <input matInput placeholder="Email" [formControl]="signInForm.controls['email']" required>
+                        <mat-error *ngIf="signInForm.controls['email'].hasError('required')">
+                            <strong>Informe</strong> seu email
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100">
+                    <mat-form-field fxFlex="100">
+                        <input matInput type="password" placeholder="Senha" [formControl]="signInForm.controls['password']" required>
+                        <mat-error *ngIf="signInForm.controls['password'].hasError('required')">
+                            Coloque a sua senha
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+        </form>
+    </mat-card-content>
+    <mat-card-actions>
+        <div fxLayout="row">
+            <a routerLink="/subscribe/signup" fxFlex="50" fxLayoutAlign="center center">Não tenho conta
+            </a>
+            <a fxLayoutAlign="center center" fxFlex="50" routerLink="/subscribe/forgot">Esqueci a senha</a>
+        </div>
+        <div fxLayout="column">
+            <button fxFlex="100" mat-raised-button color="accent" [disabled]="!signInForm.valid" (click)="signInWithEmail(signInForm.value)">ACESSAR</button>
+        </div>
+    </mat-card-actions>
+</mat-card>

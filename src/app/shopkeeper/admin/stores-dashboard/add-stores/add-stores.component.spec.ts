@@ -1,10 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-<<<<<<< HEAD
 import { AddStoresComponent } from './add-stores.component';
-=======
-import { AddStoresComponent } from './add-store.component';
->>>>>>> stores-module
 
 describe('AddStoresComponent', () => {
   let component: AddStoresComponent;

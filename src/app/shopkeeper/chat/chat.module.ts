@@ -11,11 +11,13 @@ import {
   MatSelectModule,
   MatCardModule,
   MatProgressSpinnerModule,
-MatButtonModule
+  MatButtonModule
 } from '@angular/material';
 import { FlexLayoutModule } from '@angular/flex-layout';
 
 import { CrudService } from '../../shared/services/crud-service/crud.service';
+import { SelectDialogComponent } from '../../shared/dialogs/select/select-dialog.component';
+import { CovalentDialogsModule } from '@covalent/core';
 
 @NgModule({
   imports: [
@@ -29,9 +31,12 @@ import { CrudService } from '../../shared/services/crud-service/crud.service';
     MatCardModule,
     MatProgressSpinnerModule,
     FlexLayoutModule,
-MatButtonModule
+    MatButtonModule,
+CovalentDialogsModule
   ],
-  declarations: [ChatComponent],
-  providers: [CrudService]
+  declarations: [ChatComponent, SelectDialogComponent],
+  providers: [CrudService],
+  exports: [SelectDialogComponent],
+  entryComponents: [SelectDialogComponent]
 })
 export class ChatModule { }

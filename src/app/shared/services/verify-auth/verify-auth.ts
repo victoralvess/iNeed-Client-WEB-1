@@ -13,8 +13,6 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class VerifyAuth {
 
-    private verificationUrl = 'https://us-central1-default-project-d4f76.cloudfunctions.net/sendVerificationEmail';
-    private tokenUrl = 'https://us-central1-default-project-d4f76.cloudfunctions.net/generateToken';
     private user: Observable<firebase.User>;
     private CONDITIONS: string[] = ['ALL_VERIFIED', 'MISSED_ADMIN_VERIFICATION', 'MISSED_EMAIL_VERIFICATION'];
     private usersRef = firebase.database().ref(`users`);
@@ -56,33 +54,38 @@ export class VerifyAuth {
             .map((foundUser) => {
                 console.log(user);
                 console.log(foundUser);
-                if (foundUser.$exists) {
+                if (foundUser.$exists()) {
                     if (foundUser.emailVerified) {
                         if (foundUser.profileVerified) {
                             console.log('registro completo');
                             this.router.navigate(['/shopkeeper/dashboard']);
+                          /*  if (foundUser.auth0Id) { } else {
+                                this.db.object(`users/${user.uid}`).update({ permissionLevel: 4 });
+                            }*/
                             return this.CONDITIONS[0];
                         } else {
                             console.log('email ok; profile isnt ok');
-                            this.router.navigate(['/subscribe/adminverication']);
+                            this.router.navigate(['/subscribe/verification/admin']);
                             return this.CONDITIONS[1];
                         }
                     } else {
-                        console.log('email ok; profile isnt ok');
-                        this.router.navigate(['/subscribe/emailverication']);
+                        console.log('email isnt ok; profile isnt ok');
+                        this.router.navigate(['/subscribe/verification/email']);
                         return this.CONDITIONS[2];
                     }
                 } else {
                     console.log('registro incompleto');
-                    this.router.navigate(['/subscribe/emailverication']);
+                    this.router.navigate(['/subscribe/verification/email']);
                     this.usersRef
                         .child(`${user.uid}`)
                         .set({
                             uid: user.uid,
-                            emailVerified: false,
-                            verificationSent: false,
+                            name: user.displayName,
+                            emailVerified: user.emailVerified,
+                            verificationSent: true, // WILL SEND THE EMAIL
                             profileVerified: false,
-                            email: user.email
+                            email: user.email,
+                            permissionLevel: 4
                         });
                     return this.CONDITIONS[2];
                 }
@@ -95,27 +98,8 @@ export class VerifyAuth {
      * @param user
      */
     private sendEmailVerification(user: firebase.User) {
-        this.usersRef
-            .child(`${user.uid}`)
-            .once('value', (snapshot) => {
-                if (!(snapshot.val().verificationSent)) {
-                    this.http.get(`${this.tokenUrl}?apiKey=${environment.firebase.apiKey}&uid=${user.uid}&email=${user.email}`)
-                        .retry(3)
-                        .map(response => response.json())
-                        .subscribe(response => {
-                            console.log(response);
-                            this.http.get(`${this.verificationUrl}?userId=${user.uid}&userName=${user.displayName}&email=${user.email}&code=${response}&apiKey=${environment.firebase.apiKey}`)
-                                .retry(3)
-                                .subscribe(() => {
-                                    console.log(`${this.verificationUrl}?userId=${user.uid}&userName=${user.displayName}&email=${user.email}&code=${response}&apiKey=${environment.firebase.apiKey}`);
-                                    this.usersRef
-                                        .child(`${user.uid}`)
-                                        .update({
-                                            verificationSent: true
-                                        });
-                                });
-                        });
-                }
-            });
+        user.sendEmailVerification().then((success) => {
+            this.usersRef.child(`${user.uid}`).update({ verificationSent: true });
+        });
     }
 }

@@ -1,8 +1,8 @@
 <div class="container-fluid display-table abs">
   <div class="row display-table-row">
-    <mat-sidenav-container class="n-container" style=    "background-color: white;">
-      <mat-sidenav #sidenav class="n-sidenav">
-        <img [src]="user.photoURL" alt="user picture" class="n-circle-logo n-margin ">
+    <mat-sidenav-container class="n-container" style="background-color: white;">
+      <mat-sidenav [disableClose]="isDesktop" [opened]="isDesktop" #sidenav class="n-sidenav" [mode]="mode" style="transition: 0.3s;">
+        <img [src]="user.providerData[0].photoURL || user.photoURL" alt="user picture" class="n-circle-logo n-margin ">
         <br/>
         <div class="n-header">
           <span class="mat-nav-name n-padding">{{user.displayName}}</span>
@@ -12,13 +12,13 @@
         </div>
         <mat-divider></mat-divider>
         <mat-nav-list>
-          <a *ngFor="let item of routes" mat-list-item [routerLink]="item.route" (click)="sidenav.close()">
+          <a *ngFor="let item of routes" mat-list-item [routerLink]="item.route" (click)="(!sidenav.disableClose) ? sidenav.close() : null">
             <mat-icon>{{item.icon}}</mat-icon>{{item.title}}</a>
         </mat-nav-list>
       </mat-sidenav>
 
       <mat-toolbar color="primary" class="n-toolbar">
-        <button mat-icon-button (click)="sidenav.open()">
+        <button mat-icon-button (click)="(sidenav.opened) ? sidenav.close() : sidenav.open()" *ngIf="!isDesktop">
           <mat-icon>menu</mat-icon>
         </button>
 

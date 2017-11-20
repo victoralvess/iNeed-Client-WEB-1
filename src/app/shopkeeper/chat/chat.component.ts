@@ -12,6 +12,12 @@ import { Subject } from 'rxjs/Subject';
 import { Observable } from 'rxjs/Observable';
 import { CrudService } from '../../shared/services/crud-service/crud.service';
 
+import { ViewContainerRef } from '@angular/core';
+import { TdDialogService } from '@covalent/core';
+import { MatDialog } from '@angular/material';
+import { SelectDialogComponent } from '../../shared/dialogs/select/select-dialog.component';
+import { MatOption } from '@angular/material';
+
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
@@ -65,7 +71,10 @@ export class ChatComponent implements OnInit {
     private elementRef: ElementRef,
     private renderer: Renderer,
     private router: Router,
-    private crudService: CrudService) {
+    private crudService: CrudService,
+    private dialog: MatDialog,
+    private viewContainerRef: ViewContainerRef,
+    private dialogService: TdDialogService) {
     this.user = firebase.auth().currentUser;
     this.channelMessages$.asObservable().subscribe((channelUrl) => {
       this.channelUrl = channelUrl;
@@ -77,14 +86,7 @@ export class ChatComponent implements OnInit {
     this.channelListHack$.asObservable().subscribe((hack) => {
       this.updateChannels();
     });
-    /*
-    this.messagesObservable = db.list('/messages', {
-      query: {
-        orderByChild: 'sentAt',
-        limitToLast: 20
-      }
-    });
-    */
+
     this.userSubscription = crudService.getStoresWhereUserWorks().subscribe((stores) => {
       this.stores = stores;
       this.storeId = this.stores[0].$key;
@@ -140,28 +142,14 @@ export class ChatComponent implements OnInit {
           }
         });
       } else {
-	this.messages = [];
-this.scroll();
-}
+        this.messages = [];
+        this.scroll();
+      }
     });
   }
 
   ngOnInit() {
-
     this.adaptChatToScreen(window.innerWidth);
-
-
-    /*this.messagesObservable.subscribe(() => {
-      setTimeout(() => {
-        this.scroll();
-      });
-      setTimeout(() => {
-        this.scroll();
-      }, 1500);
-      setTimeout(() => {
-        this.messagesAreLoading = false;
-      }, 1000);
-    });*/
   }
 
   adaptChatToScreen(width: number) {
@@ -186,14 +174,7 @@ this.scroll();
   }
 
   send(message: string) {
-    /*
-    if (!message || message.trim().length === 0) {
-      return;
-    }
-   
-    this.textAreaInput = '';
-    let message = new Message(this.user.uid, 'cliente_1', message, firebase.database.ServerValue.TIMESTAMP);
-    this.lastMessageKey = this.messagesObservable.push(message).key;*/
+
     this.textAreaInput = '';
     this.sb.GroupChannel.getChannel(this.channelUrl, (channel, channelError) => {
       if (channel) {
@@ -246,10 +227,7 @@ this.scroll();
           hackList.next('');
         };
         this.sb.addChannelHandler(`${storeId}_handler`, channelHandler);
-        // tslint:disable-next-line:max-line-length
-        /* this.sb.updateCurrentUserInfo(worksAt[0].name, 'https://s.gravatar.com/avatar/a3f6a72374f74dd7457fd19f4495b866?s=480&r=pg', (response, errr) => {
-           console.log(response, errr);
-         });*/
+
         let channelListQuery = this.sb.GroupChannel.createMyGroupChannelListQuery();
         channelListQuery.includeEmpty = true;
         channelListQuery.userIdsFilter = [storeId, consumerId];
@@ -261,14 +239,34 @@ this.scroll();
               console.error(filterError);
               return;
             }
-if(channelList && channelList.length > 0) {
-            hackMessages.next(channelList[0].url);}else {hackMessages.next('');}
+            if (channelList && channelList.length > 0) {
+              hackMessages.next(channelList[0].url);
+            } else { hackMessages.next(''); }
             console.log(channelList);
 
           });
-        } 
-
+        }
         this.updateChannels();
+      }
+    });
+  }
+
+  openChannelChangeDialog() {
+    let dialogRef;
+    console.log('here');
+    let options = [];
+
+    this.stores.forEach(store => {
+      options.push({ value: store.$key, label: store.name });
+    });
+
+    dialogRef = this.dialog.open(SelectDialogComponent, {
+      data: { options : options }
+    });
+
+    dialogRef.afterClosed().subscribe((storeId: any) => {
+      if (storeId) {
+        this.changeStoreChannel(storeId);
       }
     });
   }
