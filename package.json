@@ -10,7 +10,8 @@
     "lint": "ng lint",
     "e2e": "ng e2e",
     "precache": "sw-precache",
-    "precache-build": "sw-precache --verbose --config=sw-precache-config.js"
+    "precache-build": "sw-precache --verbose --config=sw-precache-config.js",
+    "upload": "ng build --aot --prod && gulp css js && npm run precache-build && gulp js && firebase deploy --only hosting"
   },
   "private": true,
   "dependencies": {

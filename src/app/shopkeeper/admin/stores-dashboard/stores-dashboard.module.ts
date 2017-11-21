@@ -57,6 +57,7 @@ import { StoresService } from './services/stores.service';
 import { LocationService } from './services/location/location.service';
 import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
 import { TimePickerDialogComponent } from './time-picker-dialog/time-picker-dialog.component';
+import { FeedbacksComponent } from './feedbacks/feedbacks.component';
 @NgModule({
   imports: [
     SearchPipeModule,
@@ -107,7 +108,7 @@ import { TimePickerDialogComponent } from './time-picker-dialog/time-picker-dial
     FlexLayoutModule,
     CovalentDataTableModule
   ],
-  declarations: [StoresDashboardComponent, AddStoresComponent, EditStoresComponent, DeleteStoresComponent, TimePickerDialogComponent],
+  declarations: [StoresDashboardComponent, AddStoresComponent, EditStoresComponent, DeleteStoresComponent, TimePickerDialogComponent, FeedbacksComponent],
   providers: [StoresService, LocationService, ProductsService, NotificationsService, CrudService],
   exports: [TimePickerDialogComponent],
 entryComponents: [TimePickerDialogComponent]

@@ -296,7 +296,7 @@ export class EditStoresComponent implements OnInit {
       this.store.location.parts['city'] = addressFormValues.city;
       this.store.location.parts['state'] = addressFormValues.state;
       this.store.location.parts['vicinity'] = addressFormValues.vicinity;
-      
+
       if (this.phoneValidator.test(<string>extraInfoFormValues.phone)) {
         this.store.phone = extraInfoFormValues.phone;
       }

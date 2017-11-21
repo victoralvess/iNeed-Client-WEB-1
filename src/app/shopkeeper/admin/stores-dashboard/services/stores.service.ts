@@ -162,4 +162,9 @@ export class StoresService {
   optmizeImage(file) {
     return this.crudService.optmizeImage(file);
   }
+
+	reportFeedback(storeKey, key, feedback) {
+this.db.object(`stores/${storeKey}/feedbacks/${key}`).remove();
+this.db.object(`/reported/${key}`).set(feedback);
+}
 }
