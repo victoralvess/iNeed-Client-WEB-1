@@ -6,10 +6,10 @@ import { EditEmployeesComponent } from './edit-employees/edit-employees.componen
 import { MustBeAdminGuard } from '../../guards/must-be-admin/must-be-admin.guard';
 
 const routes: Routes = [
-  { path: '', component: EmployeesDashboardComponent, canActivate: [MustBeAdminGuard], data: {sudo: true} },
-  { path: 'add', component: AddEmployeesComponent, canActivate: [MustBeAdminGuard], data: {sudo: true} },
-  { path: 'edit/:employeeId', component: EditEmployeesComponent, canActivate: [MustBeAdminGuard], data: {sudo: true} },
-	{ path: '**', redirectTo: '', pathMatch: 'full' }
+  { path: '', component: EmployeesDashboardComponent, canActivate: [MustBeAdminGuard], data: { sudo: true } },
+  { path: 'add', component: AddEmployeesComponent, canActivate: [MustBeAdminGuard], data: { sudo: true } },
+  { path: 'edit/:employeeId', component: EditEmployeesComponent, canActivate: [MustBeAdminGuard], data: { sudo: true } },
+  { path: '**', redirectTo: '', pathMatch: 'full' }
 ];
 
 @NgModule({

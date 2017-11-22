@@ -1,13 +1,14 @@
 <div fxLayout="column" fxFlex="100">
-<div *ngFor="let feedback of feedbacksList">
-  <mat-card fxFlex="100">
-    <mat-card-header>
-      <img matCardAvatar src="https://s.gravatar.com/avatar/f008001def3a5eb889932e09a3047a20?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2F{{feedback.author[0].toLowerCase()}}.png"
-      />
-      <mat-card-title><strong>{{ feedback.author }}</strong> - {{ feedback.title }}</mat-card-title>
-      <mat-card-subtitle>{{ feedback.date }}</mat-card-subtitle>
-      <span flex></span>
-    <!--  <div class="pad-top pad-right">
+  <div *ngFor="let feedback of feedbacksList">
+    <mat-card fxFlex="100">
+      <mat-card-header>
+        <img matCardAvatar src="https://s.gravatar.com/avatar/f008001def3a5eb889932e09a3047a20?s=480&r=pg&d=https%3A%2F%2Fcdn.auth0.com%2Favatars%2F{{feedback.author[0].toLowerCase()}}.png"
+        />
+        <mat-card-title>
+          <strong>{{ feedback.author }}</strong> - {{ feedback.title }}</mat-card-title>
+        <mat-card-subtitle>{{ feedback.date }}</mat-card-subtitle>
+        <span flex></span>
+        <!--  <div class="pad-top pad-right">
         <button mat-icon-button>
           <mat-icon>reply</mat-icon>
         </button>
@@ -18,27 +19,27 @@
           <mat-icon>more_vert</mat-icon>
         </button>
       </div> -->
-    </mat-card-header>
-    <mat-divider></mat-divider>
-    <div class="mat-padding">
-      <p>
-        {{ feedback.body }}
-      </p>
-<p>A minha avaliação para a sua loja foi:</p>
-		<mat-icon class="pull-bottom">stars</mat-icon>
-        	<p style="margin-top: -25px; line-height: 18px; margin-left: 30px;">{{ feedback.rating }}</p>
-    </div>
-    <mat-divider></mat-divider>
-    <div layout="row" layout-align="space-around center" class="pad">        
-     <!-- <button mat-button class="tc-grey-600">
+      </mat-card-header>
+      <mat-divider></mat-divider>
+      <div class="mat-padding">
+        <p>
+          {{ feedback.body }}
+        </p>
+        <p>A minha avaliação para a sua loja foi:</p>
+        <mat-icon class="pull-bottom">stars</mat-icon>
+        <p style="margin-top: -25px; line-height: 18px; margin-left: 30px;">{{ feedback.rating }}</p>
+      </div>
+      <mat-divider></mat-divider>
+      <div layout="row" layout-align="space-around center" class="pad">
+        <!-- <button mat-button class="tc-grey-600">
         <mat-icon class="pull-bottom">reply</mat-icon>
         <div class="mat-caption">Reply</div>
       </button> -->
-<button mat-button class="tc-grey-600" (click)="sendReport(feedback.$key, feedback)">
-        <mat-icon class="pull-bottom">block</mat-icon>
-        <div class="mat-caption">Denunciar</div>
-      </button>
-    </div>
-  </mat-card>
-</div>
+        <button mat-button class="tc-grey-600" (click)="sendReport(feedback.$key, feedback)">
+          <mat-icon class="pull-bottom">block</mat-icon>
+          <div class="mat-caption">Denunciar</div>
+        </button>
+      </div>
+    </mat-card>
+  </div>
 </div>

@@ -45,9 +45,9 @@ export class FeedbacksComponent implements OnInit {
   ngOnInit() {
   }
 
-sendReport(key,feedback) {
-console.log(feedback);
-this.storesService.reportFeedback(this.storeId, key, feedback);
-}
+  sendReport(key, feedback) {
+    console.log(feedback);
+    this.storesService.reportFeedback(this.storeId, key, feedback);
+  }
 
 }

@@ -38,13 +38,22 @@ export class EmployeesService {
   }
 
   addEmployee(employee) {
-    const signedUp = this.auth0Service.signUp({
-      email: employee.email, password: `${this.crudService.unique()}`, user_metadata: {
-        name: employee.name,
-        permissionLevel: `${employee.permissionLevel}`,
-        worksAt: employee.stores
+    this.db.object(`users/${this.user.uid}`).subscribe((userFirebase) => {
+      let boss;
+      if (userFirebase.boss) {
+        boss = userFirebase.boss;
+      } else {
+        boss = this.user.uid;
       }
-    }, this.signUp$);
+      const signedUp = this.auth0Service.signUp({
+        email: employee.email, password: `${this.crudService.unique()}`, user_metadata: {
+          name: employee.name,
+          permissionLevel: `${employee.permissionLevel}`,
+          worksAt: employee.stores,
+          boss: boss
+        }
+      }, this.signUp$);
+    });
   }
 
   updateEmployee(employee) {

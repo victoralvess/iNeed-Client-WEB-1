@@ -26,7 +26,7 @@ export class AddEmployeesComponent implements OnInit, OnDestroy {
   permissions: Permission[] = [
     {
       value: 1,
-      function: 'Pode visualizar e responder feedbacks'
+      function: 'Pode gerenciar feedbacks'
     },
     {
       value: 2,

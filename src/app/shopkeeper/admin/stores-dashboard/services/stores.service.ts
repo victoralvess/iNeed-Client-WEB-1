@@ -163,8 +163,8 @@ export class StoresService {
     return this.crudService.optmizeImage(file);
   }
 
-	reportFeedback(storeKey, key, feedback) {
-this.db.object(`stores/${storeKey}/feedbacks/${key}`).remove();
-this.db.object(`/reported/${key}`).set(feedback);
-}
+  reportFeedback(storeKey, key, feedback) {
+    this.db.object(`stores/${storeKey}/feedbacks/${key}`).remove();
+    this.db.object(`/reported/${key}`).set(feedback);
+  }
 }

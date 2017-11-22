@@ -6,51 +6,69 @@ import { DataSource } from '@angular/cdk/collections';
 import { Observable } from 'rxjs/Observable';
 import { StoresService } from './services/stores.service';
 import { Router } from '@angular/router';
+import { AngularFireDatabase } from 'angularfire2/database';
+import { environment } from '../../../../environments/environment';
 
 @Component({
-  selector: 'app-stores-dashboard',
-  templateUrl: './stores-dashboard.component.html',
-  styleUrls: ['./stores-dashboard.component.css']
+    selector: 'app-stores-dashboard',
+    templateUrl: './stores-dashboard.component.html',
+    styleUrls: ['./stores-dashboard.component.css']
 })
 export class StoresDashboardComponent {
 
-  displayedColumns = ['name', 'address', 'color', 'actions'];
-  dataSource: StoresDataSource;
+    displayedColumns = ['name', 'address', 'color', 'actions'];
+    dataSource: StoresDataSource;
 
-  constructor(private router: Router, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private storesService: StoresService) {
-    this.dataSource = new StoresDataSource(storesService);
-  }
+    constructor(private db: AngularFireDatabase, private router: Router, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private storesService: StoresService) {
+        this.dataSource = new StoresDataSource(storesService);
+    }
 
-  deleteStore(key) {
-    this.dialogService.openConfirm({
-      message: `Você realmente deseja excluir esta loja?`,
-      disableClose: true,
-      viewContainerRef: this.viewContainerRef,
-      title: '',
-      cancelButton: 'Cancelar',
-      acceptButton: 'Excluir',
-    }).afterClosed().subscribe((accept: boolean) => {
-      if (accept) {
-        this.storesService.deleteStore(key);
-      }
-    });
-  }
+    deleteStore(key) {
+        const user = JSON.parse(localStorage.getItem(`firebase:authUser:${environment.firebase.apiKey}:[DEFAULT]`));
+        if (user != null) {
+            this.db.object(`users/${user.uid}`)
+                .subscribe((currentUser) => {
+                    if ((<number>currentUser.permissionLevel) >= 2) {
+                        this.dialogService.openConfirm({
+                            message: `Você realmente deseja excluir esta loja?`,
+                            disableClose: true,
+                            viewContainerRef: this.viewContainerRef,
+                            title: '',
+                            cancelButton: 'Cancelar',
+                            acceptButton: 'Excluir',
+                        }).afterClosed().subscribe((accept: boolean) => {
+                            if (accept) {
+                                this.storesService.deleteStore(key);
+                            }
+                        });
+                    } else {
+                        this.dialogService.openAlert({
+                            message: `Você NÃO tem nível de permissão suficiente para excluir uma loja.`,
+                            disableClose: false,
+                            viewContainerRef: this.viewContainerRef,
+                            title: '',
+                            closeButton: 'Entendi'
+                        });
+                    }
+                });
+        }
+    }
 
-  updateStore(key) {
-    this.router.navigate([`/shopkeeper/dashboard/admin/stores/edit/${key}`]);
-  }
+    updateStore(key) {
+        this.router.navigate([`/shopkeeper/dashboard/admin/stores/edit/${key}`]);
+    }
 
 }
 
 export class StoresDataSource extends DataSource<any> {
 
-  constructor(private storesService: StoresService) {
-    super();
-  }
+    constructor(private storesService: StoresService) {
+        super();
+    }
 
-  connect(): Observable<any[]> {
-    return this.storesService.getAllStores();
-  }
+    connect(): Observable<any[]> {
+        return this.storesService.getAllStores();
+    }
 
-  disconnect() { }
+    disconnect() { }
 }
