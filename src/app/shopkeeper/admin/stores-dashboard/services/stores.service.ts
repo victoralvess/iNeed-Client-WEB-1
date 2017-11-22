@@ -5,6 +5,7 @@ import { AngularFireDatabase, FirebaseObjectObservable, FirebaseListObservable }
 import * as firebase from 'firebase';
 import { Subject } from 'rxjs/Subject';
 import { CrudService } from '../../../../shared/services/crud-service/crud.service';
+import * as SendBird from 'sendbird/SendBird.min.js';
 
 @Injectable()
 export class StoresService {
@@ -14,6 +15,10 @@ export class StoresService {
 
   user: firebase.User;
   stores$ = new Subject<FirebaseObjectObservable<any>[]>();
+
+  sb = new SendBird({
+    appId: '0AE653E2-CB57-4945-A496-00C12C0BC0B8'
+  });
 
   constructor(public db: AngularFireDatabase, private crudService: CrudService) {
     this.user = firebase.auth().currentUser;
@@ -44,6 +49,8 @@ export class StoresService {
 
     const storesRef = this.db.app.database().ref(`/stores`);
     const key = storesRef.push(store).key;
+
+    this.sb.connect(key, (user, connectionError) => {});
 
     this.db.object(`/stores/${key}/id`).set(key);
     this.db.database.ref(`users/${this.user.uid}`).once('value', (snapshot) => {
