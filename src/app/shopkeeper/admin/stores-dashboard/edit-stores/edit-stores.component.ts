@@ -15,7 +15,7 @@ import { ViewContainerRef } from '@angular/core';
 import { TdDialogService } from '@covalent/core';
 import { MatDialog } from '@angular/material';
 import { TimePickerDialogComponent } from '../time-picker-dialog/time-picker-dialog.component';
-import { MatOption } from '@angular/material';
+import { MatOption, MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-edit-stores',
@@ -94,7 +94,9 @@ export class EditStoresComponent implements OnInit {
     cellphone: new FormControl('')
   });
 
-  constructor(private dialog: MatDialog, private toast: Md2Toast, private locationService: LocationService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private storesService: StoresService, private activatedRoute: ActivatedRoute, private router: Router) {
+  isLoading = false;
+
+  constructor(public snackBar: MatSnackBar, private dialog: MatDialog, private toast: Md2Toast, private locationService: LocationService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private storesService: StoresService, private activatedRoute: ActivatedRoute, private router: Router) {
     this.addressReady$.asObservable().subscribe((isReady) => {
       this.ready = isReady;
     });
@@ -179,6 +181,13 @@ export class EditStoresComponent implements OnInit {
         this.extraInfoForm.patchValue({ 'cellphone': foundStore.cellphone || '' });
 
         this.addressReady$.next(true);
+      });
+    });
+
+    this.storesService.update$.subscribe((updated) => {
+      this.isLoading = false;
+      this.snackBar.open('Atualizado!', 'ENTENDI', {
+        duration: 5000
       });
     });
   }
@@ -266,6 +275,7 @@ export class EditStoresComponent implements OnInit {
   }
 
   updateStore(formsValues: any[]) {
+    this.isLoading = true;
     const originalPics = JSON.parse(localStorage.getItem(`${this.storeId}/Pictures`));
     if (this.ready) {
       if (this.openingClosingArr.length === 0) {

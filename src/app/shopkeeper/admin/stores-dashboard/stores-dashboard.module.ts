@@ -5,7 +5,6 @@ import { StoresDashboardRoutingModule } from './stores-dashboard-routing.module'
 import { StoresDashboardComponent } from './stores-dashboard.component';
 import { AddStoresComponent } from './add-stores/add-stores.component';
 import { EditStoresComponent } from './edit-stores/edit-stores.component';
-import { DeleteStoresComponent } from './delete-stores/delete-stores.component';
 import { CodeHighlighterModule, InputMaskModule } from 'primeng/primeng';
 import { FormsModule } from '@angular/forms';
 import { ColorPickerModule } from 'primeng/primeng';
@@ -108,7 +107,7 @@ import { FeedbacksComponent } from './feedbacks/feedbacks.component';
     FlexLayoutModule,
     CovalentDataTableModule
   ],
-  declarations: [StoresDashboardComponent, AddStoresComponent, EditStoresComponent, DeleteStoresComponent, TimePickerDialogComponent, FeedbacksComponent],
+  declarations: [StoresDashboardComponent, AddStoresComponent, EditStoresComponent, TimePickerDialogComponent, FeedbacksComponent],
   providers: [StoresService, LocationService, ProductsService, NotificationsService, CrudService],
   exports: [TimePickerDialogComponent],
 entryComponents: [TimePickerDialogComponent]

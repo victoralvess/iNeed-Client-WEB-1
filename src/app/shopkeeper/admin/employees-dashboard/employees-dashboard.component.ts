@@ -68,7 +68,7 @@ export class EmployeesDashboardComponent implements OnInit, OnDestroy {
   }
 
   deleteEmployee(key, permissionLevel) {
-    if (permissionLevel != 4) {
+    if (permissionLevel != 4 && key != this.employeesService.user.uid) {
       this.dialogService.openConfirm({
         message: `Você realmente deseja excluir este funcionário?`,
         disableClose: true,
@@ -83,6 +83,10 @@ export class EmployeesDashboardComponent implements OnInit, OnDestroy {
             duration: 5000
           });
         }
+      });
+    } else if (key == this.employeesService.user.uid || permissionLevel == 4) {
+      this.snackBar.open('Você não pode fazer isso', 'ENTENDI', {
+        duration: 5000
       });
     }
   }

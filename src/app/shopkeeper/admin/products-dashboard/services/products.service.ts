@@ -14,7 +14,7 @@ import { Message } from 'primeng/primeng';
 @Injectable()
 export class ProductsService {
 
-  optimizationAPI = 'http://localhost:8081';
+  optimizationAPI = 'http://2need.store';
 
   user: firebase.User;
   databaseChanged = new Subject<Message>();

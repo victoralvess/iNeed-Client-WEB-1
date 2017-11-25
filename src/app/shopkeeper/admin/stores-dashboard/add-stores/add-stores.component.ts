@@ -15,7 +15,7 @@ import { ViewContainerRef } from '@angular/core';
 import { TdDialogService } from '@covalent/core';
 import { MatDialog } from '@angular/material';
 import { TimePickerDialogComponent } from '../time-picker-dialog/time-picker-dialog.component';
-import { MatOption } from '@angular/material';
+import { MatOption, MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-add-stores',
@@ -88,7 +88,9 @@ export class AddStoresComponent implements OnDestroy {
     cellphone: new FormControl('')
   });
 
-  constructor(private dialog: MatDialog, private toast: Md2Toast, private locationService: LocationService, private storesService: StoresService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService) {
+  isLoading = false;
+
+  constructor(public snackBar: MatSnackBar, private dialog: MatDialog, private toast: Md2Toast, private locationService: LocationService, private storesService: StoresService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService) {
     this.addressReady$.asObservable().subscribe((isReady) => {
       this.ready = isReady;
     });
@@ -130,6 +132,13 @@ export class AddStoresComponent implements OnDestroy {
       });
       this.categories = aux;
       this.categoriesReady = true;
+    });
+
+    this.storesService.update$.subscribe((updated) => {
+      this.isLoading = false;
+      this.snackBar.open('Loja adicionada!', 'ENTENDI', {
+        duration: 5000
+      });
     });
   }
 
@@ -203,6 +212,7 @@ export class AddStoresComponent implements OnDestroy {
   }
 
   addStore(formsValues: any[]) {
+    this.isLoading = true;
     if (this.ready) {
       if (this.openingClosingArr.length === 0) {
         this.toast.show('ADICIONE OS HORÁRIOS DE FUNCIONAMENTO');
@@ -274,7 +284,9 @@ export class AddStoresComponent implements OnDestroy {
   imageFinishedUploading(event: FileHolder) {
     console.log(event, event.file.type);
     if ((event.file.type !== 'image/jpeg' && event.file.type !== 'image/png') || (event.file.size > 1100000)) {
-      this.toast.toast('Remova as imagens com mais de 1MB. Elas não serão adicionadas!');
+      this.snackBar.open('Remova as imagens com mais de 1MB. Elas não serão adicionadas!', 'ENTENDI', {
+        duration: 5000
+      });
       return;
     }
 

@@ -6,7 +6,7 @@ import { ShopkeeperComponent } from './shopkeeper.component';
 import { MainDashboardComponent } from './dashboard/main-dashboard/main-dashboard.component';
 import { MatToolbarModule } from '@angular/material';
 import { MatIconModule, MatButtonModule, MatMenuModule, MatListModule } from '@angular/material';
-import {MatSidenavModule} from '@angular/material';
+import { MatSidenavModule } from '@angular/material';
 import { CovalentMenuModule, CovalentLayoutModule } from '@covalent/core';
 import { FlexLayoutModule } from '@angular/flex-layout';
 

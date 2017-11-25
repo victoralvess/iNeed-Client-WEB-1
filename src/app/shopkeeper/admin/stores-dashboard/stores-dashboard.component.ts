@@ -8,6 +8,7 @@ import { StoresService } from './services/stores.service';
 import { Router } from '@angular/router';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { environment } from '../../../../environments/environment';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
     selector: 'app-stores-dashboard',
@@ -19,7 +20,7 @@ export class StoresDashboardComponent {
     displayedColumns = ['name', 'address', 'color', 'actions'];
     dataSource: StoresDataSource;
 
-    constructor(private db: AngularFireDatabase, private router: Router, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private storesService: StoresService) {
+    constructor(public snackBar: MatSnackBar, private db: AngularFireDatabase, private router: Router, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private storesService: StoresService) {
         this.dataSource = new StoresDataSource(storesService);
     }
 
@@ -39,6 +40,9 @@ export class StoresDashboardComponent {
                         }).afterClosed().subscribe((accept: boolean) => {
                             if (accept) {
                                 this.storesService.deleteStore(key);
+                                this.snackBar.open('Excluído!', 'ENTENDI', {
+                                    duration: 5000
+                                });
                             }
                         });
                     } else {
@@ -56,6 +60,10 @@ export class StoresDashboardComponent {
 
     updateStore(key) {
         this.router.navigate([`/shopkeeper/dashboard/admin/stores/edit/${key}`]);
+    }
+
+    feedbacksOf(store) {
+        this.router.navigate([`/shopkeeper/dashboard/admin/stores/feedbacks/${store}`]);
     }
 
 }

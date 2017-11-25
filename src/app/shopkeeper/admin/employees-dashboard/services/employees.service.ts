@@ -15,8 +15,8 @@ export class EmployeesService {
 
   user: firebase.User;
   signUp$ = new Subject<boolean>();
-update$ = new Subject<boolean>();
-  
+  update$ = new Subject<boolean>();
+
   constructor(private http: Http, public db: AngularFireDatabase, private auth: AuthService, private crudService: CrudService, private auth0Service: Auth0Service) {
     this.user = firebase.auth().currentUser;
   }
@@ -74,7 +74,7 @@ update$ = new Subject<boolean>();
         this.db.object(`/stores-employees/${storeId}/${employee.employeeId}`).set(snapshot.val());
       });
     });
-this.update$.next(true);
+    this.update$.next(true);
   }
 
   deleteEmployee(id, storeId?) {

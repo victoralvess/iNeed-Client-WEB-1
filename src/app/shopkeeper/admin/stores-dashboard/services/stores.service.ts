@@ -20,6 +20,8 @@ export class StoresService {
     appId: '0AE653E2-CB57-4945-A496-00C12C0BC0B8'
   });
 
+  update$ = new Subject<boolean>();
+
   constructor(public db: AngularFireDatabase, private crudService: CrudService) {
     this.user = firebase.auth().currentUser;
 
@@ -73,6 +75,8 @@ export class StoresService {
       picIndex++;
 
     });
+
+    this.update$.next(true);
   }
 
   updateStore(store, sendPics: any[], originalUrls: any[], addedPics?: any[]) {
@@ -114,7 +118,8 @@ export class StoresService {
         });
       });
     }
-    // this.verifyChangesOnProducts(product.productId, 'Sucesso!', 'O produto foi atualizado com êxito!');
+
+    this.update$.next(true);
   }
 
   deleteStore(key: string) {
