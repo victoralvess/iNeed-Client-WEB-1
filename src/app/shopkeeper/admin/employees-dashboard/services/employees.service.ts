@@ -15,14 +15,10 @@ export class EmployeesService {
 
   user: firebase.User;
   signUp$ = new Subject<boolean>();
-
+update$ = new Subject<boolean>();
+  
   constructor(private http: Http, public db: AngularFireDatabase, private auth: AuthService, private crudService: CrudService, private auth0Service: Auth0Service) {
     this.user = firebase.auth().currentUser;
-    this.signUp$.asObservable().subscribe((signedUp) => {
-      if (signedUp) {
-        // SHOW NOTIFICATION
-      }
-    });
   }
 
   getUser() {
@@ -46,7 +42,7 @@ export class EmployeesService {
         boss = this.user.uid;
       }
       const signedUp = this.auth0Service.signUp({
-        email: employee.email, password: `${this.crudService.unique()}`, user_metadata: {
+        email: employee.email, password: employee.password, user_metadata: {
           name: employee.name,
           permissionLevel: `${employee.permissionLevel}`,
           worksAt: employee.stores,
@@ -78,11 +74,13 @@ export class EmployeesService {
         this.db.object(`/stores-employees/${storeId}/${employee.employeeId}`).set(snapshot.val());
       });
     });
+this.update$.next(true);
   }
 
   deleteEmployee(id, storeId?) {
     if (storeId) {
       this.db.app.database().ref(`employees-stores/${id}/${storeId}`).remove();
+      this.db.app.database().ref(`stores-employees/${storeId}/${id}`).remove();
     } else {
       this.db.list(`employees-stores/${id}`).subscribe((storesList) => {
         storesList.forEach((store) => {

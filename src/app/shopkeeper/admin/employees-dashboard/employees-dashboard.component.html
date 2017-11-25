@@ -27,13 +27,13 @@
 			<ng-container matColumnDef="actions">
 				<mat-header-cell *matHeaderCellDef> Ações </mat-header-cell>
 				<mat-cell *matCellDef="let employee">
-					<button mat-icon-button color="accent" (click)="updateEmployee(employee.$key)">
+					<button mat-icon-button color="accent" (click)="updateEmployee(employee.$key, employee.permissionLevel)">
 						<mat-icon>edit</mat-icon>
 					</button>
-					<button mat-icon-button color="accent" (click)="deleteEmployeeFromStore(employee.$key)">
+					<button mat-icon-button color="accent" (click)="deleteEmployeeFromStore(employee.$key, employee.permissionLevel)">
 						<mat-icon>delete</mat-icon>
 					</button>
-					<button mat-icon-button color="warn" (click)="deleteEmployee(employee.$key)">
+					<button mat-icon-button color="warn" (click)="deleteEmployee(employee.$key, employee.permissionLevel)">
 						<mat-icon>delete</mat-icon>
 					</button>
 				</mat-cell>

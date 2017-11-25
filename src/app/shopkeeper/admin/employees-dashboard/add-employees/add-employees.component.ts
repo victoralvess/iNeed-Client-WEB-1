@@ -8,6 +8,7 @@ import { Http, RequestOptionsArgs, Headers, RequestMethod } from '@angular/http'
 import { Subscription } from 'rxjs/Subscription';
 import { EmailValidator } from '@angular/forms';
 import { Permission } from '../models/permission.interface';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-add-employees',
@@ -19,6 +20,7 @@ export class AddEmployeesComponent implements OnInit, OnDestroy {
   employeeForm: FormGroup = new FormGroup({
     name: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(3), CustomValidators.maxLength(40)])),
     email: new FormControl('', Validators.compose([Validators.required])),
+    password: new FormControl('', Validators.compose([Validators.required, CustomValidators.minLength(8), CustomValidators.maxLength(22)])),
     permissionLevel: new FormControl('', Validators.required),
     stores: new FormControl([], Validators.required)
   });
@@ -40,12 +42,29 @@ export class AddEmployeesComponent implements OnInit, OnDestroy {
 
   stores: Store[] = [];
   userSubscription: Subscription;
+  isLoading = false;
 
-  constructor(private employeesService: EmployeesService, private http: Http) {
+  userSnackBar = { messageSuccess: 'Funcionário adicionado!', messageError: 'Erro ao adicionar' };
+
+
+  constructor(public snackBar: MatSnackBar, private employeesService: EmployeesService, private http: Http) {
     this.userSubscription = employeesService.getStoresWhereUserWorks().subscribe((stores) => {
       stores.forEach(store => {
         this.stores.push({ id: store.$key, name: store.name, address: store.location.address, checked: false });
       });
+    });
+
+    this.employeesService.signUp$.subscribe((signedUp) => {
+      this.isLoading = false;
+      if (signedUp) {
+        this.snackBar.open(this.userSnackBar.messageSuccess, 'ENTENDI', {
+          duration: 5000
+        });
+      } else {
+        this.snackBar.open(this.userSnackBar.messageError, 'ENTENDI', {
+          duration: 5000
+        });
+      }
     });
   }
 
@@ -56,7 +75,16 @@ export class AddEmployeesComponent implements OnInit, OnDestroy {
   }
 
   addEmployee(data) {
-    data.stores = <string>((<any[]>data.stores).join('|'));
+    this.isLoading = true;
+    let stores = '';
+    (<any[]>data.stores).forEach((store, i) => {
+      if (i !== (<any[]>data.stores).length - 1) {
+        stores += (store + '|');
+      } else {
+        stores += (store);
+      }
+    });
+    data.stores = stores;
     this.employeesService.addEmployee(data);
   }
 }

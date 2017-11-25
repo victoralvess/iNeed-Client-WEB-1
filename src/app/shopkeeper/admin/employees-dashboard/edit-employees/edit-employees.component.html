@@ -14,7 +14,7 @@
     </div>
     <div fxFlex="100">
 <mat-list>
-  <h3 mat-subheader>Você não pode editar essas lojas porque não está associado a elas</h3>
+  <h3 mat-subheader *ngIf="nonEditableStores.length > 0">Você não pode editar essas lojas porque não está associado a elas</h3>
   <mat-list-item *ngFor="let nonEditable of nonEditableStores">
     <mat-icon mat-list-icon>store</mat-icon>
     <h4 mat-line>{{nonEditable.name}}</h4>
@@ -40,5 +40,8 @@
       </mat-form-field>
     </div>
     <button mat-raised-button type="submit">ATUALIZAR</button>
+    <div *ngIf="isLoading">
+      <mat-progress-bar class="n-progress-bar" mode="indeterminate"></mat-progress-bar>
+    </div>
   </div>
 </form>

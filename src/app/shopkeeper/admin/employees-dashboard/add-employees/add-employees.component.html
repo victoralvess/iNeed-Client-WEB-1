@@ -21,6 +21,20 @@
     </div>
     <div fxFlex="100">
       <mat-form-field fxFlex="100">
+        <input type="password" matInput placeholder="Senha" [formControl]="employeeForm.controls['password']" required>
+        <mat-hint align="end">{{ employeeForm.controls['password'].value.length }} / 22</mat-hint>
+        <mat-error align="start" *ngIf="employeeForm.controls['password'].hasError('maxlength')">
+          A senha é
+          <strong>longa demais</strong>
+        </mat-error>
+        <mat-error *ngIf="employeeForm.controls['password'].hasError('minlength')">
+          A senha é
+          <strong>curta demais</strong>
+        </mat-error>
+      </mat-form-field>
+    </div>
+    <div fxFlex="100">
+      <mat-form-field fxFlex="100">
         <mat-select fxFlex="100" id="options-select" label="Onde trabalha" placeholder="Onde trabalha" [formControl]="employeeForm.controls['stores']"
           required multiple>
           <mat-option *ngFor="let store of stores" [value]="store.id">{{store.name + " - " + store.address}}</mat-option>
@@ -39,3 +53,6 @@
     <button mat-raised-button type="submit" [disabled]="!employeeForm.valid">ADICIONAR</button>
   </div>
 </form>
+<div *ngIf="isLoading">
+  <mat-progress-bar class="n-progress-bar" mode="indeterminate"></mat-progress-bar>
+</div>

@@ -10,6 +10,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { EmailValidator } from '@angular/forms';
 import { Subject } from 'rxjs/Subject';
 import { Permission } from '../models/permission.interface';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-edit-employees',
@@ -50,7 +51,11 @@ export class EditEmployeesComponent implements OnInit, OnDestroy {
   callHack = 0;
   employeeStoresSubscription;
 
-  constructor(private employeesService: EmployeesService, private http: Http, private activatedRoute: ActivatedRoute, private router: Router) {
+  isLoading = false;
+  userSnackBar = { messageSuccess: 'Atualizado com sucesso!', messageError: 'Erro ao atualizar' };
+
+
+  constructor(public snackBar: MatSnackBar, private employeesService: EmployeesService, private http: Http, private activatedRoute: ActivatedRoute, private router: Router) {
     this.storesHack$.asObservable().subscribe((storesArray) => {
 
       this.callHack++;
@@ -93,6 +98,19 @@ export class EditEmployeesComponent implements OnInit, OnDestroy {
         this.bossWorksAt = this.stores;
       });
     });
+
+    this.employeesService.update$.subscribe((updated) => {
+      this.isLoading = false;
+      if (updated) {
+        this.snackBar.open(this.userSnackBar.messageSuccess, 'ENTENDI', {
+          duration: 5000
+        });
+      } else {
+        this.snackBar.open(this.userSnackBar.messageError, 'ENTENDI', {
+          duration: 5000
+        });
+      }
+    });
   }
 
   ngOnInit() { }
@@ -104,6 +122,7 @@ export class EditEmployeesComponent implements OnInit, OnDestroy {
   }
 
   updateEmployee(data) {
+this.isLoading = true;
     data.employeeId = this.employeeId;
     data.previousStoresIds = this.employeeWorksAt;
     let bossWorksAtIds = {};
@@ -127,3 +146,15 @@ export class EditEmployeesComponent implements OnInit, OnDestroy {
     this.employeesService.updateEmployee(data);
   }
 }
+/*      if (storesArray[0].length > 0 && storesArray[1].length > 0 && this.callHack === 2) {
+        storesArray[1].forEach((nonEditable) => {
+          const onUserArray = storesArray[0].findIndex(i => i.id === nonEditable.id);
+          if (onUserArray > -1) {
+const onEmployeeArray = storesArray[1].findIndex(i => i.id === nonEditable.id);
+            this.nonEditableStores.splice(onEmployeeArray, 1);
+            storesArray[1].splice(onEmployeeArray, 1);
+          }
+        });
+      }
+    });
+*/

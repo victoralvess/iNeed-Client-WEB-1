@@ -34,8 +34,9 @@ export class Auth0Service {
             console.log(err);
             if (err) {
                 observer.next(false);
+            } else {
+                observer.next(true);
             }
-            observer.next(true);
         });
     }
 
@@ -59,7 +60,7 @@ export class Auth0Service {
                 });
                 this.setSession(authResult);
                 this.router.navigate(['/shopkeeper/dashboard/home']);
-            } else if (parseError) {                
+            } else if (parseError) {
                 console.log(parseError);
             }
         });
