@@ -122,7 +122,7 @@ export class EditEmployeesComponent implements OnInit, OnDestroy {
   }
 
   updateEmployee(data) {
-this.isLoading = true;
+    this.isLoading = true;
     data.employeeId = this.employeeId;
     data.previousStoresIds = this.employeeWorksAt;
     let bossWorksAtIds = {};

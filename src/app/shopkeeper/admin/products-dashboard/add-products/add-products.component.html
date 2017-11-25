@@ -53,6 +53,8 @@
       [fileTooLargeMessage]="'Imagem muito grande!'" (uploadFinished)="imageFinishedUploading($event)" (removed)="imageRemoved($event)"
       (uploadStateChanged)="uploadStateChange($event)"></image-upload>
     <button mat-raised-button type="submit" [disabled]="!productsForm.valid">ADICIONAR</button>
+    <div *ngIf="isLoading">
+      <mat-progress-bar class="n-progress-bar" mode="indeterminate"></mat-progress-bar>
+    </div>
   </div>
 </form>
-<p-growl [value]="growlMessages"></p-growl>

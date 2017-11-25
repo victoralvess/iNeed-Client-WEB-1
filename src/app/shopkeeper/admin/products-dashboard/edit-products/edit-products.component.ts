@@ -9,6 +9,7 @@ import { Message } from 'primeng/primeng';
 import { FileHolder } from 'angular2-image-upload';
 import { User } from 'firebase/app';
 import { CustomValidators } from '../../../../shared/validators/custom-validators';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-edit-products',
@@ -26,7 +27,6 @@ export class EditProductsComponent implements OnInit, OnDestroy {
   productsSubscription;
   categoriesSubscription;
   products;
-  growlMessages: Message[] = [];
   categoriesReady = false;
   picsUrls = [];
   newFiles = [];
@@ -42,7 +42,9 @@ export class EditProductsComponent implements OnInit, OnDestroy {
     downVotesCount: new FormControl(0)
   });
 
-  constructor(private fb: FormBuilder, private productsService: ProductsService, private activatedRoute: ActivatedRoute, private router: Router) {
+  isLoading = false;
+
+  constructor(public snackBar: MatSnackBar, private fb: FormBuilder, private productsService: ProductsService, private activatedRoute: ActivatedRoute, private router: Router) {
 
     this.activatedRouteSubscription = this.activatedRoute.params.subscribe((params: Params) => {
 
@@ -87,10 +89,10 @@ export class EditProductsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.productsService.databaseChanged.asObservable().subscribe((notification) => {
-      this.growlMessages.push(notification);
-      setTimeout(() => {
-        this.growlMessages = [];
-      }, 7000);
+      this.isLoading = false;
+      this.snackBar.open(notification.detail, 'ENTENDI', {
+        duration: 5000
+      });
     });
   }
 
@@ -103,6 +105,7 @@ export class EditProductsComponent implements OnInit, OnDestroy {
   }
 
   updateProduct(data) {
+    this.isLoading = true;
     const originalPics = JSON.parse(localStorage.getItem(`${this.productId}/Pictures`));
     if (originalPics) {
       data.productId = this.productId;
@@ -133,12 +136,9 @@ export class EditProductsComponent implements OnInit, OnDestroy {
 
   imageFinishedUploading(event: FileHolder) {
     if ((event.file.type !== 'image/jpeg' && event.file.type !== 'image/png') || (event.file.size > 1100000)) {
-      this.growlMessages = [
-        { severity: 'error', summary: 'Erro', detail: 'Remova as imagens com mais de 1MB. Elas não serão adicionadas!' }
-      ];
-      setTimeout(() => {
-        this.growlMessages = [];
-      }, 7000);
+      this.snackBar.open('Remova as imagens com mais de 1MB. Elas não serão adicionadas!', 'ENTENDI', {
+        duration: 5000
+      });
       return;
     }
 

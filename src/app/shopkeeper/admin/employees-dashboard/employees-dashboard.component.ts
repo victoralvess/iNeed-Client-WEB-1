@@ -68,48 +68,49 @@ export class EmployeesDashboardComponent implements OnInit, OnDestroy {
   }
 
   deleteEmployee(key, permissionLevel) {
-	if (permissionLevel != 4) {
-    this.dialogService.openConfirm({
-      message: `Você realmente deseja excluir este funcionário?`,
-      disableClose: true,
-      viewContainerRef: this.viewContainerRef,
-      title: '',
-      cancelButton: 'Cancelar',
-      acceptButton: 'Excluir',
-    }).afterClosed().subscribe((accept: boolean) => {
-      if (accept) {
-        this.employeesService.deleteEmployee(key);
-        this.snackBar.open('Excluído do sistema', 'ENTENDI', {
-          duration: 5000
-        });
-      }
-    });
-}
+    if (permissionLevel != 4) {
+      this.dialogService.openConfirm({
+        message: `Você realmente deseja excluir este funcionário?`,
+        disableClose: true,
+        viewContainerRef: this.viewContainerRef,
+        title: '',
+        cancelButton: 'Cancelar',
+        acceptButton: 'Excluir',
+      }).afterClosed().subscribe((accept: boolean) => {
+        if (accept) {
+          this.employeesService.deleteEmployee(key);
+          this.snackBar.open('Excluído do sistema', 'ENTENDI', {
+            duration: 5000
+          });
+        }
+      });
+    }
   }
 
   deleteEmployeeFromStore(key, permissionLevel) {
-	if (permissionLevel != 4) {
-    this.dialogService.openConfirm({
-      message: `Você realmente deseja retirar o acesso deste funcionário desta loja?`,
-      disableClose: true,
-      viewContainerRef: this.viewContainerRef,
-      title: '',
-      cancelButton: 'Cancelar',
-      acceptButton: 'Confirmar',
-    }).afterClosed().subscribe((accept: boolean) => {
-      if (accept) {
-        this.employeesService.deleteEmployee(key, this.lastSelected);
-        this.snackBar.open('Removido da loja', 'ENTENDI', {
-          duration: 5000
-        });
-      }
-    });}
+    if (permissionLevel != 4) {
+      this.dialogService.openConfirm({
+        message: `Você realmente deseja retirar o acesso deste funcionário desta loja?`,
+        disableClose: true,
+        viewContainerRef: this.viewContainerRef,
+        title: '',
+        cancelButton: 'Cancelar',
+        acceptButton: 'Confirmar',
+      }).afterClosed().subscribe((accept: boolean) => {
+        if (accept) {
+          this.employeesService.deleteEmployee(key, this.lastSelected);
+          this.snackBar.open('Removido da loja', 'ENTENDI', {
+            duration: 5000
+          });
+        }
+      });
+    }
   }
 
   updateEmployee(key, permissionLevel) {
-	if (permissionLevel != 4) {
-    this.router.navigate([`/shopkeeper/dashboard/admin/employees/edit/${key}`]);
-}
+    if (permissionLevel != 4) {
+      this.router.navigate([`/shopkeeper/dashboard/admin/employees/edit/${key}`]);
+    }
   }
 
   onChange(value) {

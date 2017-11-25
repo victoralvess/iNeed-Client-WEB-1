@@ -11,6 +11,7 @@ import { TdDialogService } from '@covalent/core';
 import { Router } from '@angular/router';
 import { DataSource } from '@angular/cdk/collections';
 import { Observable } from 'rxjs/Observable';
+import { MatSnackBar } from '@angular/material';
 
 @Component({
   selector: 'app-products-dashboard',
@@ -27,7 +28,7 @@ export class ProductsDashboardComponent {
   displayedColumns = ['name', 'price', 'upVotes', 'downVotes', 'actions'];
   dataSource: ProductsDataSource;
 
-  constructor(private productsService: ProductsService, private afAuth: AngularFireAuth, private dialogService: TdDialogService,
+  constructor(public snackBar: MatSnackBar, private productsService: ProductsService, private afAuth: AngularFireAuth, private dialogService: TdDialogService,
     private viewContainerRef: ViewContainerRef, private router: Router) {
 
     this.products$.asObservable().subscribe((storeId) => {
@@ -66,6 +67,9 @@ export class ProductsDashboardComponent {
     }).afterClosed().subscribe((accept: boolean) => {
       if (accept) {
         this.productsService.deleteProduct(key, categories, store, picsQty);
+        this.snackBar.open('Excluído', 'ENTENDI', {
+          duration: 5000
+        });
       }
     });
   }
