@@ -17,7 +17,7 @@ export const environment = {
     ineed: {
       optmization: {
         //  url: 'http://localhost:8081',
-        url: 'http://2need.store',
+        url: 'https://2need.store',
         key: ''
       }
     },
