@@ -21,7 +21,7 @@ import { MatIconModule, MatListModule, MatInputModule, MatCardModule, MatButtonM
 ReactiveFormsModule,
     SubscribeRoutingModule,
     FlexLayoutModule,
-MatIconModule,    MatListModule, MatCardModule, MatButtonModule, NoConflictStyleCompatibilityMode, CompatibilityModule,MatInputModule
+MatIconModule,    MatListModule, MatCardModule, MatButtonModule, NoConflictStyleCompatibilityMode, CompatibilityModule, MatInputModule
   ],
   declarations: [SignUpComponent, SignInComponent, PasswordForgotComponent, MessageEmailVerificationComponent, MessageAdminVerificationComponent, SubscribeComponent]
 })

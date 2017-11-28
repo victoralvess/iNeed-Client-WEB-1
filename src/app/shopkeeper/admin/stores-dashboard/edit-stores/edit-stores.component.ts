@@ -2,20 +2,21 @@ import { Component, OnInit } from '@angular/core';
 import { StoresService } from '../services/stores.service';
 import { ActivatedRoute, Router, Params } from '@angular/router';
 import { CustomValidators } from '../../../../shared/validators/custom-validators';
-import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
+import { FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store } from '../models/store.model';
 import { Subject } from 'rxjs/Subject';
 import { Subscription } from 'rxjs/Subscription';
 import { StoreLocation } from '../models/store-location.model';
 import { Category } from '../../../models/category.model';
-import { Md2Colorpicker, Md2Toast } from 'md2';
+import { Md2Toast } from 'md2';
 import { FileHolder } from 'angular2-image-upload';
 import { LocationService } from '../services/location/location.service';
 import { ViewContainerRef } from '@angular/core';
 import { TdDialogService } from '@covalent/core';
 import { MatDialog } from '@angular/material';
 import { TimePickerDialogComponent } from '../time-picker-dialog/time-picker-dialog.component';
-import { MatOption, MatSnackBar } from '@angular/material';
+import { MatSnackBar } from '@angular/material';
+import { TimeOperationsController } from '../commons/time-operations.controller';
 
 @Component({
   selector: 'app-edit-stores',
@@ -48,16 +49,6 @@ export class EditStoresComponent implements OnInit {
   categoriesReady = false;
   categoriesSubscription: Subscription;
   categories = [];
-  daysOfTheWeek = [
-    { day: 'Segunda', checked: false },
-    { day: 'Terça', checked: false },
-    { day: 'Quarta', checked: false },
-    { day: 'Quinta', checked: false },
-    { day: 'Sexta', checked: false },
-    { day: 'Sábado', checked: false },
-    { day: 'Domingo', checked: false }
-  ];
-  openingClosingArr = [];
   paymentMethods = [
     { label: 'Dinheiro', value: 'money' },
     { label: 'Boleto', value: 'payment-slip' },
@@ -95,8 +86,10 @@ export class EditStoresComponent implements OnInit {
   });
 
   isLoading = false;
+  timeOperations: TimeOperationsController;
 
   constructor(public snackBar: MatSnackBar, private dialog: MatDialog, private toast: Md2Toast, private locationService: LocationService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private storesService: StoresService, private activatedRoute: ActivatedRoute, private router: Router) {
+    this.timeOperations = new TimeOperationsController(dialog, viewContainerRef, dialogService);
     this.addressReady$.asObservable().subscribe((isReady) => {
       this.ready = isReady;
     });
@@ -113,7 +106,7 @@ export class EditStoresComponent implements OnInit {
 
         console.log(responses[1]);
         if (responses[1].status === 'OK') {
-          let storeLocation: StoreLocation = {};
+          const storeLocation: StoreLocation = {};
           storeLocation.lat = responses[1].results[0].geometry.location.lat;
           storeLocation.lng = responses[1].results[0].geometry.location.lng;
           storeLocation.address = responses[1].results[0].formatted_address;
@@ -133,7 +126,7 @@ export class EditStoresComponent implements OnInit {
     });
 
     this.categoriesSubscription = storesService.getAllCategories().subscribe((categories) => {
-      let aux: Category[] = [];
+      const aux: Category[] = [];
       categories.forEach((category) => {
         aux.push({ label: category.value, value: category.$key });
       });
@@ -160,11 +153,11 @@ export class EditStoresComponent implements OnInit {
         this.storeForm.patchValue({ 'cnpj': foundStore.cnpj });
 
         // this.openingClosingForm.patchValue({ 'days': foundStore.businessTimes });
-        this.openingClosingArr = (<any[]>foundStore.businessTimes);
+        this.timeOperations.openingClosingArr = (<any[]>foundStore.businessTimes);
         (<any[]>foundStore.businessTimes).forEach((day) => {
-          const index = this.daysOfTheWeek.findIndex((i => i.day === day.day));
+          const index = this.timeOperations.daysOfTheWeek.findIndex((i => i.day === day.day));
           if (index > -1) {
-            this.daysOfTheWeek[index].checked = true;
+            this.timeOperations.daysOfTheWeek[index].checked = true;
           }
         });
 
@@ -231,59 +224,16 @@ export class EditStoresComponent implements OnInit {
     this.step--;
   }
 
-  openTimePickerDialog(day, checked) {
-    console.log('MYTAG_', this.daysOfTheWeek);
-    this.daysOfTheWeek[this.daysOfTheWeek.map((e) => e.day).indexOf(day)].checked = checked;
-    console.log('MYTAG_', this.daysOfTheWeek);
-    const index = this.openingClosingArr.map((e) => e.day).indexOf(day);
-    if (checked) {
-      console.log(day);
-      let dialogRef;
-      if (!(index > -1)) {
-        console.log('nao é maior que -1');
-        dialogRef = this.dialog.open(TimePickerDialogComponent, {
-          data: { day: day }
-        });
-      } else {
-        console.log('here');
-        dialogRef = this.dialog.open(TimePickerDialogComponent, {
-          data: { day: day, opening: this.openingClosingArr[index].opening, closing: this.openingClosingArr[index].closing }
-        });
-      }
-
-      dialogRef.afterClosed().subscribe((response: any) => {
-        if (response) {
-          console.log('time', response);
-          this.openingClosingArr.push(response);
-          console.log('opcl', this.openingClosingArr);
-        } else {
-          this.removeTimesUnchecked(index);
-        }
-      });
-    } else {
-      this.removeTimesUnchecked(index);
-    }
-  }
-
-  removeTimesUnchecked(index) {
-    this.openingClosingArr.splice(index, 1);
-    if (this.openingClosingArr.length === 0) {
-      this.openingClosingArr = [];
-    } else {
-    }
-    console.log('opcl', this.openingClosingArr);
-  }
-
   updateStore(formsValues: any[]) {
     this.isLoading = true;
     const originalPics = JSON.parse(localStorage.getItem(`${this.storeId}/Pictures`));
     if (this.ready) {
-      if (this.openingClosingArr.length === 0) {
+      if (this.timeOperations.openingClosingArr.length === 0) {
         this.toast.show('ADICIONE OS HORÁRIOS DE FUNCIONAMENTO');
         return;
       } else {
         this.store.businessTimes = [];
-        this.openingClosingArr.forEach((oc) => {
+        this.timeOperations.openingClosingArr.forEach((oc) => {
           this.store.businessTimes.push({ day: oc.day, open: oc.openingParsed || oc.open, close: oc.closingParsed || oc.close });
         });
       }
@@ -325,7 +275,7 @@ export class EditStoresComponent implements OnInit {
 
       if (originalPics) {
         if (this.newFiles.length > 0) {
-          let pictures: string[] = [];
+          const pictures: string[] = [];
           this.newFiles.forEach((file, idx, arr) => {
             this.storesService.optmizeImage(file).subscribe((res) => {
               const response: any = res;

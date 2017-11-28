@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Component, OnInit } from '@angular/core';
 
-import { AngularFireDatabase, FirebaseObjectObservable, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase, FirebaseObjectObservable } from 'angularfire2/database';
 import * as firebase from 'firebase';
 import { Subject } from 'rxjs/Subject';
 import { CrudService } from '../../../../shared/services/crud-service/crud.service';

@@ -5,7 +5,6 @@ import { Router, ActivatedRoute, Params } from '@angular/router';
 import { SelectItem } from 'primeng/primeng';
 
 import 'rxjs/add/operator/map';
-import { Message } from 'primeng/primeng';
 import { FileHolder } from 'angular2-image-upload';
 import { User } from 'firebase/app';
 import { CustomValidators } from '../../../../shared/validators/custom-validators';
@@ -77,7 +76,7 @@ export class EditProductsComponent implements OnInit, OnDestroy {
     });
 
     this.categoriesSubscription = productsService.getAllCategories().subscribe((categories) => {
-      let auxArray = [];
+      const auxArray = [];
       categories.forEach((category) => {
         auxArray.push({ label: category.value, value: category.$key });
       });

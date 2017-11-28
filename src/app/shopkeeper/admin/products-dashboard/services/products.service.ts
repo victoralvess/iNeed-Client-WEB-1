@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { AuthService } from '../../../../shared/services/services-auth/auth.service';
 import { Http } from '@angular/http';
@@ -55,7 +54,7 @@ export class ProductsService {
 
   addProduct(product) {
     product.stores.forEach((store) => {
-      let newProduct: any = {
+      const newProduct: any = {
         name: product.name,
         description: product.description,
         price: product.price,
@@ -98,7 +97,7 @@ export class ProductsService {
   updateProduct(product, sendPics: any[], originalUrls: any[]) {
     this.picsUploaded[product.productId] = sendPics.length;
     console.log(this.picsUploaded[product.productId], sendPics);
-    let updatedProduct = {
+    const updatedProduct = {
       name: product.name,
       description: product.description,
       price: product.price,

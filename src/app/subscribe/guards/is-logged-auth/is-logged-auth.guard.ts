@@ -2,8 +2,6 @@ import { Injectable } from '@angular/core';
 import { Router, CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 
 import { Observable } from 'rxjs/Observable';
-
-import { AuthService } from '../../../shared/services/services-auth/auth.service';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { environment } from '../../../../environments/environment';
 
@@ -12,11 +10,11 @@ import 'rxjs/add/operator/map';
 @Injectable()
 export class IsLoggedAuthGuard implements CanActivate {
 
-    constructor(private router: Router, private authService: AuthService, private db: AngularFireDatabase ) {}
+    constructor(private router: Router, private db: AngularFireDatabase) { }
 
     canActivate(
         next: ActivatedRouteSnapshot,
-        state: RouterStateSnapshot ): Observable<boolean> | boolean {
+        state: RouterStateSnapshot): Observable<boolean> | boolean {
         const user = JSON.parse(localStorage.getItem(`firebase:authUser:${environment.firebase.apiKey}:[DEFAULT]`));
         console.log(user);
         let canActivate;

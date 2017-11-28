@@ -7,9 +7,6 @@ import { Component, OnInit } from '@angular/core';
 })
 export class SubscribeComponent implements OnInit {
 
-  // Começa no metodo de sign Up
-  private method: string = 'signUp';
-
   constructor() { }
 
   ngOnInit() {

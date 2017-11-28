@@ -5,13 +5,14 @@ import { Observable } from 'rxjs/Observable';
 import { AuthService } from '../../../shared/services/services-auth/auth.service';
 import { AngularFireDatabase } from 'angularfire2/database';
 import { environment } from '../../../../environments/environment';
+import { MatSnackBar } from '@angular/material';
 
 import 'rxjs/add/operator/map';
 
 @Injectable()
 export class MustBeAdminGuard implements CanActivate {
 
-  constructor(private router: Router, private authService: AuthService, private db: AngularFireDatabase) { }
+  constructor(public snackBar: MatSnackBar, private router: Router, private authService: AuthService, private db: AngularFireDatabase) { }
 
   canActivate(
     next: ActivatedRouteSnapshot,
@@ -32,6 +33,7 @@ export class MustBeAdminGuard implements CanActivate {
 
           if (!canActivate) {
             this.router.navigate(['/shopkeeper/dashboard/home']);
+            this.snackBar.open('Você não tem permissão suficiente', 'ENTENDI');
             console.log('can\'t');
             return false;
           }

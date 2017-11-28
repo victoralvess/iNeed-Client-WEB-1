@@ -9,22 +9,22 @@ import { IsLoggedAuthGuard } from './guards/is-logged-auth/is-logged-auth.guard'
 import { SubscribeComponent } from './subscribe.component';
 
 const routes: Routes = [
-	{
-		path: '', component: SubscribeComponent, children: [
-			{ path: 'signup', component: SignUpComponent, canActivate: [IsLoggedAuthGuard] },
-			{ path: 'signin', component: SignInComponent, canActivate: [IsLoggedAuthGuard] },
-			{ path: 'verification/email', component: MessageEmailVerificationComponent, canActivate: [IsLoggedAuthGuard] },
-			{ path: 'verification/admin', component: MessageAdminVerificationComponent, canActivate: [IsLoggedAuthGuard] },
-			{ path: 'forgot', component: PasswordForgotComponent, canActivate: [IsLoggedAuthGuard] },
-			{ path: '', redirectTo: 'signin', pathMatch: 'full' },
-			{ path: '**', redirectTo: 'signin', pathMatch: 'full' }
-		]
-	}
+  {
+    path: '', component: SubscribeComponent, children: [
+      { path: 'signup', component: SignUpComponent, canActivate: [IsLoggedAuthGuard] },
+      { path: 'signin', component: SignInComponent, canActivate: [IsLoggedAuthGuard] },
+      { path: 'verification/email', component: MessageEmailVerificationComponent, canActivate: [IsLoggedAuthGuard] },
+      { path: 'verification/admin', component: MessageAdminVerificationComponent, canActivate: [IsLoggedAuthGuard] },
+      { path: 'forgot', component: PasswordForgotComponent, canActivate: [IsLoggedAuthGuard] },
+      { path: '', redirectTo: 'signin', pathMatch: 'full' },
+      { path: '**', redirectTo: 'signin', pathMatch: 'full' }
+    ]
+  }
 ];
 
 @NgModule({
-	imports: [RouterModule.forChild(routes)],
-	exports: [RouterModule],
-	providers: [IsLoggedAuthGuard]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
+  providers: [IsLoggedAuthGuard]
 })
 export class SubscribeRoutingModule { }

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 
 import { ViewContainerRef } from '@angular/core';
 import { TdDialogService } from '@covalent/core';

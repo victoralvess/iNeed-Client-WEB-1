@@ -1,13 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router, ActivatedRoute, Params } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 
 import { FormGroup, FormControl, Validators } from '@angular/forms';
-import { CustomValidators } from '../../../../shared/validators/custom-validators';
 import { Store } from '../../../models/store.model';
 import { EmployeesService } from '../services/employees.service';
-import { Http, RequestOptionsArgs, Headers, RequestMethod } from '@angular/http';
 import { Subscription } from 'rxjs/Subscription';
-import { EmailValidator } from '@angular/forms';
 import { Subject } from 'rxjs/Subject';
 import { Permission } from '../models/permission.interface';
 import { MatSnackBar } from '@angular/material';
@@ -55,7 +52,7 @@ export class EditEmployeesComponent implements OnInit, OnDestroy {
   userSnackBar = { messageSuccess: 'Atualizado com sucesso!', messageError: 'Erro ao atualizar' };
 
 
-  constructor(public snackBar: MatSnackBar, private employeesService: EmployeesService, private http: Http, private activatedRoute: ActivatedRoute, private router: Router) {
+  constructor(public snackBar: MatSnackBar, private employeesService: EmployeesService, private activatedRoute: ActivatedRoute) {
     this.storesHack$.asObservable().subscribe((storesArray) => {
 
       this.callHack++;
@@ -78,7 +75,7 @@ export class EditEmployeesComponent implements OnInit, OnDestroy {
         this.email = employee.email;
         this.employeeForm.patchValue({ permissionLevel: employee.permissionLevel });
         this.employeeStoresSubscription = employeesService.getStoresWhereEmployeeWorks(this.employeeId).subscribe((stores) => {
-          let employeeWorksAtList = [];
+          const employeeWorksAtList = [];
           stores.forEach(store => {
             employeeWorksAtList.push(store.$key);
             this.nonEditableStores.push({ id: store.$key, name: store.name, address: store.location.address, checked: true });
@@ -125,12 +122,12 @@ export class EditEmployeesComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     data.employeeId = this.employeeId;
     data.previousStoresIds = this.employeeWorksAt;
-    let bossWorksAtIds = {};
+    const bossWorksAtIds = {};
     this.bossWorksAt.forEach((store) => {
       bossWorksAtIds[store.id] = store.id;
     });
 
-    let cannotUpdate = this.employeeWorksAt.filter((store) => {
+    const cannotUpdate = this.employeeWorksAt.filter((store) => {
       return !(store in bossWorksAtIds);
     });
 

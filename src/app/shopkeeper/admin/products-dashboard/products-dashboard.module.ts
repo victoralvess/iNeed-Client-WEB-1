@@ -16,8 +16,6 @@ import { ImageUploadModule } from 'angular2-image-upload';
 
 import { ModalModule } from 'ngx-modialog';
 // import { BootstrapModalModule } from 'ngx-modialog/plugins/bootstrap';
-
-import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
 import { NotificationsService } from '../../../shared/services/notifications/notifications.service';
 import { CrudService } from '../../../shared/services/crud-service/crud.service';
 import { CovalentDialogsModule } from '@covalent/core';
@@ -70,7 +68,6 @@ import { FlexLayoutModule } from '@angular/flex-layout';
     GrowlModule,
     ImageUploadModule.forRoot(),
     ModalModule.forRoot(),
-    SearchPipeModule,
     CovalentDialogsModule,
     NoConflictStyleCompatibilityMode,
     CompatibilityModule,

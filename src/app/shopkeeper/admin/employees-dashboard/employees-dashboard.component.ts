@@ -2,12 +2,6 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 
 import { EmployeesService } from './services/employees.service';
 import { Router } from '@angular/router';
-
-import * as firebase from 'firebase/app';
-import { PaginationInstance } from 'ngx-pagination';
-
-import { Modal } from 'ngx-modialog/plugins/bootstrap/bundle/ngx-modialog-bootstrap';
-
 import { Subject } from 'rxjs/Subject';
 import { Permission } from './models/permission.interface';
 import { ViewContainerRef } from '@angular/core';
@@ -68,7 +62,7 @@ export class EmployeesDashboardComponent implements OnInit, OnDestroy {
   }
 
   deleteEmployee(key, permissionLevel) {
-    if (permissionLevel != 4 && key != this.employeesService.user.uid) {
+    if ((<number>permissionLevel) !== 4 && (<string>key) !== this.employeesService.user.uid) {
       this.dialogService.openConfirm({
         message: `Você realmente deseja excluir este funcionário?`,
         disableClose: true,
@@ -84,15 +78,13 @@ export class EmployeesDashboardComponent implements OnInit, OnDestroy {
           });
         }
       });
-    } else if (key == this.employeesService.user.uid || permissionLevel == 4) {
-      this.snackBar.open('Você não pode fazer isso', 'ENTENDI', {
-        duration: 5000
-      });
+    } else if ((<string>key) === this.employeesService.user.uid || (<number>permissionLevel) === 4) {
+	this.youShallNotPass();
     }
   }
 
   deleteEmployeeFromStore(key, permissionLevel) {
-    if (permissionLevel != 4) {
+    if ((<number>permissionLevel) !== 4 && (<string>key) !== this.employeesService.user.uid) {
       this.dialogService.openConfirm({
         message: `Você realmente deseja retirar o acesso deste funcionário desta loja?`,
         disableClose: true,
@@ -108,12 +100,16 @@ export class EmployeesDashboardComponent implements OnInit, OnDestroy {
           });
         }
       });
+    } else if ((<string>key) === this.employeesService.user.uid || (<number>permissionLevel) === 4) {
+	this.youShallNotPass();
     }
   }
 
   updateEmployee(key, permissionLevel) {
-    if (permissionLevel != 4) {
+    if ((<number>permissionLevel) !== 4 && (<string>key) !== this.employeesService.user.uid) {
       this.router.navigate([`/shopkeeper/dashboard/admin/employees/edit/${key}`]);
+    } else if ((<string>key) === this.employeesService.user.uid || (<number>permissionLevel) === 4) {
+	this.youShallNotPass();
     }
   }
 
@@ -121,6 +117,11 @@ export class EmployeesDashboardComponent implements OnInit, OnDestroy {
     this.lastSelected = value;
     this.employees$.next(this.lastSelected);
   }
+
+youShallNotPass() {
+      this.snackBar.open('Não permitido', 'ENTENDI', {
+        duration: 5000
+      });}
 
 }
 

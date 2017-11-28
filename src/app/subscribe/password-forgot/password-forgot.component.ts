@@ -5,7 +5,6 @@ import { Shopkeeper } from '../../shared/models/shopkeeper.model';
 import { AuthService } from '../../shared/services/services-auth/auth.service';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 
-import { CustomValidators } from '../../shared/validators/custom-validators';
 
 @Component({
     selector: 'app-password-forgot',

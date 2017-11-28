@@ -2,7 +2,7 @@
   <div class="row display-table-row">
     <mat-sidenav-container class="n-container" style="background-color: white;">
       <mat-sidenav [disableClose]="isDesktop" [opened]="isDesktop" #sidenav class="n-sidenav" [mode]="mode" style="transition: 0.3s;">
-        <img [src]="user.providerData[0].photoURL || user.photoURL" alt="user picture" class="n-circle-logo n-margin ">
+        <img [src]="user?.providerData[0]?.photoURL || user.photoURL" alt="user picture" class="n-circle-logo n-margin ">
         <br/>
         <div class="n-header">
           <span class="mat-nav-name n-padding">{{user.displayName}}</span>

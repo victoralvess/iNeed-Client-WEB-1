@@ -1,3 +1,3 @@
 export class ProductPicture {
-    private _a : string;
+    private _a: string;
 }

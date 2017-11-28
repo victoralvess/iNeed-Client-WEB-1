@@ -3,7 +3,6 @@ import { ProductsService } from '../services/products.service';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { SelectItem } from 'primeng/primeng';
 
-import { Message } from 'primeng/primeng';
 import { User } from 'firebase/app';
 import { Store } from '../../../models/store.model';
 import { Category } from '../../../models/category.model';
@@ -45,7 +44,7 @@ export class AddProductsComponent implements OnInit, OnDestroy {
     });
 
     this.categoriesSubscription = productsService.getAllCategories().subscribe((categories) => {
-      let aux: Category[] = [];
+      const aux: Category[] = [];
       categories.forEach((category) => {
         aux.push({ label: category.value, value: category.$key });
       });

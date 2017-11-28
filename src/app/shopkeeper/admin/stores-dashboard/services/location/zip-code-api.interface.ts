@@ -17,7 +17,7 @@ export interface ZipCodeAPI {
     categories?: string[];
     location: StoreLocation;
   }
-  
+
   export class StoreLocation {
     lat: number;
     lng: number;

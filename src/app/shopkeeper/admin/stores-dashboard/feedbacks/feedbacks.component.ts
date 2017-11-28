@@ -1,21 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { StoresService } from '../services/stores.service';
 import { ActivatedRoute, Router, Params } from '@angular/router';
-import { CustomValidators } from '../../../../shared/validators/custom-validators';
-import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
-import { Store } from '../models/store.model';
-import { Subject } from 'rxjs/Subject';
-import { Subscription } from 'rxjs/Subscription';
-import { StoreLocation } from '../models/store-location.model';
-import { Category } from '../../../models/category.model';
-import { Md2Colorpicker, Md2Toast } from 'md2';
-import { FileHolder } from 'angular2-image-upload';
+import { Md2Toast } from 'md2';
 import { LocationService } from '../services/location/location.service';
 import { ViewContainerRef } from '@angular/core';
 import { TdDialogService } from '@covalent/core';
 import { MatDialog } from '@angular/material';
-import { TimePickerDialogComponent } from '../time-picker-dialog/time-picker-dialog.component';
-import { MatOption } from '@angular/material';
 
 @Component({
   selector: 'app-feedbacks',

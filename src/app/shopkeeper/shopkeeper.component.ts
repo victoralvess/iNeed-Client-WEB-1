@@ -1,22 +1,22 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { AngularFireAuth } from 'angularfire2/auth';
 import { AuthService } from '../shared/services/services-auth/auth.service';
 import * as $ from 'jquery';
 import { User } from 'firebase/app';
-import {Subscription} from "rxjs/Subscription";
-import {MediaChange, ObservableMedia} from "@angular/flex-layout";
+import { Subscription } from 'rxjs/Subscription';
+import { MediaChange, ObservableMedia } from '@angular/flex-layout';
 
 @Component({
   selector: 'app-shopkeeper',
   templateUrl: './shopkeeper.component.html',
   styleUrls: ['./shopkeeper.component.css']
 })
-export class ShopkeeperComponent implements OnInit, AfterViewInit {
+export class ShopkeeperComponent implements OnInit, OnDestroy {
 
   user: User;
-  chosenInitialized: boolean = false;
+  chosenInitialized = false;
 
   // HOME PROD LOJ FUN CHAT
 
@@ -43,10 +43,10 @@ export class ShopkeeperComponent implements OnInit, AfterViewInit {
   }
   ];
 
-watcher: Subscription;
-activeMediaQuery = '';
-isDesktop = false;
-mode = 'over';
+  watcher: Subscription;
+  activeMediaQuery = '';
+  isDesktop = false;
+  mode = 'over';
   constructor(private afAuth: AngularFireAuth, private service: AuthService, private router: Router, media: ObservableMedia) {
     this.user = afAuth.auth.currentUser;
 
@@ -57,34 +57,22 @@ mode = 'over';
       }
     });
 
-this.watcher = media.subscribe((change: MediaChange) => {
-      this.activeMediaQuery = change ? `'${change.mqAlias}' = (${change.mediaQuery})` : "";
-if(change.mqAlias === "xs" || change.mqAlias === "sm") {
-this.isDesktop = false;
-this.mode = 'over';
-} else {
-this.isDesktop = true;
-this.mode = 'side';
-}
+    this.watcher = media.subscribe((change: MediaChange) => {
+      this.activeMediaQuery = change ? `'${change.mqAlias}' = (${change.mediaQuery})` : '';
+      if (change.mqAlias === 'xs' || change.mqAlias === 'sm') {
+        this.isDesktop = false;
+        this.mode = 'over';
+      } else {
+        this.isDesktop = true;
+        this.mode = 'side';
+      }
     });
-  }
-
-
-  ngAfterViewInit() {
-
-    if (!this.chosenInitialized) {
-      $(document).ready(function () {
-        $('[data-toggle="offcanvas"]').click(function () {
-          $('#navigation').toggleClass('hidden-xs');
-        });
-      });
-    }
   }
 
   ngOnInit() {
   }
 
-ngOnDestroy() {
+  ngOnDestroy() {
     this.watcher.unsubscribe();
   }
 

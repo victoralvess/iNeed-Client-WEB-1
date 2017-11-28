@@ -19,6 +19,13 @@ export const environment = {
         //  url: 'http://localhost:8081',
         url: 'https://2need.store',
         key: ''
+      },
+      auth0: {
+        domain: 'default-tenant.auth0.com',
+        clientID: 'bK8ww4-EDzJUgz-lcdg5JTRz8hCPtTQi',
+        redirectUri: 'https://2need.store/callback',
+        responseType: 'token id_token',
+        scope: 'openid profile'
       }
     },
     google: {

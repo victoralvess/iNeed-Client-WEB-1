@@ -5,8 +5,6 @@ import { AngularFireAuth } from 'angularfire2/auth';
 import * as firebase from 'firebase/app';
 import { Observable } from 'rxjs/Observable';
 import { AngularFireDatabase } from 'angularfire2/database';
-import { Http } from '@angular/http';
-import { environment } from '../../../../environments/environment';
 import 'rxjs/add/operator/retry';
 import 'rxjs/add/operator/map';
 
@@ -17,7 +15,7 @@ export class VerifyAuth {
     private CONDITIONS: string[] = ['ALL_VERIFIED', 'MISSED_ADMIN_VERIFICATION', 'MISSED_EMAIL_VERIFICATION'];
     private usersRef = firebase.database().ref(`users`);
 
-    constructor(private afAuth: AngularFireAuth, private db: AngularFireDatabase, private http: Http, private router: Router) {
+    constructor(private afAuth: AngularFireAuth, private db: AngularFireDatabase, private router: Router) {
         this.user = afAuth.authState;
     }
 

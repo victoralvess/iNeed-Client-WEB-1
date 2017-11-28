@@ -4,9 +4,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { CustomValidators } from '../../../../shared/validators/custom-validators';
 import { Store } from '../../../models/store.model';
 import { EmployeesService } from '../services/employees.service';
-import { Http, RequestOptionsArgs, Headers, RequestMethod } from '@angular/http';
 import { Subscription } from 'rxjs/Subscription';
-import { EmailValidator } from '@angular/forms';
 import { Permission } from '../models/permission.interface';
 import { MatSnackBar } from '@angular/material';
 
@@ -47,7 +45,7 @@ export class AddEmployeesComponent implements OnInit, OnDestroy {
   userSnackBar = { messageSuccess: 'Funcionário adicionado!', messageError: 'Erro ao adicionar' };
 
 
-  constructor(public snackBar: MatSnackBar, private employeesService: EmployeesService, private http: Http) {
+  constructor(public snackBar: MatSnackBar, private employeesService: EmployeesService) {
     this.userSubscription = employeesService.getStoresWhereUserWorks().subscribe((stores) => {
       stores.forEach(store => {
         this.stores.push({ id: store.$key, name: store.name, address: store.location.address, checked: false });

@@ -1,22 +1,19 @@
 import { Component, ElementRef, Renderer, ViewChild, OnInit, HostListener } from '@angular/core';
 import { Http } from '@angular/http';
 
-import { AngularFireDatabase, FirebaseListObservable } from 'angularfire2/database';
+import { AngularFireDatabase } from 'angularfire2/database';
 import 'rxjs/add/operator/map';
 import { Router } from '@angular/router';
 
 import * as firebase from 'firebase/app';
-import { Message } from '../../shared/models/message.model';
 import * as SendBird from 'sendbird/SendBird.min.js';
 import { Subject } from 'rxjs/Subject';
-import { Observable } from 'rxjs/Observable';
 import { CrudService } from '../../shared/services/crud-service/crud.service';
 
 import { ViewContainerRef } from '@angular/core';
 import { TdDialogService } from '@covalent/core';
 import { MatDialog } from '@angular/material';
 import { SelectDialogComponent } from '../../shared/dialogs/select/select-dialog.component';
-import { MatOption } from '@angular/material';
 
 @Component({
   selector: 'app-chat',
@@ -52,7 +49,7 @@ export class ChatComponent implements OnInit {
   textAreaInput: string;
 
   lastMessageKey: string;
-  messagesAreLoading: boolean = true;
+  messagesAreLoading = true;
 
   @ViewChild('scrollable') private erScrollable: ElementRef;
   @ViewChild('messagesList') private erMessages: ElementRef;
@@ -97,7 +94,7 @@ export class ChatComponent implements OnInit {
 
   updateChannels() {
     const hackList = this.channelList$;
-    let allChannelListQuery = this.sb.GroupChannel.createMyGroupChannelListQuery();
+    const allChannelListQuery = this.sb.GroupChannel.createMyGroupChannelListQuery();
     allChannelListQuery.includeEmpty = true;
     allChannelListQuery.userIdsFilter = [this.storeId];
     allChannelListQuery.channelNameContainsFilter = `${this.storeId}_`;
@@ -117,7 +114,7 @@ export class ChatComponent implements OnInit {
   getMessagesFrom(channelUrl) {
     this.sb.GroupChannel.getChannel(channelUrl, (channel, channelError) => {
       if (channel) {
-        let messageListQuery = channel.createPreviousMessageListQuery();
+        const messageListQuery = channel.createPreviousMessageListQuery();
 
         messageListQuery.load(30, true, (messageList, messagesError) => {
           if (messageList) {
@@ -216,7 +213,7 @@ export class ChatComponent implements OnInit {
         console.log(user);
         const hackMessages = this.channelMessages$;
         const hackList = this.channelListHack$;
-        let channelHandler = new this.sb.ChannelHandler();
+        const channelHandler = new this.sb.ChannelHandler();
         channelHandler.onMessageReceived = function (channel, message) {
           if (this.channelUrl === channel.url) {
             hackMessages.next(channel.url);
@@ -228,7 +225,7 @@ export class ChatComponent implements OnInit {
         };
         this.sb.addChannelHandler(`${storeId}_handler`, channelHandler);
 
-        let channelListQuery = this.sb.GroupChannel.createMyGroupChannelListQuery();
+        const channelListQuery = this.sb.GroupChannel.createMyGroupChannelListQuery();
         channelListQuery.includeEmpty = true;
         channelListQuery.userIdsFilter = [storeId, consumerId];
         channelListQuery.queryType = 'AND';
@@ -254,7 +251,7 @@ export class ChatComponent implements OnInit {
   openChannelChangeDialog() {
     let dialogRef;
     console.log('here');
-    let options = [];
+    const options = [];
 
     this.stores.forEach(store => {
       options.push({ value: store.$key, label: store.name });

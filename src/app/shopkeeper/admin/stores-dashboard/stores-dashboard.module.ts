@@ -54,12 +54,10 @@ import {
 
 import { StoresService } from './services/stores.service';
 import { LocationService } from './services/location/location.service';
-import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
 import { TimePickerDialogComponent } from './time-picker-dialog/time-picker-dialog.component';
 import { FeedbacksComponent } from './feedbacks/feedbacks.component';
 @NgModule({
   imports: [
-    SearchPipeModule,
     CommonModule,
     StoresDashboardRoutingModule,
     InputMaskModule,
@@ -110,7 +108,7 @@ import { FeedbacksComponent } from './feedbacks/feedbacks.component';
   declarations: [StoresDashboardComponent, AddStoresComponent, EditStoresComponent, TimePickerDialogComponent, FeedbacksComponent],
   providers: [StoresService, LocationService, ProductsService, NotificationsService, CrudService],
   exports: [TimePickerDialogComponent],
-entryComponents: [TimePickerDialogComponent]
+  entryComponents: [TimePickerDialogComponent]
 })
 export class StoresDashboardModule {
 }

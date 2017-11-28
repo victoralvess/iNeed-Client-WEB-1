@@ -18,7 +18,6 @@ import { ImageUploadModule } from 'angular2-image-upload';
 
 import { ModalModule } from 'ngx-modialog';
 // import { BootstrapModalModule } from 'ngx-modialog/plugins/bootstrap';
-import { SearchPipeModule } from '../../../shared/pipes/search/search-pipe.module';
 
 import { CovalentDialogsModule } from '@covalent/core';
 import { NoConflictStyleCompatibilityMode, CompatibilityModule } from '@angular/material';
@@ -72,7 +71,6 @@ import { Auth0Service } from '../../../shared/services/auth0-service/auth0.servi
     GrowlModule,
     ImageUploadModule.forRoot(),
     ModalModule.forRoot(),
-    SearchPipeModule,
     CovalentDialogsModule,
     NoConflictStyleCompatibilityMode,
     CompatibilityModule,
@@ -116,8 +114,7 @@ import { Auth0Service } from '../../../shared/services/auth0-service/auth0.servi
     MultiSelectModule,
     GrowlModule,
     ImageUploadModule.forRoot(),
-    ModalModule.forRoot(),
-    SearchPipeModule
+    ModalModule.forRoot()
   ],
   declarations: [EmployeesDashboardComponent, AddEmployeesComponent, EditEmployeesComponent],
   exports: [EmployeesDashboardComponent, AddEmployeesComponent, EditEmployeesComponent],
