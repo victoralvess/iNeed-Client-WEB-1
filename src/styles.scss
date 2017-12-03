@@ -2,12 +2,11 @@
 //@import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import '~@angular/material/theming';
 @import '~@covalent/core/theming/all-theme';
-@import url('https://fonts.googleapis.com/css?family=Noto+Sans');
 @import url('https://fonts.googleapis.com/css?family=Lobster|Noto+Sans');
 
 @include mat-core();
 
-$primary: mat-palette($mat-purple, 700);
+$primary: mat-palette($mat-purple, 600);
 $accent:  mat-palette($mat-orange, 600, A100, A400);
 
 $warn:    mat-palette($mat-red, 600);
