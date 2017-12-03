@@ -13,7 +13,7 @@
         </div>
         <mat-divider></mat-divider>
         <mat-nav-list>
-          <a *ngFor="let item of routes" mat-list-item [routerLink]="item.route"
+          <a *ngFor="let item of routes" mat-list-item [routerLink]="item.route" [target]="item.target"
              (click)="(!sidenav.disableClose) ? sidenav.close() : null">
             <mat-icon>{{item.icon}}</mat-icon>
             {{item.title}}</a>

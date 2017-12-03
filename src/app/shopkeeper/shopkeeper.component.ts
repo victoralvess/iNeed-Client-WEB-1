@@ -9,83 +9,89 @@ import { Subscription } from 'rxjs/Subscription';
 import { MediaChange, ObservableMedia } from '@angular/flex-layout';
 
 @Component({
-  selector: 'app-shopkeeper',
-  templateUrl: './shopkeeper.component.html',
-  styleUrls: ['./shopkeeper.component.css']
+    selector: 'app-shopkeeper',
+    templateUrl: './shopkeeper.component.html',
+    styleUrls: ['./shopkeeper.component.css']
 })
 export class ShopkeeperComponent implements OnInit, OnDestroy {
 
-  user: User;
-  chosenInitialized = false;
+    user: User;
+    chosenInitialized = false;
 
-  tiles = [
-    {text: '© COPYRIGHT 2017 - iNeed, TODOS OS DIREITOS RESERVADOS', cols: 2, rows: 1},
-    {text: 'Two', cols: 1, rows: 1},
-    {text: 'Three', cols: 1, rows: 1},
-  ];
+    tiles = [
+        {text: '© COPYRIGHT 2017 - iNeed, TODOS OS DIREITOS RESERVADOS', cols: 2, rows: 1},
+        {text: 'Two', cols: 1, rows: 1},
+        {text: 'Three', cols: 1, rows: 1},
+    ];
 
-  // HOME PROD LOJ FUN CHAT
+    // HOME PROD LOJ FUN CHAT
 
-  routes: any[] = [{
-    icon: 'home',
-    route: '/shopkeeper/dashboard/home',
-    title: 'Home',
-  }, {
-    icon: 'shopping_basket',
-    route: '/shopkeeper/dashboard/admin/products',
-    title: 'Produtos',
-  }, {
-    icon: 'store',
-    route: '/shopkeeper/dashboard/admin/stores',
-    title: 'Lojas',
-  }, {
-    icon: 'people',
-    route: '/shopkeeper/dashboard/admin/employees',
-    title: 'Funcionários',
-  }, {
-    icon: 'chat',
-    route: '/shopkeeper/chat',
-    title: 'Chat',
-  }
-  ];
+    routes: any[] = [{
+        icon: 'home',
+        route: '/shopkeeper/dashboard/home',
+        title: 'Home',
+        target: '_self',
+    }, {
+        icon: 'shopping_basket',
+        route: '/shopkeeper/dashboard/admin/products',
+        title: 'Produtos',
+        target: '_self',
+    }, {
+        icon: 'store',
+        route: '/shopkeeper/dashboard/admin/stores',
+        title: 'Lojas',
+        target: '_self',
+    }, {
+        icon: 'people',
+        route: '/shopkeeper/dashboard/admin/employees',
+        title: 'Funcionários',
+        target: '_self',
+    }, {
+        icon: 'chat',
+        route: '/shopkeeper/chat',
+        title: 'Chat',
+        target: '_blank',
+    }
+    ];
 
-  watcher: Subscription;
-  activeMediaQuery = '';
-  isDesktop = false;
-  mode = 'over';
-  constructor(private afAuth: AngularFireAuth, private service: AuthService, private router: Router, media: ObservableMedia) {
-    this.user = afAuth.auth.currentUser;
+    watcher: Subscription;
+    activeMediaQuery = '';
+    isDesktop = false;
+    mode = 'over';
 
-    this.afAuth.auth.onAuthStateChanged((user) => {
-      if (!user) {
-        console.log('mata tuto chessus');
-        this.router.navigate(['/subscribe/signin']);
-      }
-    });
+    constructor(private afAuth: AngularFireAuth, private service: AuthService, private router: Router, media: ObservableMedia) {
+        this.user = afAuth.auth.currentUser;
 
-    this.watcher = media.subscribe((change: MediaChange) => {
-      this.activeMediaQuery = change ? `'${change.mqAlias}' = (${change.mediaQuery})` : '';
-      if (change.mqAlias === 'xs' || change.mqAlias === 'sm') {
-        this.isDesktop = false;
-        this.mode = 'over';
-      } else {
-        this.isDesktop = true;
-        this.mode = 'side';
-      }
-    });
-  }
+        this.afAuth.auth.onAuthStateChanged((user) => {
+            if (!user) {
+                console.log('mata tuto chessus');
+                this.router.navigate(['/subscribe/signin']);
+            }
+        });
 
-  ngOnInit() {
-  }
+        this.watcher = media.subscribe((change: MediaChange) => {
+            this.activeMediaQuery = change ? `'${change.mqAlias}' = (${change.mediaQuery})` : '';
+            if (change.mqAlias === 'xs' || change.mqAlias === 'sm') {
+                this.isDesktop = false;
+                this.mode = 'over';
+            } else {
+                this.isDesktop = true;
+                this.mode = 'side';
+            }
+        });
+    }
 
-  ngOnDestroy() {
-    this.watcher.unsubscribe();
-  }
+    ngOnInit() {
+    }
+
+    ngOnDestroy() {
+        this.watcher.unsubscribe();
+    }
 
 
-  onClickLogout() {
-    this.service.logout();
-    this.router.navigate(['/home']);
-  }
+    onClickLogout() {
+        this.service.logout();
+        this.router.navigate(['/home']);
+    }
 
 }
