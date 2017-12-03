@@ -1,3 +1,5 @@
+<h2>Atualize sua loja</h2>
+<p>Preserve sua loja sempre atualizada!</p>
 <div fxLayout="column">
   <mat-accordion class="headers-align">
     <mat-expansion-panel [expanded]="step === 0" (opened)="setStep(0)" hideToggle="true">
@@ -83,15 +85,8 @@
           <mat-icon>access_time</mat-icon>
         </mat-panel-description>
       </mat-expansion-panel-header>
-      <!-- <form [formGroup]="openingClosingForm"> -->
       <div fxLayout="column">
         <div fxFlex="100">
-          <!-- <mat-form-field fxFlex="100">
-            <mat-select #daysSelect fxFlex="100" id="options-select" label="Dias" placeholder="Dias" (change)="openTimePickerDialog(daysSelect.selected, $event.value)" [formControl]="openingClosingForm.controls['days']"
-              multiple>
-              <mat-option [value]="day" *ngFor="let day of daysOfTheWeek">{{ day }}</mat-option>
-            </mat-select>
-          </mat-form-field> -->
           <mat-checkbox fxFlex="20" [value]="day.day" *ngFor="let day of timeOperations.daysOfTheWeek"
                         [checked]="day.checked" (change)="timeOperations.openTimePickerDialog(day.day, $event.checked)">
             {{ day.day }}
