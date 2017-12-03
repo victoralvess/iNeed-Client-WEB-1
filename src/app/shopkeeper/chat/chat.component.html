@@ -1,51 +1,60 @@
 <div #container class="container" style="position:absolute;width: 100%; padding-right: 0px; padding-left: 0px;">
-  <div #contacts class="contacts">
-    <div fxLayout="row">
-      <mat-card fxFlex="100" fxFlexAlign="center" fxShow [fxShow.lt-sm]="false">
-        <mat-form-field>
-          <mat-select placeholder="Chat" [(ngModel)]="storeId" name="stores"
-                      (change)="changeStoreChannel($event.value)">
-            <mat-option *ngFor="let store of stores" [value]="store.$key">
-              {{ store.name }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-      </mat-card>
-    </div>
-    <ul>
-      <li *ngFor="let channel of channelList; let i = index">
-        <img class="consumer-img" [alt]="channel.inviter.nickname + ' picture'" [src]="channel.inviter.profileUrl"
-             (click)="changeConsumerChannel(channel.inviter.userId)"
-        />
-        <p class="consumer-name">{{ channel.inviter.nickname }}</p>
-
-      </li>
-      <a style="margin-left: 5px; margin-top: 6px;" fxHide [fxHide.lt-sm]="false" mat-fab
-         (click)="openChannelChangeDialog()">
-        <mat-icon style="color: white">store</mat-icon>
-      </a>
-    </ul>
-  </div>
-  <div #messagesList class="messages">
-    <div class="bottom-to-top">
-      <div #scrollable class="scrollable">
-        <div *ngIf="messagesAreLoading">
-          <mat-spinner></mat-spinner>
+    <div #contacts class="contacts">
+        <div fxLayout="row">
+            <mat-card fxFlex="100" fxFlexAlign="center" fxShow [fxShow.lt-sm]="false">
+                <mat-form-field>
+                    <mat-select placeholder="Chat" [(ngModel)]="storeId" name="stores"
+                                (change)="changeStoreChannel($event.value)">
+                        <mat-option *ngFor="let store of stores" [value]="store.$key">
+                            {{ store.name }}
+                        </mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </mat-card>
         </div>
-        <ul *ngIf="!messagesAreLoading" class="messages-container">
-          <li class="message-body" *ngFor="let message of messages" [class.other]="(message._sender.userId != storeId)"
-              [class.me]="(message._sender.userId == storeId)">
-            {{message.message}}
-          </li>
+
+        <br>
+
+        <ul>
+            <li *ngFor="let channel of channelList; let i = index">
+                <img class="consumer-img" [alt]="channel.inviter.nickname + ' picture'"
+                     [src]="channel.inviter.profileUrl"
+                     (click)="changeConsumerChannel(channel.inviter.userId)"
+                />
+                <p class="consumer-name">{{ channel.inviter.nickname }}</p>
+
+            </li>
+            <a style="margin-left: 5px; margin-top: 6px;" fxHide [fxHide.lt-sm]="false" mat-fab
+               (click)="openChannelChangeDialog()">
+                <mat-icon style="color: white">store</mat-icon>
+            </a>
         </ul>
-      </div>
     </div>
-  </div>
-  <div #stackWrap class="stack-wrap"></div>
-  <div class="form">
-    <div class="form-inner">
-      <textarea [(ngModel)]="textAreaInput" (keyup.enter)="send(textAreaInput)"></textarea>
-      <button (click)="send(textAreaInput)">✚</button>
+    <div #messagesList class="messages">
+        <div class="bottom-to-top">
+            <div #scrollable class="scrollable">
+                <div *ngIf="messagesAreLoading">
+                    <mat-spinner class="spinner"></mat-spinner>
+                </div>
+                <ul *ngIf="!messagesAreLoading" class="messages-container">
+                    <li class="message-body" *ngFor="let message of messages"
+                        [class.other]="(message._sender.userId != storeId)"
+                        [class.me]="(message._sender.userId == storeId)">
+                        {{message.message}}
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
-  </div>
+    <div #stackWrap class="stack-wrap"></div>
+
+    <div class="form">
+        <div class="form-inner">
+            <textarea [(ngModel)]="textAreaInput" (keyup.enter)="send(textAreaInput)"
+                      placeholder="Digite uma mensagem"></textarea>
+            <button (click)="send(textAreaInput)" class="button-send">
+                <mat-icon>send</mat-icon>
+            </button>
+        </div>
+    </div>
 </div>
