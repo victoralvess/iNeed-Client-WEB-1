@@ -1,53 +1,64 @@
-<form [formGroup]="employeeForm" (ngSubmit)="updateEmployee(employeeForm.value)">
-  <div fxLayout="column">
-    <div fxFlex="100">
-      <mat-list>
-        <mat-list-item>
-          <mat-icon mat-list-icon>person</mat-icon>
-          <h4 mat-line>{{name}}</h4>
-        </mat-list-item>
-        <mat-list-item>
-          <mat-icon mat-list-icon>email</mat-icon>
-          <h4 mat-line>{{email}}</h4>
-        </mat-list-item>
-      </mat-list>
-    </div>
-    <div fxFlex="100">
-      <mat-list>
-        <h3 mat-subheader *ngIf="nonEditableStores.length > 0">Você não pode editar essas lojas porque não está
-          associado a elas</h3>
-        <mat-list-item *ngFor="let nonEditable of nonEditableStores">
-          <mat-icon mat-list-icon>store</mat-icon>
-          <h4 mat-line>{{nonEditable.name}}</h4>
-          <p mat-line> {{nonEditable.address}} </p>
-        </mat-list-item>
-      </mat-list>
-    </div>
-    <div fxFlex="100">
-      <mat-form-field fxFlex="100">
-        <mat-select fxFlex="100" id="options-select" label="Onde trabalha" placeholder="Onde trabalha"
-                    [formControl]="employeeForm.controls['stores']"
-                    multiple>
-          <mat-option *ngFor="let store of stores" [value]="store.id">{{store.name + " - " + store.address}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-    <div fxFlex="100">
-      <mat-form-field fxFlex="100">
-        <mat-select fxFlex="100" id="options-select" label="Permissão" placeholder="Permissão"
-                    [formControl]="employeeForm.controls['permissionLevel']"
-                    required>
-          <mat-option *ngFor="let permission of permissions" [value]="permission.value">{{permission.value + " - " +
-            permission.function}}
-          </mat-option>
-        </mat-select>
-        <mat-hint align="start">As permissões se acumulam</mat-hint>
-      </mat-form-field>
-    </div>
-    <button mat-raised-button type="submit">ATUALIZAR</button>
-    <div *ngIf="isLoading">
-      <mat-progress-bar class="n-progress-bar" mode="indeterminate"></mat-progress-bar>
-    </div>
-  </div>
-</form>
+<h2>Adicionar Funcionário</h2>
+<p>Adicionar funcionário e suas permissões.</p>
+
+<mat-card>
+    <mat-card-content>
+        <form [formGroup]="employeeForm" (ngSubmit)="updateEmployee(employeeForm.value)">
+            <div fxLayout="column">
+                <div fxFlex="100">
+                    <mat-list>
+                        <mat-list-item>
+                            <mat-icon mat-list-icon>person</mat-icon>
+                            <h4 mat-line>{{name}}</h4>
+                        </mat-list-item>
+                        <mat-list-item>
+                            <mat-icon mat-list-icon>email</mat-icon>
+                            <h4 mat-line>{{email}}</h4>
+                        </mat-list-item>
+                    </mat-list>
+                </div>
+                <div fxFlex="100">
+                    <mat-list>
+                        <h3 mat-subheader *ngIf="nonEditableStores.length > 0">Você não pode editar essas lojas porque
+                            não está
+                            associado a elas</h3>
+                        <mat-list-item *ngFor="let nonEditable of nonEditableStores">
+                            <mat-icon mat-list-icon>store</mat-icon>
+                            <h4 mat-line>{{nonEditable.name}}</h4>
+                            <p mat-line> {{nonEditable.address}} </p>
+                        </mat-list-item>
+                    </mat-list>
+                </div>
+                <div fxFlex="100">
+                    <mat-form-field fxFlex="100">
+                        <mat-select fxFlex="100" id="options-select" label="Onde trabalha" placeholder="Onde trabalha"
+                                    [formControl]="employeeForm.controls['stores']"
+                                    multiple>
+                            <mat-option *ngFor="let store of stores" [value]="store.id">{{store.name + " - " +
+                                store.address}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100">
+                    <mat-form-field fxFlex="100">
+                        <mat-select fxFlex="100" id="options-select" label="Permissão" placeholder="Permissão"
+                                    [formControl]="employeeForm.controls['permissionLevel']"
+                                    required>
+                            <mat-option *ngFor="let permission of permissions" [value]="permission.value">
+                                {{permission.value + " - " +
+                                permission.function}}
+                            </mat-option>
+                        </mat-select>
+                        <mat-hint align="start">As permissões se acumulam</mat-hint>
+                    </mat-form-field>
+                </div>
+                <button mat-raised-button type="submit">ATUALIZAR</button>
+                <div *ngIf="isLoading">
+                    <mat-progress-bar class="n-progress-bar" mode="indeterminate"></mat-progress-bar>
+                </div>
+            </div>
+        </form>
+    </mat-card-content>
+</mat-card>
+
