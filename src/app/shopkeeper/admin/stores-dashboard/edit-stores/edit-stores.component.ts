@@ -182,6 +182,7 @@ export class EditStoresComponent implements OnInit {
       this.snackBar.open('Atualizado!', 'ENTENDI', {
         duration: 5000
       });
+      this.router.navigate(['/shopkeeper/dashboard/admin/stores']);
     });
   }
 

@@ -16,6 +16,7 @@ import { TdDialogService } from '@covalent/core';
 import { MatDialog } from '@angular/material';
 import { MatSnackBar } from '@angular/material';
 import { TimeOperationsController } from '../commons/time-operations.controller';
+import {Router} from '@angular/router';
 
 @Component({
   selector: 'app-add-stores',
@@ -82,7 +83,7 @@ export class AddStoresComponent implements OnDestroy {
 
   timeOperations: TimeOperationsController;
 
-  constructor(public snackBar: MatSnackBar, private dialog: MatDialog, private toast: Md2Toast, private locationService: LocationService, private storesService: StoresService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService) {
+  constructor(public snackBar: MatSnackBar, private dialog: MatDialog, private toast: Md2Toast, private locationService: LocationService, private storesService: StoresService, private viewContainerRef: ViewContainerRef, private dialogService: TdDialogService, private router: Router) {
     this.timeOperations = new TimeOperationsController(dialog, viewContainerRef, dialogService);
     this.addressReady$.asObservable().subscribe((isReady) => {
       this.ready = isReady;
@@ -132,6 +133,7 @@ export class AddStoresComponent implements OnDestroy {
       this.snackBar.open('Loja adicionada!', 'ENTENDI', {
         duration: 5000
       });
+      this.router.navigate(['/shopkeeper/dashboard/admin/stores']);
     });
   }
 
