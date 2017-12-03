@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { Permission } from '../models/permission.interface';
 import { MatSnackBar } from '@angular/material';
 import { Router } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-add-employees',
@@ -46,7 +47,7 @@ export class AddEmployeesComponent implements OnInit, OnDestroy {
     userSnackBar = {messageSuccess: 'Funcionário adicionado!', messageError: 'Erro ao adicionar'};
 
 
-    constructor(public snackBar: MatSnackBar, private employeesService: EmployeesService, private router: Router) {
+    constructor(public snackBar: MatSnackBar, private employeesService: EmployeesService, private router: Router, private titleService: Title) {
         this.userSubscription = employeesService.getStoresWhereUserWorks().subscribe((stores) => {
             stores.forEach(store => {
                 this.stores.push({id: store.$key, name: store.name, address: store.location.address, checked: false});
@@ -69,6 +70,7 @@ export class AddEmployeesComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        this.titleService.setTitle('Adicionar Funcionário');
     }
 
     ngOnDestroy() {

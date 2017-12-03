@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { Subject } from 'rxjs/Subject';
 import { Permission } from '../models/permission.interface';
 import { MatSnackBar } from '@angular/material';
+import { Title } from '@angular/platform-browser';
 
 @Component({
     selector: 'app-edit-employees',
@@ -52,7 +53,7 @@ export class EditEmployeesComponent implements OnInit, OnDestroy {
     userSnackBar = {messageSuccess: 'Atualizado com sucesso!', messageError: 'Erro ao atualizar'};
 
 
-    constructor(public snackBar: MatSnackBar, private employeesService: EmployeesService, private activatedRoute: ActivatedRoute, private router: Router) {
+    constructor(public snackBar: MatSnackBar, private employeesService: EmployeesService, private activatedRoute: ActivatedRoute, private router: Router, private titleService: Title) {
         this.storesHack$.asObservable().subscribe((storesArray) => {
 
             this.callHack++;
@@ -122,6 +123,7 @@ export class EditEmployeesComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        this.titleService.setTitle('Atualizar Funcionário');
     }
 
     ngOnDestroy() {
