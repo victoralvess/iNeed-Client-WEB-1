@@ -14,6 +14,7 @@ import { ViewContainerRef } from '@angular/core';
 import { TdDialogService } from '@covalent/core';
 import { MatDialog } from '@angular/material';
 import { SelectDialogComponent } from '../../shared/dialogs/select/select-dialog.component';
+import { Title } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-chat',
@@ -71,7 +72,8 @@ export class ChatComponent implements OnInit {
               private crudService: CrudService,
               private dialog: MatDialog,
               private viewContainerRef: ViewContainerRef,
-              private dialogService: TdDialogService) {
+              private dialogService: TdDialogService,
+              private titleService: Title) {
     this.user = firebase.auth().currentUser;
     this.channelMessages$.asObservable().subscribe((channelUrl) => {
       this.channelUrl = channelUrl;
@@ -147,6 +149,9 @@ export class ChatComponent implements OnInit {
 
   ngOnInit() {
     this.adaptChatToScreen(window.innerWidth);
+    this.titleService.setTitle(
+        'Chat'
+    );
   }
 
   adaptChatToScreen(width: number) {

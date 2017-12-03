@@ -1,61 +1,79 @@
+<h2>Atualize seu produto</h2>
+<p>Mantenha seu produto sempre atualizada!</p>
+
 <p *ngIf="!(products | async)">LOADING</p>
-<div *ngIf="(products | async)">
-  <form [formGroup]="productsForm" (ngSubmit)="updateProduct(productsForm.value)">
-    <div fxLayout="column">
-      <div fxFlex="100">
-        <mat-form-field fxFlex="100">
-          <input matInput placeholder="Nome do produto" [formControl]="productsForm.controls['name']" required>
-          <mat-hint align="end">{{ productsForm.controls['name'].value.length }} / 40</mat-hint>
-          <mat-error align="start" *ngIf="productsForm.controls['name'].hasError('maxlength')">
-            O nome é
-            <strong>longo demais</strong>
-          </mat-error>
-          <mat-error *ngIf="productsForm.controls['name'].hasError('minlength')">
-            O nome é
-            <strong>curto demais</strong>
-          </mat-error>
-        </mat-form-field>
-      </div>
-      <div fxFlex="100">
-        <mat-form-field fxFlex="100">
+<mat-card>
+    <mat-card-content>
+        <div *ngIf="(products | async)">
+            <form [formGroup]="productsForm" (ngSubmit)="updateProduct(productsForm.value)">
+                <div fxLayout="column">
+                    <div fxFlex="100">
+                        <mat-form-field fxFlex="100">
+                            <input matInput placeholder="Nome do produto" [formControl]="productsForm.controls['name']"
+                                   required>
+                            <mat-hint align="end">{{ productsForm.controls['name'].value.length }} / 40</mat-hint>
+                            <mat-error align="start" *ngIf="productsForm.controls['name'].hasError('maxlength')">
+                                O nome é
+                                <strong>longo demais</strong>
+                            </mat-error>
+                            <mat-error *ngIf="productsForm.controls['name'].hasError('minlength')">
+                                O nome é
+                                <strong>curto demais</strong>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div fxFlex="100">
+                        <mat-form-field fxFlex="100">
           <textarea matInput placeholder="Conte mais sobre o produto!"
                     [formControl]="productsForm.controls['description']" required></textarea>
-          <mat-hint align="end">{{ productsForm.controls['description'].value.length }} / 200</mat-hint>
-          <mat-error align="start" *ngIf="productsForm.controls['description'].hasError('maxlength')">
-            A descrição é
-            <strong>longa demais</strong>
-          </mat-error>
-          <mat-error align="start" *ngIf="productsForm.controls['description'].hasError('minlength')">
-            A descrição é
-            <strong>curta demais</strong>
-          </mat-error>
-        </mat-form-field>
-      </div>
-      <div fxFlex="100">
-        <mat-form-field fxFlex="100">
-          <input matInput type="number" placeholder="Preço" [formControl]="productsForm.controls['price']" required>
-        </mat-form-field>
-      </div>
-      <div fxFlex="100">
-        <mat-form-field fxFlex="100">
-          <mat-select fxFlex="100" id="options-select" label="Categorias" placeholder="Categorias"
-                      [formControl]="productsForm.controls['selectedCategories']"
-                      required multiple>
-            <div *ngIf="categoriesReady">
-              <mat-option *ngFor="let category of categories" [value]="category.value">{{category.label}}</mat-option>
-            </div>
-          </mat-select>
-        </mat-form-field>
-      </div>
-      <image-upload [max]="5" [extensions]="['jpeg','png']" [buttonCaption]="'Escolha'"
-                    [dropBoxMessage]="'Solte suas imagens aqui!'"
-                    [fileTooLargeMessage]="'Imagem muito grande!'" [uploadedFiles]="picsUrls"
-                    (uploadFinished)="imageFinishedUploading($event)"
-                    (removed)="imageRemoved($event)" (uploadStateChanged)="uploadStateChange($event)"></image-upload>
-      <button mat-raised-button type="submit" [disabled]="!productsForm.valid">ATUALIZAR</button>
-      <div *ngIf="isLoading">
-        <mat-progress-bar class="n-progress-bar" mode="indeterminate"></mat-progress-bar>
-      </div>
-    </div>
-  </form>
-</div>
+                            <mat-hint align="end">{{ productsForm.controls['description'].value.length }} / 200
+                            </mat-hint>
+                            <mat-error align="start" *ngIf="productsForm.controls['description'].hasError('maxlength')">
+                                A descrição é
+                                <strong>longa demais</strong>
+                            </mat-error>
+                            <mat-error align="start" *ngIf="productsForm.controls['description'].hasError('minlength')">
+                                A descrição é
+                                <strong>curta demais</strong>
+                            </mat-error>
+                        </mat-form-field>
+                    </div>
+                    <div fxFlex="100">
+                        <mat-form-field fxFlex="100">
+                            <input matInput type="number" placeholder="Preço"
+                                   [formControl]="productsForm.controls['price']" required>
+                        </mat-form-field>
+                    </div>
+                    <div fxFlex="100">
+                        <mat-form-field fxFlex="100">
+                            <mat-select fxFlex="100" id="options-select" label="Categorias" placeholder="Categorias"
+                                        [formControl]="productsForm.controls['selectedCategories']"
+                                        required multiple>
+                                <div *ngIf="categoriesReady">
+                                    <mat-option *ngFor="let category of categories" [value]="category.value">
+                                        {{category.label}}
+                                    </mat-option>
+                                </div>
+                            </mat-select>
+                        </mat-form-field>
+                    </div>
+                    <image-upload [max]="5" [extensions]="['jpeg','png']" [buttonCaption]="'Escolha'"
+                                  [dropBoxMessage]="'Solte suas imagens aqui!'"
+                                  [fileTooLargeMessage]="'Imagem muito grande!'" [uploadedFiles]="picsUrls"
+                                  (uploadFinished)="imageFinishedUploading($event)"
+                                  (removed)="imageRemoved($event)"
+                                  (uploadStateChanged)="uploadStateChange($event)"></image-upload>
+
+                    <br>
+
+                    <button mat-raised-button type="submit" [disabled]="!productsForm.valid" class="button-save">
+                        SALVAR
+                    </button>
+                    <div *ngIf="isLoading">
+                        <mat-progress-bar class="n-progress-bar" mode="indeterminate"></mat-progress-bar>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </mat-card-content>
+</mat-card>

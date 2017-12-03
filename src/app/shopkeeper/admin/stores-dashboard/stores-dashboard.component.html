@@ -1,44 +1,47 @@
-<div class="tbl mat-elevation-z8">
-  <mat-table #table [dataSource]="dataSource">
+<h2>Lista de lojas cadastradas</h2>
+<p>Gerencie sua loja para um maior engajamento.</p>
 
-    <ng-container matColumnDef="name">
-      <mat-header-cell *matHeaderCellDef> Nome</mat-header-cell>
-      <mat-cell *matCellDef="let store"> {{store.name}}</mat-cell>
-    </ng-container>
+<div class="tbl mat-elevation-z5 animation-start">
+    <mat-table #table [dataSource]="dataSource">
 
-    <ng-container matColumnDef="address">
-      <mat-header-cell *matHeaderCellDef> Endereço</mat-header-cell>
-      <mat-cell *matCellDef="let store"> {{store.location.address}}</mat-cell>
-    </ng-container>
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef> Nome</mat-header-cell>
+            <mat-cell *matCellDef="let store"> {{store.name}}</mat-cell>
+        </ng-container>
 
-    <ng-container matColumnDef="color">
-      <mat-header-cell *matHeaderCellDef> Cor</mat-header-cell>
-      <mat-cell *matCellDef="let store" [style.color]="store.color">
-        <b> {{store.color | uppercase}} </b>
-      </mat-cell>
-    </ng-container>
+        <ng-container matColumnDef="address">
+            <mat-header-cell *matHeaderCellDef> Endereço</mat-header-cell>
+            <mat-cell *matCellDef="let store"> {{store.location.address}}</mat-cell>
+        </ng-container>
 
-    <ng-container matColumnDef="actions">
-      <mat-header-cell *matHeaderCellDef> Ações</mat-header-cell>
-      <mat-cell *matCellDef="let store">
-        <button mat-icon-button color="accent" (click)="updateStore(store.$key)">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="accent" (click)="deleteStore(store.$key)">
-          <mat-icon>delete</mat-icon>
-        </button>
-        <button mat-icon-button color="accent" (click)="feedbacksOf(store.$key)">
-          <mat-icon>chat_bubble</mat-icon>
-        </button>
-      </mat-cell>
-    </ng-container>
+        <ng-container matColumnDef="color">
+            <mat-header-cell *matHeaderCellDef> Cor</mat-header-cell>
+            <mat-cell *matCellDef="let store" [style.color]="store.color">
+                <b> {{store.color | uppercase}} </b>
+            </mat-cell>
+        </ng-container>
 
-    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
-  </mat-table>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef> Ações</mat-header-cell>
+            <mat-cell *matCellDef="let store">
+                <button mat-icon-button color="accent" (click)="updateStore(store.$key)">
+                    <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="accent" (click)="deleteStore(store.$key)">
+                    <mat-icon>delete</mat-icon>
+                </button>
+                <button mat-icon-button color="accent" (click)="feedbacksOf(store.$key)">
+                    <mat-icon>chat_bubble</mat-icon>
+                </button>
+            </mat-cell>
+        </ng-container>
+
+        <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
 </div>
 <div fxLayout="row" fxLayoutAlign="end end">
-  <a class="mat-fab-margin-top" href="/shopkeeper/dashboard/admin/stores/add" mat-fab>
-    <mat-icon class="md-24">add</mat-icon>
-  </a>
+    <a class="mat-fab-margin-top" href="/shopkeeper/dashboard/admin/stores/add" mat-fab>
+        <mat-icon class="md-24">add</mat-icon>
+    </a>
 </div>
