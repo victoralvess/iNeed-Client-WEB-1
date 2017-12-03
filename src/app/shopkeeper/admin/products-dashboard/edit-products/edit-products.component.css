@@ -1,54 +1,66 @@
 .form-control.ng-valid[required] {
-  border-left: 5px solid #42A948; /* green */
+    border-left: 5px solid #42A948; /* green */
 }
 
 .form-control.ng-invalid {
-  border-left: 5px solid #a94442; /* red */
+    border-left: 5px solid #a94442; /* red */
 }
 
 .container {
-  position: relative;
-  width: 50%;
+    position: relative;
+    width: 50%;
 }
 
 .image {
-  display: block;
-  width: 100%;
-  height: auto;
+    display: block;
+    width: 100%;
+    height: auto;
 }
 
 .overlay {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  width: 100%;
-  opacity: 0;
-  transition: .5s ease;
-  background-color: #008CBA;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0;
+    transition: .5s ease;
+    background-color: #008CBA;
 }
 
 .removed {
-  background-color: tomato;
-  opacity: 1;
+    background-color: tomato;
+    opacity: 1;
 }
 
 .container:hover .overlay {
-  opacity: 1;
-}
-
-.removed {
-
+    opacity: 1;
 }
 
 .text {
-  color: white;
-  font-size: 20px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
+    color: white;
+    font-size: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+}
+
+.button-save {
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+
+.button-save:hover {
+    color: white;
+    background-color: orange;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
 }

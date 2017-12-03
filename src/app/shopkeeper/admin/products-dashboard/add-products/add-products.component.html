@@ -1,66 +1,79 @@
-<form [formGroup]="productsForm" (ngSubmit)="addNewProduct(productsForm.value)">
-  <div fxLayout="column">
-    <div fxFlex="100">
-      <mat-form-field fxFlex="100">
-        <input matInput placeholder="Nome do produto" [formControl]="productsForm.controls['name']" required>
-        <mat-hint align="end">{{ productsForm.controls['name'].value.length }} / 40</mat-hint>
-        <mat-error align="start" *ngIf="productsForm.controls['name'].hasError('maxlength')">
-          O nome é
-          <strong>longo demais</strong>
-        </mat-error>
-        <mat-error *ngIf="productsForm.controls['name'].hasError('minlength')">
-          O nome é
-          <strong>curto demais</strong>
-        </mat-error>
-      </mat-form-field>
-    </div>
-    <div fxFlex="100">
-      <mat-form-field fxFlex="100">
+<h2>Cadastro de produtos</h2>
+<p>Mantendo o estoque sempre em dia garante mais vendas.</p>
+
+<mat-card>
+    <mat-card-content>
+        <form [formGroup]="productsForm" (ngSubmit)="addNewProduct(productsForm.value)">
+            <div fxLayout="column">
+                <div fxFlex="100">
+                    <mat-form-field fxFlex="100">
+                        <input matInput placeholder="Nome do produto" [formControl]="productsForm.controls['name']"
+                               required>
+                        <mat-hint align="end">{{ productsForm.controls['name'].value.length }} / 40</mat-hint>
+                        <mat-error align="start" *ngIf="productsForm.controls['name'].hasError('maxlength')">
+                            O nome é
+                            <strong>longo demais</strong>
+                        </mat-error>
+                        <mat-error *ngIf="productsForm.controls['name'].hasError('minlength')">
+                            O nome é
+                            <strong>curto demais</strong>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100">
+                    <mat-form-field fxFlex="100">
         <textarea matInput placeholder="Conte mais sobre o produto!"
                   [formControl]="productsForm.controls['description']" required></textarea>
-        <mat-hint align="end">{{ productsForm.controls['description'].value.length }} / 200</mat-hint>
-        <mat-error align="start" *ngIf="productsForm.controls['description'].hasError('maxlength')">
-          A descrição é
-          <strong>longa demais</strong>
-        </mat-error>
-        <mat-error align="start" *ngIf="productsForm.controls['description'].hasError('minlength')">
-          A descrição é
-          <strong>curta demais</strong>
-        </mat-error>
-      </mat-form-field>
-    </div>
-    <div fxFlex="100">
-      <mat-form-field fxFlex="100">
-        <input matInput type="number" placeholder="Preço" [formControl]="productsForm.controls['price']" required>
-      </mat-form-field>
-    </div>
-    <div fxFlex="100">
-      <mat-form-field fxFlex="100">
-        <mat-select fxFlex="100" id="options-select" label="Onde vende" placeholder="Onde vende"
-                    [formControl]="productsForm.controls['stores']"
-                    required multiple>
-          <mat-option *ngFor="let store of stores" [value]="store.id">{{store.name + " - " + store.address}}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-    <div fxFlex="100">
-      <mat-form-field fxFlex="100">
-        <mat-select fxFlex="100" id="options-select" label="Categorias" placeholder="Categorias"
-                    [formControl]="productsForm.controls['selectedCategories']"
-                    required multiple>
-          <mat-option *ngFor="let category of categories" [value]="category.value">{{category.label}}</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-    <image-upload [max]="5" [extensions]="['jpeg','png']" [buttonCaption]="'Escolha'"
-                  [dropBoxMessage]="'Solte suas imagens aqui!'"
-                  [fileTooLargeMessage]="'Imagem muito grande!'" (uploadFinished)="imageFinishedUploading($event)"
-                  (removed)="imageRemoved($event)"
-                  (uploadStateChanged)="uploadStateChange($event)"></image-upload>
-    <button mat-raised-button type="submit" [disabled]="!productsForm.valid">ADICIONAR</button>
-    <div *ngIf="isLoading">
-      <mat-progress-bar class="n-progress-bar" mode="indeterminate"></mat-progress-bar>
-    </div>
-  </div>
-</form>
+                        <mat-hint align="end">{{ productsForm.controls['description'].value.length }} / 200</mat-hint>
+                        <mat-error align="start" *ngIf="productsForm.controls['description'].hasError('maxlength')">
+                            A descrição é
+                            <strong>longa demais</strong>
+                        </mat-error>
+                        <mat-error align="start" *ngIf="productsForm.controls['description'].hasError('minlength')">
+                            A descrição é
+                            <strong>curta demais</strong>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100">
+                    <mat-form-field fxFlex="100">
+                        <input matInput type="number" placeholder="Preço" [formControl]="productsForm.controls['price']"
+                               required>
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100">
+                    <mat-form-field fxFlex="100">
+                        <mat-select fxFlex="100" id="options-select" label="Onde vende" placeholder="Onde vende"
+                                    [formControl]="productsForm.controls['stores']"
+                                    required multiple>
+                            <mat-option *ngFor="let store of stores" [value]="store.id">{{store.name + " - " +
+                                store.address}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <div fxFlex="100">
+                    <mat-form-field fxFlex="100">
+                        <mat-select fxFlex="100" id="options-select" label="Categorias" placeholder="Categorias"
+                                    [formControl]="productsForm.controls['selectedCategories']"
+                                    required multiple>
+                            <mat-option *ngFor="let category of categories" [value]="category.value">
+                                {{category.label}}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+                <image-upload [max]="5" [extensions]="['jpeg','png']" [buttonCaption]="'Escolha'"
+                              [dropBoxMessage]="'Solte suas imagens aqui!'"
+                              [fileTooLargeMessage]="'Imagem muito grande!'"
+                              (uploadFinished)="imageFinishedUploading($event)"
+                              (removed)="imageRemoved($event)"
+                              (uploadStateChanged)="uploadStateChange($event)"></image-upload>
+                <button mat-raised-button type="submit" [disabled]="!productsForm.valid">ADICIONAR</button>
+                <div *ngIf="isLoading">
+                    <mat-progress-bar class="n-progress-bar" mode="indeterminate"></mat-progress-bar>
+                </div>
+            </div>
+        </form>
+    </mat-card-content>
+</mat-card>
